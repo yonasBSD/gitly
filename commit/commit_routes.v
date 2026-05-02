@@ -7,8 +7,7 @@ import api
 
 @['/api/v1/:user/:repo_name/:branch_name/commits/count']
 fn (mut app App) handle_commits_count(mut ctx Context, username string, repo_name string, branch_name string) veb.Result {
-	has_access := app.has_user_repo_read_access_by_repo_name(ctx, ctx.user.id, username,
-		repo_name)
+	has_access := app.has_user_repo_read_access_by_repo_name(ctx, ctx.user.id, username, repo_name)
 
 	if !has_access {
 		return ctx.json_error('Not found')
@@ -17,7 +16,6 @@ fn (mut app App) handle_commits_count(mut ctx Context, username string, repo_nam
 	repo := app.find_repo_by_name_and_username(repo_name, username) or {
 		return ctx.json_error('Not found')
 	}
-
 
 	branch := app.find_repo_branch_by_name(repo.id, branch_name)
 	count := app.get_repo_commit_count(repo.id, branch.id)
@@ -95,11 +93,15 @@ pub fn (mut app App) commit(mut ctx Context, username string, repo_name string, 
 	mut all_adds := 0
 	mut all_dels := 0
 	mut sources := map[string]veb.RawHtml{}
-	for change in changes {
+	mut change := Change{}
+	mut highlighted_src := ''
+	mut i := 0
+	for i = 0; i < changes.len; i++ {
+		change = changes[i]
 		all_adds += change.additions
 		all_dels += change.deletions
-		src, _, _ := highlight.highlight_text(change.message, change.file, true)
-		sources[change.file] = veb.RawHtml(src)
+		highlighted_src, _, _ = highlight.highlight_text(change.message, change.file, true)
+		sources[change.file] = veb.RawHtml(highlighted_src)
 	}
 
 	return $veb.html()

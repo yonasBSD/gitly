@@ -18,10 +18,13 @@ const feed_items_per_page = 30
 fn (mut app App) build_user_feed_as_page(user_id int, offset int) []FeedItem {
 	mut feed := []FeedItem{}
 	repo_ids := app.find_watching_repo_ids(user_id)
+	if repo_ids.len == 0 {
+		return []
+	}
 	where_repo_ids := repo_ids.map(it.str()).join(', ')
 
-	commits := app.db.exec_no_null('
-		select author, hash, created_at, repo_id, branch_id, message from `Commit`
+	commits := db_exec_values(app.db, '
+		select author, hash, created_at, repo_id, branch_id, message from ${sql_table('Commit')}
 			where repo_id in (${where_repo_ids}) order by created_at desc
 			limit ${feed_items_per_page} offset ${offset}') or {
 		return []
@@ -31,7 +34,7 @@ fn (mut app App) build_user_feed_as_page(user_id int, offset int) []FeedItem {
 	println(commits)
 
 	for commit in commits {
-		vals := commit.vals
+		vals := commit
 		author_name := vals[0]
 		commit_hash := vals[1]
 		created_at_unix := vals[2].int()
@@ -62,11 +65,15 @@ fn (mut app App) build_user_feed_as_page(user_id int, offset int) []FeedItem {
 
 fn (mut app App) get_feed_items_count(user_id int) int {
 	repo_ids := app.find_watching_repo_ids(user_id)
+	if repo_ids.len == 0 {
+		return 0
+	}
 	where_repo_ids := repo_ids.map(it.str()).join(', ')
 
-	count_result := app.db.exec_no_null('select count(id) from `Commit` where repo_id in (${where_repo_ids})') or {
+	count_result := db_exec_values(app.db,
+		'select count(id) from ${sql_table('Commit')} where repo_id in (${where_repo_ids})') or {
 		return 0
 	}
 
-	return count_result.first().vals.first().int()
+	return count_result.first().first().int()
 }

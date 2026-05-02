@@ -27,18 +27,35 @@ v build.vsh
 ./gitly
 ```
 
+Gitly builds against PostgreSQL by default. Create the default PostgreSQL role/database with:
+
+```sh
+v run setup_db.vsh
+```
+
+To build a SQLite-backed binary instead, use:
+
+```sh
+v -d sqlite .
+./gitly
+```
+
+The SQLite database path defaults to `gitly.sqlite` and can be changed with `sqlite.path` in
+`config.json` or `GITLY_SQLITE_PATH`. PostgreSQL settings can be changed with `pg` in
+`config.json`, `GITLY_DB_*` environment variables, or the usual `PG*` environment variables.
+
 If you don't want to install `sassc`, you can simply run
 
 ```
-curl https://gitly.org/css/gitly.css --output static/css/gitly.css
+curl https://gitly.org/css/gitly.css --output static/static/css/gitly.css
 ```
 
 
 Required dependencies:
 * V 0.4.2 93ff40a (https://vlang.io)
 * SQLite (Ubuntu/Debian: `libsqlite3-dev`)
+* PostgreSQL client library (Ubuntu/Debian: `libpq-dev`, macOS: `brew install libpq`)
 * Markdown (`v install markdown`)
-* PCRE (`v install pcre`)
 * sassc
 * libgit2
 
@@ -48,6 +65,9 @@ You can install libgit2 with:
   * macOS: `brew install libgit2`
 
 
-Gitly will support Postgres and MySQL in the future (once V ORM does).
+### Features
+
+- Track performance in CI
+- "Top files" mode
 
 ![](https://user-images.githubusercontent.com/687996/85933714-b195fe80-b8da-11ea-9ddd-09cadc2103e4.png)

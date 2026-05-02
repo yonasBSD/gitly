@@ -14,8 +14,7 @@ type CommentWithUser = ItemWithUser[Comment]
 
 @['/api/v1/:username/:repo_name/issues/count']
 fn (mut app App) handle_issues_count(username string, repo_name string) veb.Result {
-	has_access := app.has_user_repo_read_access_by_repo_name(ctx, ctx.user.id, username,
-		repo_name)
+	has_access := app.has_user_repo_read_access_by_repo_name(ctx, ctx.user.id, username, repo_name)
 	if !has_access {
 		return ctx.json_error('Not found')
 	}
@@ -77,8 +76,13 @@ pub fn (mut app App) issues(mut ctx Context, username string, repo_name string, 
 	repo := app.find_repo_by_name_and_username(repo_name, username) or { return ctx.not_found() }
 	page_i := page.int()
 	mut issues_with_users := []IssueWithUser{}
-	for issue in app.find_repo_issues_as_page(repo.id, page_i) {
-		user := app.get_user_by_id(issue.author_id) or { continue }
+	mut issue := Issue{}
+	mut user := User{}
+	repo_issues := app.find_repo_issues_as_page(repo.id, page_i)
+	mut i := 0
+	for i = 0; i < repo_issues.len; i++ {
+		issue = repo_issues[i]
+		user = app.get_user_by_id(issue.author_id) or { continue }
 		issues_with_users << IssueWithUser{
 			item: issue
 			user: user
@@ -111,11 +115,16 @@ pub fn (mut app App) issue(mut ctx Context, username string, repo_name string, i
 	issue := app.find_issue_by_id(id.int()) or { return ctx.not_found() }
 	issue_author := app.get_user_by_id(issue.author_id) or { return ctx.not_found() }
 	mut comments_with_users := []CommentWithUser{}
-	for comment in app.get_all_issue_comments(issue.id) {
-		user := app.get_user_by_id(comment.author_id) or { continue }
+	mut comment := Comment{}
+	mut comment_author := User{}
+	issue_comments := app.get_all_issue_comments(issue.id)
+	mut i := 0
+	for i = 0; i < issue_comments.len; i++ {
+		comment = issue_comments[i]
+		comment_author = app.get_user_by_id(comment.author_id) or { continue }
 		comments_with_users << CommentWithUser{
 			item: comment
-			user: user
+			user: comment_author
 		}
 	}
 	return $veb.html()
@@ -137,10 +146,14 @@ pub fn (mut app App) user_issues(mut ctx Context, username string, page string) 
 	mut issues := app.find_user_issues(user.id)
 	mut first := false
 	mut last := false
-	for i, issue in issues {
-		repo := app.find_repo_by_id(issue.repo_id) or { continue }
-		issues[i].repo_author = repo.user_name
-		issues[i].repo_name = repo.name
+	mut issue := Issue{}
+	mut issue_repo := Repo{}
+	mut i := 0
+	for i = 0; i < issues.len; i++ {
+		issue = issues[i]
+		issue_repo = app.find_repo_by_id(issue.repo_id) or { continue }
+		issues[i].repo_author = issue_repo.user_name
+		issues[i].repo_name = issue_repo.name
 	}
 	if issues.len > commits_per_page {
 		offset := page_i * commits_per_page
@@ -157,8 +170,10 @@ pub fn (mut app App) user_issues(mut ctx Context, username string, page string) 
 		first = true
 	}
 	mut issues_with_users := []IssueWithUser{}
-	for issue in issues {
-		issue_author := app.get_user_by_id(issue.author_id) or { continue }
+	mut issue_author := User{}
+	for i = 0; i < issues.len; i++ {
+		issue = issues[i]
+		issue_author = app.get_user_by_id(issue.author_id) or { continue }
 		issues_with_users << IssueWithUser{
 			item: issue
 			user: issue_author

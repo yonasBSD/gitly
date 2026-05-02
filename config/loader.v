@@ -11,6 +11,23 @@ pub:
 	hostname          string
 	ci_service_url    string
 	port              int
+	pg                PgConfig
+	sqlite            SqliteConfig
+}
+
+pub struct PgConfig {
+pub:
+	host     string = 'localhost'
+	port     int    = 5432
+	dbname   string = 'gitly'
+	user     string = 'gitly'
+	password string = 'gitly'
+	conninfo string
+}
+
+pub struct SqliteConfig {
+pub:
+	path string = 'gitly.sqlite'
 }
 
 pub fn read_config(path string) !Config {

@@ -6,8 +6,6 @@ import veb
 import time
 import os
 import log
-// import db.sqlite
-import db.pg
 import api
 import config
 
@@ -21,13 +19,20 @@ const max_repo_name_len = 100
 const max_namechanges = 3
 const namechange_period = time.hour * 24
 
+fn static_root_path() string {
+	if os.exists(os.join_path('static', 'static')) && !os.exists(os.join_path('static', 'assets')) {
+		return os.join_path('static', 'static')
+	}
+	return 'static'
+}
+
 @[heap]
 pub struct App {
 	veb.StaticHandler
 	veb.Middleware[Context]
 	started_at i64
 pub mut:
-	db pg.DB
+	db GitlyDb
 mut:
 	version  string
 	logger   log.Log
@@ -53,17 +58,14 @@ mut:
 
 fn new_app() !&App {
 	// C.sqlite3_config(3)
+	conf := config.read_config('./config.json') or {
+		panic('Config not found or has syntax errors')
+	}
 
 	mut app := &App{
 		// db: sqlite.connect('gitly.sqlite') or { panic(err) }
-		db: pg.connect(
-			// host:     conf.pg.host
-			dbname:   'gitly'
-			user:     'gitly'
-			password: 'gitly'
-			// port:     conf.pg.port
-		)!
-
+		db:         connect_db(conf)!
+		config:     conf
 		started_at: time.now().unix()
 	}
 
@@ -75,30 +77,31 @@ fn new_app() !&App {
 
 	app.setup_logger()
 
-	mut version := os.read_file('static/assets/version') or { 'unknown' }
+	static_root := static_root_path()
+	version_path := os.join_path(static_root, 'assets', 'version')
+	create_directory_if_not_exists(os.dir(version_path))
+
+	stored_version := os.read_file(version_path) or { 'unknown' }
+	mut version := stored_version
 	git_result := os.execute('git rev-parse --short HEAD')
 
 	if git_result.exit_code == 0 && !git_result.output.contains('fatal') {
 		version = git_result.output.trim_space()
 	}
 
-	if version != app.version {
-		os.write_file('static/assets/version', app.version) or { panic(err) }
+	if version != stored_version {
+		os.write_file(version_path, version) or { panic(err) }
 	}
 
 	app.version = version
 
-	app.handle_static('static', true)!
+	app.handle_static(static_root, true)!
 	if !os.exists('avatars') {
 		os.mkdir('avatars')!
 	}
 	app.handle_static('avatars', false)!
 
 	app.load_settings()
-
-	app.config = config.read_config('./config.json') or {
-		panic('Config not found or has syntax errors')
-	}
 
 	create_directory_if_not_exists(app.config.repo_storage_path)
 	create_directory_if_not_exists(app.config.archive_path)

@@ -7,7 +7,7 @@ import os
 import highlight
 import validation
 import git
-import db.pg
+import config
 
 @['/:username/repos']
 pub fn (mut app App) user_repos(username string) veb.Result {
@@ -255,7 +255,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		// t := time.now()
 
 		new_repo.status = .cloning
-		spawn clone_repo(mut new_repo)
+		spawn clone_repo(mut new_repo, app.config)
 		// new_repo.clone()
 		// println(time.since(t))
 	}
@@ -297,17 +297,14 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	return ctx.redirect('/${ctx.user.username}/${new_repo.name}')
 }
 
-fn bg_fetch_files_info(repo_ Repo, branch string, path string) {
+fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Config) {
 	mut repo := repo_
 	mut app := &App{
-		db: pg.connect(
-			dbname:   'gitly'
-			user:     'gitly'
-			password: 'gitly'
-		) or {
-			eprintln('cannot open db connection for bg_fetch thread: ${err}')
+		db:     connect_db(conf) or {
+			eprintln('cannot open ${db_backend_name()} db connection for bg_fetch thread: ${err}')
 			return
 		}
+		config: conf
 	}
 	app.slow_fetch_files_info(mut repo, branch, path) or {
 		eprintln('bg_fetch_files_info error: ${err}')
@@ -315,19 +312,16 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string) {
 	app.db.close() or {}
 }
 
-fn clone_repo(mut new_repo Repo) {
+fn clone_repo(mut new_repo Repo, conf config.Config) {
 	new_repo.clone()
 	// Use a dedicated DB connection for the clone thread to avoid
-	// corrupting the main connection's PostgreSQL protocol state.
+	// sharing a connection across threads.
 	mut app := &App{
-		db: pg.connect(
-			dbname:   'gitly'
-			user:     'gitly'
-			password: 'gitly'
-		) or {
-			eprintln('cannot open db connection for clone thread: ${err}')
+		db:     connect_db(conf) or {
+			eprintln('cannot open ${db_backend_name()} db connection for clone thread: ${err}')
 			return
 		}
+		config: conf
 	}
 	// Mark repo as done immediately so the user can browse it.
 	// The tree page will fetch files from git on demand.
@@ -409,10 +403,10 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 			[]File{}
 		}
 		// Fetch commit info in background — don't block the page
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path)
+		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	} else if items.any(it.last_msg == '') {
 		// Some files still need commit info — fetch in background
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path)
+		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	}
 
 	// Fetch last commit message for this directory, printed at the top of the tree
@@ -449,8 +443,7 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	if readme_file.id != 0 {
 		readme_path := '${path}/${readme_file.name}'
 		readme_content := repo.read_file(branch_name, readme_path)
-		highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path,
-			false)
+		highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
 
 		readme = veb.RawHtml(highlighted_readme)
 	}
@@ -470,9 +463,7 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 
 	// CI status for last commit
 	ci_status := app.find_ci_status_for_commit(repo_id, last_commit.hash) or {
-		app.find_ci_status_for_branch(repo_id, branch_name) or {
-			CiStatus{}
-		}
+		app.find_ci_status_for_branch(repo_id, branch_name) or { CiStatus{} }
 	}
 	has_ci := ci_status.id != 0
 

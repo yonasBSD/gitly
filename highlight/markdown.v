@@ -1,7 +1,7 @@
 module highlight
 
 import markdown
-import pcre
+import regex.pcre
 
 const allowed_tags = [
 	'a',
@@ -89,7 +89,7 @@ pub fn sanitize_markdown_code(code string) string {
 fn sanitize_html_tags(code string) string {
 	mut result := code
 	// tag name, attributes, tag content(optional)
-	paired_tags_re := r'<[\s]*?(?<tag>[a-zA-Z0-9]*)(.*?)>([\s\S]*?)<\/\s*?\g{tag}*?\s*?>'
+	paired_tags_re := r'<[\s]*?([a-zA-Z0-9]+)(.*?)>(.*?)<\/\s*?[a-zA-Z0-9]+\s*?>'
 	unpaired_tags_re := r'<(\w*)\s+(.*?)()>'
 
 	result = sanitize_html_tags_with_re(paired_tags_re, result)
@@ -145,15 +145,13 @@ fn sanitize_html_tags_with_re(re string, code string) string {
 		}
 	}
 
-	tags_re.free()
-
 	return result
 }
 
 fn sanitize_html_attributes(attributes string) string {
 	mut result := attributes
 
-	attributes_query := r'(\w+)[\s\S]*?=["]([\s\S]*?)["]'
+	attributes_query := r'(\w+).*?=["](.*?)["]'
 	attributes_re := pcre.new_regex(attributes_query, 0) or {
 		println(err)
 		return result
@@ -187,19 +185,11 @@ fn sanitize_html_attributes(attributes string) string {
 fn remove_comments(code string) string {
 	mut result := code
 
-	remove_comments_query := r'<!--[\S\s]*?-->'
-	remove_comments_re := pcre.new_regex(remove_comments_query, 0) or {
-		println(err)
-		return result
-	}
-
 	for {
-		matched := remove_comments_re.match_str(result, 0, 0) or { break }
-		comment := matched.get(0) or { break }
-		result = result.replace(comment, '')
+		start := result.index('<!--') or { break }
+		end := result.index_after('-->', start + 4) or { return result[..start] }
+		result = result[..start] + result[end + 3..]
 	}
-
-	remove_comments_re.free()
 
 	return result
 }
