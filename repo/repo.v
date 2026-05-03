@@ -133,23 +133,24 @@ fn (mut app App) find_user_public_repos(user_id int) []Repo {
 }
 
 fn (app &App) search_public_repos(query string) []Repo {
-	repo_rows := app.db.exec_no_null('select id, name, user_id, description, stars_count from `Repo` where is_public is true and name like "%${query}%"') or {
+	repo_rows := db_exec_values(app.db,
+		'select id, name, user_id, description, stars_count from ${sql_table('Repo')} where is_public is true and name like ${sql_like_pattern(query)}') or {
 		return []
 	}
 
 	mut repos := []Repo{}
 
 	for row in repo_rows {
-		user_id := row.vals[2].int()
+		user_id := row[2].int()
 		user := app.get_user_by_id(user_id) or { User{} }
 
 		repos << Repo{
-			id:          row.vals[0].int()
+			id:          row[0].int()
 			git_repo:    unsafe { nil }
-			name:        row.vals[1]
+			name:        row[1]
 			user_name:   user.username
-			description: row.vals[3]
-			nr_stars:    row.vals[4].int()
+			description: row[3]
+			nr_stars:    row[4].int()
 		}
 	}
 
@@ -312,7 +313,8 @@ fn (mut app App) update_repo_branch_from_fs(mut repo Repo, branch_name string) !
 		return
 	}
 
-	data := repo.git('--no-pager log ${branch_name} --abbrev-commit --abbrev=7 --pretty="%h${log_field_separator}%aE${log_field_separator}%cD${log_field_separator}%s${log_field_separator}%aN"')
+	data :=
+		repo.git('--no-pager log ${branch_name} --abbrev-commit --abbrev=7 --pretty="%h${log_field_separator}%aE${log_field_separator}%cD${log_field_separator}%s${log_field_separator}%aN"')
 
 	for line in data.split_into_lines() {
 		args := line.split(log_field_separator)
@@ -343,8 +345,8 @@ fn (mut app App) update_repo_branch_from_fs(mut repo Repo, branch_name string) !
 				commit_author_id = user.id
 			}
 
-			app.add_commit(repo_id, branch.id, commit_hash, commit_author,
-				commit_author_id, commit_message, int(commit_date.unix()))!
+			app.add_commit(repo_id, branch.id, commit_hash, commit_author, commit_author_id,
+				commit_message, int(commit_date.unix()))!
 		}
 	}
 }
@@ -392,7 +394,8 @@ fn (mut app App) update_repo_branch_data(mut repo Repo, branch_name string) ! {
 		return
 	}
 
-	data := repo.git('--no-pager log ${branch_name} --abbrev-commit --abbrev=7 --pretty="%h${log_field_separator}%aE${log_field_separator}%cD${log_field_separator}%s${log_field_separator}%aN"')
+	data :=
+		repo.git('--no-pager log ${branch_name} --abbrev-commit --abbrev=7 --pretty="%h${log_field_separator}%aE${log_field_separator}%cD${log_field_separator}%s${log_field_separator}%aN"')
 
 	for line in data.split_into_lines() {
 		args := line.split(log_field_separator)
@@ -421,8 +424,8 @@ fn (mut app App) update_repo_branch_data(mut repo Repo, branch_name string) ! {
 				commit_author_id = user.id
 			}
 
-			app.add_commit(repo_id, branch.id, commit_hash, commit_author,
-				commit_author_id, commit_message, int(commit_date.unix()))!
+			app.add_commit(repo_id, branch.id, commit_hash, commit_author, commit_author_id,
+				commit_message, int(commit_date.unix()))!
 		}
 	}
 }
@@ -633,7 +636,8 @@ fn (mut app App) cache_repository_items(mut r Repo, branch string, path string) 
 	} else {
 		directory_path := if path == '' { path } else { '${path}/' }
 		format := '%(objectmode) %(objecttype) %(objectname) %(objectsize) %(path)'
-		repository_ls = r.git('ls-tree --full-name --format="${format}" ${branch} ${directory_path}')
+		repository_ls =
+			r.git('ls-tree --full-name --format="${format}" ${branch} ${directory_path}')
 	}
 
 	// mode type name path
@@ -779,7 +783,8 @@ fn (mut app App) fetch_file_info(r &Repo, file &File) ! {
 
 	file_id := file.id
 	sql app.db {
-		update File set last_msg = last_msg, last_time = last_time, last_hash = last_hash where id == file_id
+		update File set last_msg = last_msg, last_time = last_time, last_hash = last_hash
+		where id == file_id
 	}!
 }
 

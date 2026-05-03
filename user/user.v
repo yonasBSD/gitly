@@ -281,16 +281,17 @@ pub fn (mut app App) get_all_registered_user_count() int {
 }
 
 fn (app App) search_users(query string) []User {
-	q := 'select id, full_name, username, avatar from `User` where is_blocked is false and ' +
-		'(username like "%${query}%" or full_name like "%${query}%")'
-	repo_rows := app.db.exec_no_null(q) or { return [] }
+	q :=
+		'select id, full_name, username, avatar from ${sql_table('User')} where is_blocked is false and ' +
+		'(username like ${sql_like_pattern(query)} or full_name like ${sql_like_pattern(query)})'
+	repo_rows := db_exec_values(app.db, q) or { return [] }
 	mut users := []User{}
 	for row in repo_rows {
 		users << User{
-			id:        row.vals[0].int()
-			full_name: row.vals[1]
-			username:  row.vals[2]
-			avatar:    row.vals[3]
+			id:        row[0].int()
+			full_name: row[1]
+			username:  row[2]
+			avatar:    row[3]
 		}
 	}
 	return users

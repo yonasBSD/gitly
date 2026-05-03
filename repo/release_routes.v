@@ -32,11 +32,18 @@ pub fn (mut app App) releases(mut ctx Context, username string, repo_name string
 
 	download_archive_prefix := '/${username}/${repo_name}/tag'
 
-	for rel in rels {
+	mut rel := Release{}
+	mut tag := Tag{}
+	mut user := User{}
+	mut i := 0
+	mut j := 0
+	for i = 0; i < rels.len; i++ {
+		rel = rels[i]
 		release.notes = rel.notes
 		mut user_id := 0
 
-		for tag in tags {
+		for j = 0; j < tags.len; j++ {
+			tag = tags[j]
 			if tag.id == rel.tag_id {
 				release.tag_name = tag.name
 				release.tag_hash = tag.hash
@@ -45,7 +52,8 @@ pub fn (mut app App) releases(mut ctx Context, username string, repo_name string
 				break
 			}
 		}
-		for user in users {
+		for j = 0; j < users.len; j++ {
+			user = users[j]
 			if user.id == user_id {
 				release.user = user.username
 				break

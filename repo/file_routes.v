@@ -68,6 +68,7 @@ pub fn (mut app App) handle_update_file(username string, repo_name string) veb.R
 	file_content := ctx.form['file_content']
 	branch_name := ctx.form['branch']
 	commit_message := ctx.form['commit_message']
+	mut actual_branch := ''
 
 	if commit_message == '' {
 		ctx.error('Commit message is required')
@@ -75,7 +76,7 @@ pub fn (mut app App) handle_update_file(username string, repo_name string) veb.R
 		return $veb.html('templates/edit_file.html')
 	}
 
-	mut actual_branch := branch_name
+	actual_branch = branch_name
 	if actual_branch == '' {
 		actual_branch = repo.primary_branch
 	}
@@ -121,6 +122,7 @@ pub fn (mut app App) handle_create_file(username string, repo_name string) veb.R
 	file_content := ctx.form['file_content']
 	branch_name := ctx.form['branch']
 	commit_message := ctx.form['commit_message']
+	mut actual_branch := ''
 
 	if file_path == '' {
 		ctx.error('File path is required')
@@ -144,7 +146,7 @@ pub fn (mut app App) handle_create_file(username string, repo_name string) veb.R
 		return $veb.html('templates/new_file.html')
 	}
 
-	mut actual_branch := branch_name
+	actual_branch = branch_name
 	if actual_branch == '' {
 		actual_branch = repo.primary_branch
 	}
@@ -216,14 +218,16 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 		}
 
 		// Read existing tree into temp index
-		r1 := os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} read-tree ${existing_tree}\'')
+		r1 :=
+			os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} read-tree ${existing_tree}\'')
 		if r1.exit_code != 0 {
 			app.warn('read-tree failed: ${r1.output}')
 			return false
 		}
 
 		// Add the new blob to the index
-		r2 := os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} update-index --add --cacheinfo 100644,${blob_hash},${file_path}\'')
+		r2 :=
+			os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} update-index --add --cacheinfo 100644,${blob_hash},${file_path}\'')
 		if r2.exit_code != 0 {
 			app.warn('update-index failed: ${r2.output}')
 			return false
