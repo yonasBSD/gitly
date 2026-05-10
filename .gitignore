@@ -6,7 +6,7 @@ bin/
 *.css.map
 .sass-cache/
 .lite_workspace.lua
-src/static/assets/version
+static/assets/version
 logs/
 repos/
 archives/

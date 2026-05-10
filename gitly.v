@@ -19,13 +19,6 @@ const max_repo_name_len = 100
 const max_namechanges = 3
 const namechange_period = time.hour * 24
 
-fn static_root_path() string {
-	if os.exists(os.join_path('static', 'static')) && !os.exists(os.join_path('static', 'assets')) {
-		return os.join_path('static', 'static')
-	}
-	return 'static'
-}
-
 @[heap]
 pub struct App {
 	veb.StaticHandler
@@ -77,8 +70,7 @@ fn new_app() !&App {
 
 	app.setup_logger()
 
-	static_root := static_root_path()
-	version_path := os.join_path(static_root, 'assets', 'version')
+	version_path := os.join_path('static', 'assets', 'version')
 	create_directory_if_not_exists(os.dir(version_path))
 
 	stored_version := os.read_file(version_path) or { 'unknown' }
@@ -95,7 +87,7 @@ fn new_app() !&App {
 
 	app.version = version
 
-	app.handle_static(static_root, true)!
+	app.handle_static('static', true)!
 	if !os.exists('avatars') {
 		os.mkdir('avatars')!
 	}

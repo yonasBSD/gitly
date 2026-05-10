@@ -47,7 +47,7 @@ The SQLite database path defaults to `gitly.sqlite` and can be changed with `sql
 If you don't want to install `sassc`, you can simply run
 
 ```
-curl https://gitly.org/css/gitly.css --output static/static/css/gitly.css
+curl https://gitly.org/css/gitly.css --output static/css/gitly.css
 ```
 
 
