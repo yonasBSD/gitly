@@ -1,13 +1,8 @@
 import net.http
 
-static_root := if exists('static/static') && !exists('static/assets') {
-	'static/static'
-} else {
-	'static'
-}
-path := '${static_root}/css/gitly.css'
+path := 'static/css/gitly.css'
 if !exists(path) {
-	ret := system('sassc ${static_root}/css/gitly.scss > ${path}')
+	ret := system('sassc static/css/gitly.scss > ${path}')
 	if ret != 0 {
 		http.download_file('https://gitly.org/css/gitly.css', path)!
 		println('No sassc detected on this system, gitly.css has been downloaded from gitly.org.')
