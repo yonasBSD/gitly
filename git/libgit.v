@@ -58,11 +58,6 @@ struct C.git_error {
 @[typedef]
 struct C.git_tree_entry {}
 
-struct C.git_clone_options {
-mut:
-	bare int
-}
-
 fn C.git_commit_message(voidptr) &char
 fn C.git_reference_lookup(&&C.git_reference, &C.git_repository, &char)
 fn C.git_reference_symbolic_target(&C.git_reference) &char
@@ -86,9 +81,6 @@ fn C.git_tree_entry_id(&C.git_tree_entry) &C.git_oid
 fn C.git_blob_rawcontent(&C.git_blob) voidptr
 fn C.git_blob_rawsize(&C.git_blob) int
 fn C.git_blob_free(&C.git_blob)
-fn C.git_clone(&&C.git_repository, &char, &char, &C.git_clone_options) int
-fn C.git_clone_options_init(&C.git_clone_options, int)
-
 fn C.git_object_lookup_bypath(&&C.git_object, &C.git_object, &char, int) int
 fn C.git_object_peel(&&C.git_object, &C.git_object, int) int
 fn C.git_object_id(&C.git_object) &C.git_oid
@@ -273,31 +265,6 @@ pub fn (r &Repo) show_file_blob(branch string, file_path string) !string {
 	text := unsafe { cstring_to_vstring(content) }
 	C.git_blob_free(blob)
 	return text
-
-}
-
-pub fn clone(url string, path string) {
-	mut r := new_repo(path)
-	r.clone(url, path)
-}
-
-pub fn (mut r Repo) clone(url string, path string) {
-	println('new clone url="${url}" path="${path}"')
-	// Clone options
-	mut clone_opts := C.git_clone_options{} //( unsafe{nil})
-	C.git_clone_options_init(&clone_opts, C.GIT_CLONE_OPTIONS_VERSION)
-
-	// Set the bare flag to create a bare repository
-	clone_opts.bare = 1
-
-	// Clone the repository
-	// r.git_repo = &C.git_repository(unsafe { nil })
-	ret := C.git_clone(&r.obj, url.str, path.str, &clone_opts)
-	if ret != 0 {
-		C.printf(c'Failed to clone: %s\n', C.git_error_last().message)
-	} else {
-		println('Bare repository cloned successfully!\n')
-	}
 }
 
 /*
