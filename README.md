@@ -57,12 +57,6 @@ Required dependencies:
 * PostgreSQL client library (Ubuntu/Debian: `libpq-dev`, macOS: `brew install libpq`)
 * Markdown (`v install markdown`)
 * sassc
-* libgit2
-
-You can install libgit2 with:
-  * Ubuntu/Debian: `apt install libgit2-dev`
-  * FreeBSD: `pkg install libgit2`
-  * macOS: `brew install libgit2`
 
 
 ### Features
