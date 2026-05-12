@@ -160,9 +160,8 @@ pub fn (mut app App) handle_update_user_settings(mut ctx Context, username strin
 }
 
 fn (mut app App) rename_user_directory(old_name string, new_name string) {
-	os.mv('${app.config.repo_storage_path}/${old_name}', '${app.config.repo_storage_path}/${new_name}') or {
-		panic(err)
-	}
+	os.mv('${app.config.repo_storage_path}/${old_name}',
+		'${app.config.repo_storage_path}/${new_name}') or { panic(err) }
 }
 
 pub fn (mut app App) register(mut ctx Context) veb.Result {
@@ -238,8 +237,7 @@ pub fn (mut app App) handle_register(mut ctx Context, username string, email str
 	}
 
 	// TODO: refactor
-	is_registered := app.register_user(username, hashed_password, salt, [email], false,
-		no_users) or {
+	is_registered := app.register_user(username, hashed_password, salt, [email], false, no_users) or {
 		ctx.error('Failed to register')
 		return app.register(mut ctx)
 	}

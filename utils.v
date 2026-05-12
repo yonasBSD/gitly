@@ -58,13 +58,11 @@ fn check_last_page(total int, offset int, per_page int) bool {
 }
 
 const is_dev = true
- 
+
 fn css2(s string) veb.RawHtml {
 	if is_dev {
-	return '<link href="http://localhost:8000/${s}" rel="stylesheet" type="text/css">'
-	}
-	else {
-	return '<link href="/static/${s}" rel="stylesheet" type="text/css">'
+		return '<link href="http://localhost:8000/${s}" rel="stylesheet" type="text/css">'
+	} else {
+		return '<link href="/static/${s}" rel="stylesheet" type="text/css">'
 	}
 }
-

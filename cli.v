@@ -15,8 +15,7 @@ pub fn (mut app App) command_fetcher() ! {
 				match args[0] {
 					'adduser' {
 						if args.len > 4 {
-							app.register_user(args[1], args[2], args[3], args[4..], false,
-								false)!
+							app.register_user(args[1], args[2], args[3], args[4..], false, false)!
 							println('Added user ${args[1]}')
 						} else {
 							error('Not enough arguments (3 required but only ${args.len} given)')

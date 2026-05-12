@@ -646,8 +646,7 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 }
 
 fn (r &Repo) top_files(branch string, limit int) []File {
-	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '-r', '--full-name', '--long',
-		branch])
+	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '-r', '--full-name', '--long', branch])
 	if git_result.exit_code != 0 {
 		eprintln('git ls-tree top files error: ${git_result.output}')
 		return []File{}
