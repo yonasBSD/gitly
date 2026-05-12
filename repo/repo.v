@@ -796,13 +796,14 @@ fn (mut app App) update_repo_primary_branch(repo_id int, branch string) ! {
 
 fn (mut r Repo) clone() {
 	eprintln('R CLONE')
+	/*
 	if r.git_repo != unsafe { nil } {
 		r.git_repo.clone(r.clone_url, r.git_dir)
 	} else {
 		println('nil')
 	}
+	*/
 
-	/*
 	cmd := 'git clone --bare "${r.clone_url}" ${r.git_dir}'
 	println('CLONE() ${cmd}')
 	clone_result := os.execute('git clone --bare "${r.clone_url}" ${r.git_dir}')
@@ -813,7 +814,6 @@ fn (mut r Repo) clone() {
 		println('git clone failed with exit code ${close_exit_code}')
 		return
 	}
-	*/
 
 	r.status = .done
 	eprintln('clone done')

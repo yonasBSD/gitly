@@ -79,6 +79,28 @@ pre > code {
 	margin-bottom: 200px;
 	min-height: calc(100vh - 300px);
 }
+
+.clone-status {
+	margin-top: 25%;
+	text-align: center;
+
+	img {
+		margin-top: 10px;
+	}
+}
+
+.clone-status-url {
+	color: $gray-dark;
+	margin: 10px auto 0;
+	overflow-wrap: anywhere;
+	padding: 0 10px;
+
+	code {
+		border-radius: $small-radius;
+		padding: 2px 5px;
+	}
+}
+
 #top_right_div {
 	float:right;
 	display: flex;

@@ -8,6 +8,7 @@ import highlight
 import validation
 import git
 import config
+import net.urllib
 
 @['/:username/repos']
 pub fn (mut app App) user_repos(username string) veb.Result {
@@ -255,6 +256,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		// t := time.now()
 
 		new_repo.status = .cloning
+		app.clone_urls[new_repo.id] = clone_url_for_display(valid_clone_url)
 		spawn clone_repo(mut new_repo, app.config)
 		// new_repo.clone()
 		// println(time.since(t))
@@ -334,6 +336,7 @@ fn clone_repo(mut new_repo Repo, conf config.Config) {
 }
 
 pub fn (mut app App) kekw(mut ctx Context) veb.Result {
+	clone_url := ''
 	return $veb.html('templates/cloning_in_process.html')
 }
 
@@ -345,8 +348,10 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 	eprintln('!!! REPO STATUS = ${repo.status}')
 	if repo.status == .cloning {
+		clone_url := app.clone_urls[repo.id] or { '' }
 		return $veb.html('templates/cloning_in_process.html')
 	}
+	app.clone_urls.delete(repo.id)
 
 	_, user := app.check_username(username)
 	if !repo.is_public {
@@ -468,6 +473,15 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	has_ci := ci_status.id != 0
 
 	return $veb.html()
+}
+
+fn clone_url_for_display(clone_url string) string {
+	mut display_url := urllib.parse(clone_url) or { return clone_url }
+	display_url.user = none
+	display_url.raw_query = ''
+	display_url.fragment = ''
+	display_url.force_query = false
+	return display_url.str()
 }
 
 @['/api/v1/repos/:repo_id/star'; 'post']

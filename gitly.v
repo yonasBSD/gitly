@@ -27,11 +27,12 @@ pub struct App {
 pub mut:
 	db GitlyDb
 mut:
-	version  string
-	logger   log.Log
-	config   config.Config
-	settings Settings
-	port     int
+	version    string
+	logger     log.Log
+	config     config.Config
+	settings   Settings
+	port       int
+	clone_urls map[int]string
 }
 
 pub struct Context {
@@ -60,6 +61,7 @@ fn new_app() !&App {
 		db:         connect_db(conf)!
 		config:     conf
 		started_at: time.now().unix()
+		clone_urls: map[int]string{}
 	}
 
 	set_rand_crypto_safe_seed()
