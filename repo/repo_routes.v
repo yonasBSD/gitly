@@ -237,7 +237,6 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	repo_path := os.join_path(app.config.repo_storage_path, ctx.user.username, name)
 	id := app.get_count_repo() + 1
 	mut new_repo := &Repo{
-		git_repo:       git.new_repo(repo_path)
 		name:           name
 		id:             id
 		description:    description
@@ -346,9 +345,10 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		eprintln('tree() repo ${repo_name} not found')
 		return ctx.not_found()
 	}
+	mut clone_url := ''
 	eprintln('!!! REPO STATUS = ${repo.status}')
 	if repo.status == .cloning {
-		clone_url := app.clone_urls[repo.id] or { '' }
+		clone_url = app.clone_urls[repo.id] or { '' }
 		return $veb.html('templates/cloning_in_process.html')
 	}
 	app.clone_urls.delete(repo.id)
@@ -416,6 +416,7 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 
 	// Fetch last commit message for this directory, printed at the top of the tree
 	mut last_commit := Commit{}
+	mut dir := File{}
 	if can_up {
 		mut p := path
 		if p.ends_with('/') {
@@ -424,7 +425,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		if !p.contains('/') {
 			p = '/${p}'
 		}
-		if dir := app.find_repo_file_by_path(repo.id, branch_name, p) {
+		dir = app.find_repo_file_by_path(repo.id, branch_name, p) or { File{} }
+		if dir.id != 0 {
 			last_commit = app.find_repo_commit_by_hash(repo.id, dir.last_hash)
 		}
 	} else {

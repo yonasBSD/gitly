@@ -2,6 +2,7 @@ module main
 
 import veb
 import os
+import git
 
 // GET /:username/:repo_name/new/:branch_name - Show create file form
 @['/:username/:repo_name/new/:branch_name']
@@ -219,7 +220,7 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 
 		// Read existing tree into temp index
 		r1 :=
-			os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} read-tree ${existing_tree}\'')
+			git.Git.exec_shell('GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} read-tree ${existing_tree}')
 		if r1.exit_code != 0 {
 			app.warn('read-tree failed: ${r1.output}')
 			return false
@@ -227,14 +228,14 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 
 		// Add the new blob to the index
 		r2 :=
-			os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} update-index --add --cacheinfo 100644,${blob_hash},${file_path}\'')
+			git.Git.exec_shell('GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} update-index --add --cacheinfo 100644,${blob_hash},${file_path}')
 		if r2.exit_code != 0 {
 			app.warn('update-index failed: ${r2.output}')
 			return false
 		}
 
 		// Write the tree
-		r3 := os.execute('/bin/sh -c \'GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} write-tree\'')
+		r3 := git.Git.exec_shell('GIT_INDEX_FILE=${tmp_index} git -C ${git_dir} write-tree')
 		if r3.exit_code != 0 {
 			app.warn('write-tree failed: ${r3.output}')
 			return false
@@ -248,7 +249,7 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 		defer {
 			os.rm(tmp_tree) or {}
 		}
-		r := os.execute('/bin/sh -c \'git -C ${git_dir} mktree < ${tmp_tree}\'')
+		r := git.Git.exec_shell('git -C ${git_dir} mktree < ${tmp_tree}')
 		if r.exit_code != 0 {
 			app.warn('mktree failed: ${r.output}')
 			return false
@@ -268,7 +269,7 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 	}
 
 	commit_sh := 'GIT_AUTHOR_NAME="${author}" GIT_AUTHOR_EMAIL="${author}@gitly" GIT_COMMITTER_NAME="${author}" GIT_COMMITTER_EMAIL="${author}@gitly" git -C ${git_dir} commit-tree ${new_tree_hash} ${parent_flag} -m "${message}"'
-	r4 := os.execute("/bin/sh -c '${commit_sh}'")
+	r4 := git.Git.exec_shell(commit_sh)
 	if r4.exit_code != 0 {
 		app.warn('commit-tree failed: ${r4.output}')
 		return false
@@ -276,7 +277,7 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 	new_commit_hash := r4.output.trim_space()
 
 	// 5. Update the branch ref
-	r5 := os.execute('git -C ${git_dir} update-ref refs/heads/${branch} ${new_commit_hash}')
+	r5 := git.Git.exec_in_dir(git_dir, ['update-ref', 'refs/heads/${branch}', new_commit_hash])
 	if r5.exit_code != 0 {
 		app.warn('update-ref failed: ${r5.output}')
 		return false
@@ -287,7 +288,7 @@ fn (mut app App) create_file_in_bare_repo(mut repo Repo, branch string, file_pat
 }
 
 fn sh(cmd string) string {
-	r := os.execute('/bin/sh -c \'${cmd}\'')
+	r := git.Git.exec_shell(cmd)
 	if r.exit_code != 0 {
 		return ''
 	}

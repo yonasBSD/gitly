@@ -63,24 +63,13 @@ pub fn check_git_repo_url(url string) bool {
 }
 
 pub fn get_git_executable_path() ?string {
-	which_result := os.execute('which git')
-	which_exit_code := which_result.exit_code
-	which_output := which_result.output
-	if which_exit_code != 0 {
-		return none
-	}
-	return which_output.trim(' \n')
+	return os.find_abs_path_of_executable('git') or { none }
 }
 
 pub fn remove_git_extension_if_exists(git_repository_name string) string {
 	return git_repository_name.trim_string_right('.git')
 }
 
-/*
 fn get_branch_name_from_reference(value string) string {
-	branch_query := r'refs/heads/(.*)'
-	mut re := regex.regex_opt(branch_query) or { panic(err) }
-	re.match_string(value)
-	return re.get_group_by_id(value, 0)
+	return value.after('refs/heads/')
 }
-*/

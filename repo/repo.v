@@ -25,7 +25,6 @@ struct Repo {
 	latest_update_hash string    @[skip]
 	latest_activity    time.Time @[skip]
 mut:
-	git_repo        &git.Repo = unsafe { nil } @[skip] // libgit wrapper repo
 	webhook_secret  string
 	tags_count      int
 	nr_open_issues  int @[orm: 'open_issues_count']
@@ -103,7 +102,6 @@ fn (app App) find_repo_by_name_and_user_id(repo_name string, user_id int) ?Repo 
 	mut repo := repos[0]
 	repo.lang_stats = app.find_repo_lang_stats(repo.id)
 	println('GIT DIR = ${repo.git_dir}')
-	repo.git_repo = git.new_repo(repo.git_dir)
 
 	return repo
 }
@@ -146,7 +144,6 @@ fn (app &App) search_public_repos(query string) []Repo {
 
 		repos << Repo{
 			id:          row[0].int()
-			git_repo:    unsafe { nil }
 			name:        row[1]
 			user_name:   user.username
 			description: row[3]
@@ -574,7 +571,7 @@ fn (r &Repo) git(command string) string {
 
 	command_with_path := '-C ${r.git_dir} ${command}'
 
-	command_result := os.execute('git ${command_with_path}')
+	command_result := git.Git.exec_in_dir_command(r.git_dir, command)
 	command_exit_code := command_result.exit_code
 	if command_exit_code != 0 {
 		println('git error ${command_with_path} with ${command_exit_code} exit code out=${command_result.output}')
@@ -695,7 +692,8 @@ fn (mut app App) slow_fetch_files_info(mut repo Repo, branch string, path string
 }
 
 fn (r Repo) get_last_branch_commit_hash(branch_name string) string {
-	git_result := os.execute('git -C ${r.git_dir} log -n 1 ${branch_name} --pretty=format:"%h"')
+	git_result := git.Git.exec_in_dir(r.git_dir,
+		['log', '-n', '1', branch_name, '--pretty=format:%h'])
 	git_output := git_result.output
 
 	if git_result.exit_code != 0 {
@@ -706,7 +704,7 @@ fn (r Repo) get_last_branch_commit_hash(branch_name string) string {
 }
 
 fn (r Repo) git_advertise(service string) string {
-	git_result := os.execute('git ${service} --stateless-rpc --advertise-refs ${r.git_dir}')
+	git_result := git.Git.exec([service, '--stateless-rpc', '--advertise-refs', r.git_dir])
 	git_output := git_result.output
 
 	if git_result.exit_code != 0 {
@@ -813,13 +811,10 @@ fn (r &Repo) read_file(branch string, path string) string {
 	valid_path := path.trim_string_left('/')
 
 	println('read_file() path=${valid_path}')
-	if r.git_repo == unsafe { nil } {
-		return 'nil'
-	}
 	t := time.now()
 	// s := r.git('--no-pager show ${branch}:${valid_path}')
 
-	s := r.git_repo.show_file_blob(branch, valid_path) or { '' }
+	s := git.Git.show_file_blob(r.git_dir, branch, valid_path) or { '' }
 	println(time.since(t))
 	println(':)')
 	return s

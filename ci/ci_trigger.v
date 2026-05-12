@@ -3,6 +3,7 @@ module main
 import json
 import net.http
 import os
+import git
 
 struct CiTriggerPayload {
 	repo_id      int
@@ -32,7 +33,7 @@ fn (mut app App) trigger_ci_if_configured(repo_id int, branch_name string) {
 	}
 
 	// Read .gitly-ci.yml from the repo using git show (works with bare repos)
-	show_result := os.execute('git -C ${repo.git_dir} show ${branch_name}:.gitly-ci.yml')
+	show_result := git.Git.exec_in_dir(repo.git_dir, ['show', '${branch_name}:.gitly-ci.yml'])
 	if show_result.exit_code != 0 || show_result.output.trim_space() == '' {
 		app.info('No .gitly-ci.yml found in ${repo.name}/${branch_name}')
 		return

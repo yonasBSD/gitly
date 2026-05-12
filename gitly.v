@@ -8,6 +8,7 @@ import os
 import log
 import api
 import config
+import git
 
 const commits_per_page = 35
 const expire_length = 200
@@ -77,7 +78,7 @@ fn new_app() !&App {
 
 	stored_version := os.read_file(version_path) or { 'unknown' }
 	mut version := stored_version
-	git_result := os.execute('git rev-parse --short HEAD')
+	git_result := git.Git.exec(['rev-parse', '--short', 'HEAD'])
 
 	if git_result.exit_code == 0 && !git_result.output.contains('fatal') {
 		version = git_result.output.trim_space()
