@@ -607,12 +607,13 @@ fn (r &Repo) parse_ls(ls_line string, branch string) ?File {
 	}
 
 	return File{
-		name:        item_name
-		parent_path: parent_path
-		repo_id:     r.id
-		branch:      branch
-		is_dir:      item_type == 'tree'
-		size:        if item_type == 'blob' { item_size.int() } else { 0 }
+		name:               item_name
+		parent_path:        parent_path
+		repo_id:            r.id
+		branch:             branch
+		is_dir:             item_type == 'tree'
+		size:               if item_type == 'blob' { item_size.int() } else { 0 }
+		is_size_calculated: item_type == 'blob'
 	}
 }
 
@@ -689,6 +690,78 @@ fn (mut app App) slow_fetch_files_info(mut repo Repo, branch string, path string
 
 		app.fetch_file_info(repo, files[i])!
 	}
+}
+
+fn (mut app App) slow_fetch_folder_sizes(mut repo Repo, branch string, path string) ! {
+	files := app.find_repository_items(repo.id, branch, path)
+	dirs := files.filter(it.is_dir && !it.is_size_calculated)
+	if dirs.len == 0 {
+		return
+	}
+
+	dir_names := dirs.map(it.name)
+	sizes := repo.calculate_child_folder_sizes(branch, path, dir_names)
+
+	for dir in dirs {
+		size := sizes[dir.name] or { 0 }
+		app.update_file_size(dir.id, size, true)!
+	}
+}
+
+fn (r &Repo) calculate_child_folder_sizes(branch string, path string, dir_names []string) map[string]int {
+	mut sizes := map[string]int{}
+	for dir_name in dir_names {
+		sizes[dir_name] = 0
+	}
+	if dir_names.len == 0 {
+		return sizes
+	}
+
+	normalized_path := normalize_tree_path(path)
+	mut args := ['ls-tree', '-r', '--full-name', '--long', branch]
+	if normalized_path != '' {
+		args << '--'
+		args << normalized_path
+	}
+
+	result := git.Git.exec_in_dir(r.git_dir, args)
+	if result.exit_code != 0 {
+		eprintln('git ls-tree error while calculating folder sizes: ${result.output}')
+		return sizes
+	}
+
+	prefix := if normalized_path == '' { '' } else { '${normalized_path}/' }
+	for line in result.output.split_into_lines() {
+		tab_pos := line.index('\t') or { continue }
+		meta := line[..tab_pos]
+		item_path := line[tab_pos + 1..]
+		meta_parts := meta.fields()
+		if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+			continue
+		}
+
+		mut relative_path := item_path
+		if prefix != '' {
+			if !item_path.starts_with(prefix) {
+				continue
+			}
+			relative_path = item_path[prefix.len..]
+		}
+
+		slash_pos := relative_path.index('/') or { continue }
+		child_dir := relative_path[..slash_pos]
+		if child_dir !in sizes {
+			continue
+		}
+
+		sizes[child_dir] = sizes[child_dir] + meta_parts[3].int()
+	}
+
+	return sizes
+}
+
+fn normalize_tree_path(path string) string {
+	return path.trim_string_left('/').trim_string_right('/')
 }
 
 fn (r Repo) get_last_branch_commit_hash(branch_name string) string {
@@ -783,6 +856,12 @@ fn (mut app App) fetch_file_info(r &Repo, file &File) ! {
 	sql app.db {
 		update File set last_msg = last_msg, last_time = last_time, last_hash = last_hash
 		where id == file_id
+	}!
+}
+
+fn (mut app App) update_file_size(file_id int, size int, is_size_calculated bool) ! {
+	sql app.db {
+		update File set size = size, is_size_calculated = is_size_calculated where id == file_id
 	}!
 }
 

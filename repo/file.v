@@ -14,6 +14,7 @@ struct File {
 	contributors_count int
 	last_hash          string
 	size               int
+	is_size_calculated bool
 	views_count        int
 mut:
 	last_msg  string
@@ -47,11 +48,26 @@ fn (f File) pretty_last_time() string {
 }
 
 fn (f File) pretty_size() string {
+	if f.size == 0 {
+		return 'n/a'
+	}
+
+	return pretty_size_bytes(f.size)
+}
+
+fn (f File) pretty_tree_size() string {
+	if !f.is_dir || !f.is_size_calculated {
+		return ''
+	}
+
+	return pretty_size_bytes(f.size)
+}
+
+fn pretty_size_bytes(size_in_bytes int) string {
 	sizes := ['bytes', 'KB', 'MB', 'GB', 'TB']
-	size_in_bytes := f.size
 
 	if size_in_bytes == 0 {
-		return 'n/a'
+		return '0 bytes'
 	}
 
 	index := int(math.floor(math.log(size_in_bytes) / math.log(1024)))
@@ -70,6 +86,7 @@ struct FileInfo {
 	last_msg  string
 	last_hash string
 	last_time string
+	size      string
 }
 
 fn calculate_lines_of_code(source string) (int, int) {

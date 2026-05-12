@@ -307,8 +307,14 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Confi
 		}
 		config: conf
 	}
+	app.load_settings()
 	app.slow_fetch_files_info(mut repo, branch, path) or {
 		eprintln('bg_fetch_files_info error: ${err}')
+	}
+	if app.settings.tree_folder_size_enabled() {
+		app.slow_fetch_folder_sizes(mut repo, branch, path) or {
+			eprintln('bg_fetch_folder_sizes error: ${err}')
+		}
 	}
 	app.db.close() or {}
 }
@@ -399,6 +405,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 
 	app.info('${log_prefix}: ${items.len} items found in branch ${branch_name}')
 
+	show_folder_size := app.settings.tree_folder_size_enabled()
+
 	if items.len == 0 {
 		// No files in the db, fetch them from git and cache in db
 		app.info('${log_prefix}: caching items in repository with ${repo_id}')
@@ -411,6 +419,9 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	} else if items.any(it.last_msg == '') {
 		// Some files still need commit info — fetch in background
+		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
+	} else if show_folder_size && items.any(it.is_dir && !it.is_size_calculated) {
+		// Some folders still need size info, fetch in background
 		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	}
 
@@ -555,6 +566,7 @@ pub fn (mut app App) handle_api_repo_files(mut ctx Context, repo_id_str string) 
 			last_msg:  item.last_msg
 			last_hash: item.last_hash
 			last_time: item.pretty_last_time()
+			size:      item.pretty_tree_size()
 		}
 	}
 

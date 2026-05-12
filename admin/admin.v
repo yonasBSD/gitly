@@ -34,8 +34,8 @@ pub fn (mut app App) remove_admin(user_id int) ! {
 	app.set_user_admin_status(user_id, false)!
 }
 
-pub fn (mut app App) update_gitly_settings(oauth_client_id string, oauth_client_secret string) ! {
-	app.update_settings(oauth_client_id, oauth_client_secret)!
+pub fn (mut app App) update_gitly_settings(oauth_client_id string, oauth_client_secret string, tree_folder_size_enabled bool) ! {
+	app.update_settings(oauth_client_id, oauth_client_secret, tree_folder_size_enabled)!
 
 	app.load_settings()
 }

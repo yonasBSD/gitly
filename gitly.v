@@ -68,6 +68,7 @@ fn new_app() !&App {
 	set_rand_crypto_safe_seed()
 
 	app.create_tables()!
+	app.migrate_tables()!
 
 	create_directory_if_not_exists('logs')
 
@@ -252,6 +253,19 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table CiStatus
 	}!
+}
+
+fn (mut app App) migrate_tables() ! {
+	app.add_missing_column('File', 'is_size_calculated', db_bool_column_type())!
+	app.add_missing_column('Settings', 'disable_tree_folder_size', db_bool_column_type())!
+}
+
+fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {
+	if db_column_exists(app.db, table_name, column_name)! {
+		return
+	}
+
+	app.db.exec('alter table ${sql_table(table_name)} add column ${sql_table(column_name)} ${column_type}')!
 }
 
 fn (mut ctx Context) json_success[T](result T) veb.Result {

@@ -30,26 +30,30 @@ async function starRepo(repoId) {
   }
 }
 
-starButtonEl.addEventListener("click", () => {
-  starRepo(REPO_ID)
-    .then(() => {
-      location.reload()
-    })
-    .catch((error) => {
-      alert(error.toString());
-    })
-});
+if (starButtonEl) {
+  starButtonEl.addEventListener("click", () => {
+    starRepo(REPO_ID)
+      .then(() => {
+        location.reload()
+      })
+      .catch((error) => {
+        alert(error.toString());
+      })
+  });
+}
 
 const copyCloneURLButton = document.querySelector(".copy-clone-url-button");
-copyCloneURLButton.addEventListener("click", async () => {
-  const url = document.querySelector(".clone-input-group > input").value;
+if (copyCloneURLButton) {
+  copyCloneURLButton.addEventListener("click", async () => {
+    const url = document.querySelector(".clone-input-group > input").value;
 
-  if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
-    return navigator.clipboard.writeText(url);
-  }
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(url);
+    }
 
-  alert("The Clipboard API is not available.");
-});
+    alert("The Clipboard API is not available.");
+  });
+}
 
 const watchButtonEl = document.querySelector(".watch-button");
 
@@ -67,24 +71,40 @@ async function watchRepo(repoId) {
   }
 }
 
-watchButtonEl.addEventListener("click", () => {
-  watchRepo(REPO_ID)
-    .then(() => {
-      location.reload()
-    })
-    .catch((error) => {
-      alert(error.toString());
-    })
-});
+if (watchButtonEl) {
+  watchButtonEl.addEventListener("click", () => {
+    watchRepo(REPO_ID)
+      .then(() => {
+        location.reload()
+      })
+      .catch((error) => {
+        alert(error.toString());
+      })
+  });
+}
 
 // Poll for file commit info (last_msg, last_hash, last_time) that may still be loading
 (function() {
-  // Check if any file rows are missing commit info
+  function findDataEl(attr, value) {
+    const els = document.querySelectorAll("[" + attr + "]");
+    for (const el of els) {
+      if (el.getAttribute(attr) === value) return el;
+    }
+    return null;
+  }
+
+  // Check if any file rows are missing delayed info
   function hasMissingInfo() {
     const msgEls = document.querySelectorAll("[data-msg-for]");
     for (const el of msgEls) {
       const link = el.querySelector("a");
       if (!link || link.textContent.trim() === "") return true;
+    }
+    if (TREE_FOLDER_SIZE_ENABLED) {
+      const sizeEls = document.querySelectorAll("[data-size-for]");
+      for (const el of sizeEls) {
+        if (el.textContent.trim() === "") return true;
+      }
     }
     return false;
   }
@@ -107,21 +127,28 @@ watchButtonEl.addEventListener("click", () => {
 
         let stillMissing = false;
         for (const file of data.result) {
-          if (!file.last_msg) {
+          const sizeEl = TREE_FOLDER_SIZE_ENABLED ? findDataEl("data-size-for", file.name) : null;
+          if (!file.last_msg || (sizeEl && !file.size)) {
             stillMissing = true;
-            continue;
           }
-          const msgEl = document.querySelector('[data-msg-for="' + file.name + '"]');
-          if (msgEl) {
-            const link = msgEl.querySelector("a");
-            if (link && link.textContent.trim() === "") {
-              link.textContent = file.last_msg;
-              if (file.last_hash) {
-                link.href = "/" + REPO_USER + "/" + REPO_NAME + "/commit/" + file.last_hash;
+          if (file.last_msg) {
+            const msgEl = findDataEl("data-msg-for", file.name);
+            if (msgEl) {
+              const link = msgEl.querySelector("a");
+              if (link && link.textContent.trim() === "") {
+                link.textContent = file.last_msg;
+                if (file.last_hash) {
+                  link.href = "/" + REPO_USER + "/" + REPO_NAME + "/commit/" + file.last_hash;
+                }
               }
             }
           }
-          const timeEl = document.querySelector('[data-time-for="' + file.name + '"]');
+          if (sizeEl && file.size) {
+            if (sizeEl && sizeEl.textContent.trim() === "") {
+              sizeEl.textContent = file.size;
+            }
+          }
+          const timeEl = findDataEl("data-time-for", file.name);
           if (timeEl && timeEl.textContent.trim() === "" && file.last_time) {
             timeEl.textContent = file.last_time;
           }
