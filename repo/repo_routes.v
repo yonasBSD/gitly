@@ -10,6 +10,8 @@ import git
 import config
 import net.urllib
 
+const top_files_limit = 50
+
 @['/:username/repos']
 pub fn (mut app App) user_repos(username string) veb.Result {
 	exists, user := app.check_username(username)
@@ -400,6 +402,20 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		ctx.current_path = ctx.current_path[1..]
 	}
 
+	tree_mode := if 'mode' in ctx.query { ctx.query['mode'] } else { 'tree' }
+	is_top_files_mode := tree_mode == 'top-files'
+	top_files := if is_top_files_mode {
+		repo.top_files(branch_name, top_files_limit)
+	} else {
+		[]File{}
+	}
+	tree_url := if path == '' {
+		'/${username}/${repo_name}/tree/${branch_name}'
+	} else {
+		'/${username}/${repo_name}/tree/${branch_name}/${path}'
+	}
+	top_files_url := '/${username}/${repo_name}/tree/${branch_name}?mode=top-files'
+
 	mut items := app.find_repository_items(repo_id, branch_name, ctx.current_path)
 	branch := app.find_repo_branch_by_name(repo.id, branch_name)
 
@@ -407,22 +423,24 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 
 	show_folder_size := app.settings.tree_folder_size_enabled()
 
-	if items.len == 0 {
-		// No files in the db, fetch them from git and cache in db
-		app.info('${log_prefix}: caching items in repository with ${repo_id}')
+	if !is_top_files_mode {
+		if items.len == 0 {
+			// No files in the db, fetch them from git and cache in db
+			app.info('${log_prefix}: caching items in repository with ${repo_id}')
 
-		items = app.cache_repository_items(mut repo, branch_name, ctx.current_path) or {
-			app.info(err.str())
-			[]File{}
+			items = app.cache_repository_items(mut repo, branch_name, ctx.current_path) or {
+				app.info(err.str())
+				[]File{}
+			}
+			// Fetch commit info in background — don't block the page
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
+		} else if items.any(it.last_msg == '') {
+			// Some files still need commit info — fetch in background
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
+		} else if show_folder_size && items.any(it.is_dir && !it.is_size_calculated) {
+			// Some folders still need size info, fetch in background
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 		}
-		// Fetch commit info in background — don't block the page
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
-	} else if items.any(it.last_msg == '') {
-		// Some files still need commit info — fetch in background
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
-	} else if show_folder_size && items.any(it.is_dir && !it.is_size_calculated) {
-		// Some folders still need size info, fetch in background
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	}
 
 	// Fetch last commit message for this directory, printed at the top of the tree
@@ -455,16 +473,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	has_commits := commits_count > 0
 
 	// Get readme after updating repository
-	mut readme := veb.RawHtml('')
 	readme_file := find_readme_file(items) or { File{} }
-
-	if readme_file.id != 0 {
-		readme_path := '${path}/${readme_file.name}'
-		readme_content := repo.read_file(branch_name, readme_path)
-		highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
-
-		readme = veb.RawHtml(highlighted_readme)
-	}
+	readme := render_readme(repo, branch_name, path, readme_file)
 
 	license_file := find_license_file(items) or { File{} }
 	mut license_file_path := ''
@@ -486,6 +496,18 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	has_ci := ci_status.id != 0
 
 	return $veb.html()
+}
+
+fn render_readme(repo Repo, branch_name string, path string, readme_file File) veb.RawHtml {
+	if readme_file.id == 0 {
+		return veb.RawHtml('')
+	}
+
+	readme_path := '${path}/${readme_file.name}'
+	readme_content := repo.read_file(branch_name, readme_path)
+	highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
+
+	return veb.RawHtml(highlighted_readme)
 }
 
 fn clone_url_for_display(clone_url string) string {

@@ -1,6 +1,10 @@
 const branchSelectEl = document.querySelector(".branch-select");
 branchSelectEl.addEventListener("change", (event) => {
-  window.location.href = TREE_BRANCH_PATH_TEMPLATE + event.target.value;
+  let nextUrl = TREE_BRANCH_PATH_TEMPLATE + event.target.value;
+  if (typeof TREE_MODE !== "undefined" && TREE_MODE === "top-files") {
+    nextUrl += "?mode=top-files";
+  }
+  window.location.href = nextUrl;
 });
 
 branchSelectEl.value = BRANCH_NAME;

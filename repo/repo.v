@@ -617,6 +617,56 @@ fn (r &Repo) parse_ls(ls_line string, branch string) ?File {
 	}
 }
 
+fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
+	tab_pos := line.index('\t') or { return none }
+	meta := line[..tab_pos]
+	item_path := line[tab_pos + 1..]
+	meta_parts := meta.fields()
+	if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+		return none
+	}
+
+	item_name := item_path.after('/')
+	if item_name == '' {
+		return none
+	}
+
+	parent_path_raw := os.dir(item_path)
+	parent_path := if parent_path_raw == '.' { '' } else { parent_path_raw }
+
+	return File{
+		name:               item_name
+		parent_path:        parent_path
+		repo_id:            r.id
+		branch:             branch
+		is_dir:             false
+		size:               meta_parts[3].int()
+		is_size_calculated: true
+	}
+}
+
+fn (r &Repo) top_files(branch string, limit int) []File {
+	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '-r', '--full-name', '--long',
+		branch])
+	if git_result.exit_code != 0 {
+		eprintln('git ls-tree top files error: ${git_result.output}')
+		return []File{}
+	}
+
+	mut files := []File{}
+	for line in git_result.output.split_into_lines() {
+		file := r.parse_top_file_line(line, branch) or { continue }
+		files << file
+	}
+
+	files.sort(b.size < a.size)
+	if files.len > limit {
+		return files[..limit]
+	}
+
+	return files
+}
+
 // Fetches all files via `git ls-tree` and saves them in db
 fn (mut app App) cache_repository_items(mut r Repo, branch string, path string) ![]File {
 	if r.status == .caching {

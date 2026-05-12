@@ -26,7 +26,7 @@
 /* 1. The repo stats panel */
 .repo-stats {
 	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 	align-items: center;
 	border: 1px solid #d8dee4;
 	border-radius: 5px;
@@ -86,6 +86,7 @@ a.repo-stat-item:hover {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	flex-wrap: wrap;
 }
 
 .add-file-btn {
@@ -127,6 +128,41 @@ a.repo-stat-item:hover {
 	background-repeat: no-repeat;
 	background-position: right 8px center;
 	background-size: 10px;
+}
+
+.repo-mode-switch {
+	display: inline-flex;
+	align-items: center;
+	border: 1px solid rgba(27, 31, 35, 0.15);
+	border-radius: 6px;
+	overflow: hidden;
+	background: #ffffff;
+}
+
+.repo-mode-link {
+	display: inline-flex;
+	align-items: center;
+	height: 30px;
+	padding: 0 10px;
+	color: #24292e !important;
+	font-size: 13px !important;
+	line-height: 30px;
+	border-right: 1px solid rgba(27, 31, 35, 0.15);
+	white-space: nowrap;
+
+	&:last-child {
+		border-right: 0;
+	}
+
+	&.active {
+		background: #f6f8fa;
+		font-weight: 600;
+	}
+}
+
+a.repo-mode-link:hover {
+	background: #f6f8fa;
+	text-decoration: none;
 }
 
 /* --- Action Buttons (Code, Star, Watch) --- */
@@ -222,8 +258,9 @@ a.repo-stat-item:hover {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	flex-wrap: wrap;
 
-	h2, p, div:not(.button-container) {
+	p, div:not(.button-container) {
 		/* Hide original text elements if purely for structure,
            or style them if they contain description */
 		//display: none;
