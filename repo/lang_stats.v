@@ -11,6 +11,8 @@ struct LangStat {
 	color       string
 }
 
+const min_lang_summary_pct = 5 // pct is stored in tenths of a percent, so 5 is 0.5%.
+
 const test_lang_stats = [
 	LangStat{
 		name:        'V'
@@ -44,9 +46,10 @@ pub fn (l &LangStat) pct_html() veb.RawHtml {
 }
 
 pub fn (app App) find_repo_lang_stats(repo_id int) []LangStat {
-	return sql app.db {
+	stats := sql app.db {
 		select from LangStat where repo_id == repo_id order by pct desc
-	} or { []LangStat{} }
+	} or { return []LangStat{} }
+	return stats.filter(it.pct >= min_lang_summary_pct)
 }
 
 fn (app App) remove_repo_lang_stats(repo_id int) ! {
