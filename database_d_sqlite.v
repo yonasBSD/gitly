@@ -8,7 +8,12 @@ type GitlyDb = sqlite.DB
 
 fn connect_db(conf config.Config) !GitlyDb {
 	path := first_env(['GITLY_SQLITE_PATH', 'GITLY_DB_PATH'], conf.sqlite.path)
-	return GitlyDb(sqlite.connect(path)!)
+	mut db := sqlite.connect(path)!
+	if db.busy_timeout(10000) != 0 {
+		return error('failed to configure sqlite busy timeout')
+	}
+	db.exec('pragma journal_mode = WAL;') or { eprintln('cannot enable sqlite WAL mode: ${err}') }
+	return GitlyDb(db)
 }
 
 fn db_backend_name() string {
