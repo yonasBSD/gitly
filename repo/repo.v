@@ -25,7 +25,6 @@ struct Repo {
 	latest_update_hash string    @[skip]
 	latest_activity    time.Time @[skip]
 mut:
-	git_repo        &git.Repo = unsafe { nil } @[skip] // libgit wrapper repo
 	webhook_secret  string
 	tags_count      int
 	nr_open_issues  int @[orm: 'open_issues_count']
@@ -103,7 +102,6 @@ fn (app App) find_repo_by_name_and_user_id(repo_name string, user_id int) ?Repo 
 	mut repo := repos[0]
 	repo.lang_stats = app.find_repo_lang_stats(repo.id)
 	println('GIT DIR = ${repo.git_dir}')
-	repo.git_repo = git.new_repo(repo.git_dir)
 
 	return repo
 }
@@ -146,7 +144,6 @@ fn (app &App) search_public_repos(query string) []Repo {
 
 		repos << Repo{
 			id:          row[0].int()
-			git_repo:    unsafe { nil }
 			name:        row[1]
 			user_name:   user.username
 			description: row[3]
@@ -574,7 +571,7 @@ fn (r &Repo) git(command string) string {
 
 	command_with_path := '-C ${r.git_dir} ${command}'
 
-	command_result := os.execute('git ${command_with_path}')
+	command_result := git.Git.exec_in_dir_command(r.git_dir, command)
 	command_exit_code := command_result.exit_code
 	if command_exit_code != 0 {
 		println('git error ${command_with_path} with ${command_exit_code} exit code out=${command_result.output}')
@@ -610,13 +607,63 @@ fn (r &Repo) parse_ls(ls_line string, branch string) ?File {
 	}
 
 	return File{
-		name:        item_name
-		parent_path: parent_path
-		repo_id:     r.id
-		branch:      branch
-		is_dir:      item_type == 'tree'
-		size:        if item_type == 'blob' { item_size.int() } else { 0 }
+		name:               item_name
+		parent_path:        parent_path
+		repo_id:            r.id
+		branch:             branch
+		is_dir:             item_type == 'tree'
+		size:               if item_type == 'blob' { item_size.int() } else { 0 }
+		is_size_calculated: item_type == 'blob'
 	}
+}
+
+fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
+	tab_pos := line.index('\t') or { return none }
+	meta := line[..tab_pos]
+	item_path := line[tab_pos + 1..]
+	meta_parts := meta.fields()
+	if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+		return none
+	}
+
+	item_name := item_path.after('/')
+	if item_name == '' {
+		return none
+	}
+
+	parent_path_raw := os.dir(item_path)
+	parent_path := if parent_path_raw == '.' { '' } else { parent_path_raw }
+
+	return File{
+		name:               item_name
+		parent_path:        parent_path
+		repo_id:            r.id
+		branch:             branch
+		is_dir:             false
+		size:               meta_parts[3].int()
+		is_size_calculated: true
+	}
+}
+
+fn (r &Repo) top_files(branch string, limit int) []File {
+	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '-r', '--full-name', '--long', branch])
+	if git_result.exit_code != 0 {
+		eprintln('git ls-tree top files error: ${git_result.output}')
+		return []File{}
+	}
+
+	mut files := []File{}
+	for line in git_result.output.split_into_lines() {
+		file := r.parse_top_file_line(line, branch) or { continue }
+		files << file
+	}
+
+	files.sort(b.size < a.size)
+	if files.len > limit {
+		return files[..limit]
+	}
+
+	return files
 }
 
 // Fetches all files via `git ls-tree` and saves them in db
@@ -694,8 +741,81 @@ fn (mut app App) slow_fetch_files_info(mut repo Repo, branch string, path string
 	}
 }
 
+fn (mut app App) slow_fetch_folder_sizes(mut repo Repo, branch string, path string) ! {
+	files := app.find_repository_items(repo.id, branch, path)
+	dirs := files.filter(it.is_dir && !it.is_size_calculated)
+	if dirs.len == 0 {
+		return
+	}
+
+	dir_names := dirs.map(it.name)
+	sizes := repo.calculate_child_folder_sizes(branch, path, dir_names)
+
+	for dir in dirs {
+		size := sizes[dir.name] or { 0 }
+		app.update_file_size(dir.id, size, true)!
+	}
+}
+
+fn (r &Repo) calculate_child_folder_sizes(branch string, path string, dir_names []string) map[string]int {
+	mut sizes := map[string]int{}
+	for dir_name in dir_names {
+		sizes[dir_name] = 0
+	}
+	if dir_names.len == 0 {
+		return sizes
+	}
+
+	normalized_path := normalize_tree_path(path)
+	mut args := ['ls-tree', '-r', '--full-name', '--long', branch]
+	if normalized_path != '' {
+		args << '--'
+		args << normalized_path
+	}
+
+	result := git.Git.exec_in_dir(r.git_dir, args)
+	if result.exit_code != 0 {
+		eprintln('git ls-tree error while calculating folder sizes: ${result.output}')
+		return sizes
+	}
+
+	prefix := if normalized_path == '' { '' } else { '${normalized_path}/' }
+	for line in result.output.split_into_lines() {
+		tab_pos := line.index('\t') or { continue }
+		meta := line[..tab_pos]
+		item_path := line[tab_pos + 1..]
+		meta_parts := meta.fields()
+		if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+			continue
+		}
+
+		mut relative_path := item_path
+		if prefix != '' {
+			if !item_path.starts_with(prefix) {
+				continue
+			}
+			relative_path = item_path[prefix.len..]
+		}
+
+		slash_pos := relative_path.index('/') or { continue }
+		child_dir := relative_path[..slash_pos]
+		if child_dir !in sizes {
+			continue
+		}
+
+		sizes[child_dir] = sizes[child_dir] + meta_parts[3].int()
+	}
+
+	return sizes
+}
+
+fn normalize_tree_path(path string) string {
+	return path.trim_string_left('/').trim_string_right('/')
+}
+
 fn (r Repo) get_last_branch_commit_hash(branch_name string) string {
-	git_result := os.execute('git -C ${r.git_dir} log -n 1 ${branch_name} --pretty=format:"%h"')
+	git_result := git.Git.exec_in_dir(r.git_dir,
+		['log', '-n', '1', branch_name, '--pretty=format:%h'])
 	git_output := git_result.output
 
 	if git_result.exit_code != 0 {
@@ -706,7 +826,7 @@ fn (r Repo) get_last_branch_commit_hash(branch_name string) string {
 }
 
 fn (r Repo) git_advertise(service string) string {
-	git_result := os.execute('git ${service} --stateless-rpc --advertise-refs ${r.git_dir}')
+	git_result := git.Git.exec([service, '--stateless-rpc', '--advertise-refs', r.git_dir])
 	git_output := git_result.output
 
 	if git_result.exit_code != 0 {
@@ -788,6 +908,12 @@ fn (mut app App) fetch_file_info(r &Repo, file &File) ! {
 	}!
 }
 
+fn (mut app App) update_file_size(file_id int, size int, is_size_calculated bool) ! {
+	sql app.db {
+		update File set size = size, is_size_calculated = is_size_calculated where id == file_id
+	}!
+}
+
 fn (mut app App) update_repo_primary_branch(repo_id int, branch string) ! {
 	sql app.db {
 		update Repo set primary_branch = branch where id == repo_id
@@ -796,24 +922,14 @@ fn (mut app App) update_repo_primary_branch(repo_id int, branch string) ! {
 
 fn (mut r Repo) clone() {
 	eprintln('R CLONE')
-	if r.git_repo != unsafe { nil } {
-		r.git_repo.clone(r.clone_url, r.git_dir)
-	} else {
-		println('nil')
-	}
+	clone_result := git.Git.clone(r.clone_url, r.git_dir)
+	clone_exit_code := clone_result.exit_code
 
-	/*
-	cmd := 'git clone --bare "${r.clone_url}" ${r.git_dir}'
-	println('CLONE() ${cmd}')
-	clone_result := os.execute('git clone --bare "${r.clone_url}" ${r.git_dir}')
-	close_exit_code := clone_result.exit_code
-
-	if close_exit_code != 0 {
+	if clone_exit_code != 0 {
 		r.status = .clone_failed
-		println('git clone failed with exit code ${close_exit_code}')
+		println('git clone failed with exit code ${clone_exit_code}')
 		return
 	}
-	*/
 
 	r.status = .done
 	eprintln('clone done')
@@ -823,13 +939,10 @@ fn (r &Repo) read_file(branch string, path string) string {
 	valid_path := path.trim_string_left('/')
 
 	println('read_file() path=${valid_path}')
-	if r.git_repo == unsafe { nil } {
-		return 'nil'
-	}
 	t := time.now()
 	// s := r.git('--no-pager show ${branch}:${valid_path}')
 
-	s := r.git_repo.show_file_blob(branch, valid_path) or { '' }
+	s := git.Git.show_file_blob(r.git_dir, branch, valid_path) or { '' }
 	println(time.since(t))
 	println(':)')
 	return s

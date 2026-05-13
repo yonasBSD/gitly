@@ -67,7 +67,7 @@ fn main() {
 	test_blob_page(test_username, repo_name, test_github_repo_primary_branch, 'examples/hello.v')
 	// test_refs_page(test_username, repo_name)
 	// test_api_branches_count(test_username, repo_name)
-	ilog("all tests passed!")
+	ilog('all tests passed!')
 
 	after()!
 }
@@ -143,7 +143,6 @@ fn remove_repos_dir_if_exists() ! {
 
 fn compile_gitly() {
 	ilog('Compile gitly')
-	// TODO: gitly segfaults with mbedtls (some interference with libgit2 initialisation) on Ubuntu 20.04. Investigate why exactly and fix it.
 	// Note that using `-d use_openssl` prevents tcc from working, so the compilation will be much slower:
 	os.execute('v -d use_libbacktrace -cg -keepc -d use_openssl -o gitly.exe .')
 	ilog('Compiled gitly.exe, size: ${os.file_size('gitly.exe')}')
@@ -179,9 +178,8 @@ fn test_index_page() {
 
 // returns headers and token
 fn register_user(username string, password string, email string) !(http.Header, string) {
-	response := http.post(prepare_url('register'), 'username=${username}&password=${password}&email=${email}&no_redirect=1') or {
-		return err
-	}
+	response := http.post(prepare_url('register'),
+		'username=${username}&password=${password}&email=${email}&no_redirect=1') or { return err }
 
 	mut token := ''
 	for val in response.header.values(.set_cookie) {
@@ -209,28 +207,36 @@ fn test_user_page(username string) {
 
 fn test_repo_page(username string, repo_name string) {
 	ilog('Testing the new repo /${username}/${repo_name} page is up')
-	repo_page_result := http.get(prepare_url("${username}/${repo_name}")) or { exit_with_message(err.str()) }
+	repo_page_result := http.get(prepare_url('${username}/${repo_name}')) or {
+		exit_with_message(err.str())
+	}
 
 	assert repo_page_result.status_code == 200
 }
 
 fn test_branch_page(username string, repo_name string, branch_name string) {
 	ilog('Testing the new branch /${username}/${repo_name}/tree/${branch_name} page is up')
-	branch_page_result := http.get(prepare_url("${username}/${repo_name}/tree/${branch_name}")) or { exit_with_message(err.str()) }
+	branch_page_result := http.get(prepare_url('${username}/${repo_name}/tree/${branch_name}')) or {
+		exit_with_message(err.str())
+	}
 
 	assert branch_page_result.status_code == 200
 }
 
 fn test_repos_page(username string) {
 	ilog('Testing the new repos /${username}/repos page is up')
-	repos_page_result := http.get(prepare_url("${username}/repos")) or { exit_with_message(err.str()) }
+	repos_page_result := http.get(prepare_url('${username}/repos')) or {
+		exit_with_message(err.str())
+	}
 
 	assert repos_page_result.status_code == 200
 }
 
 fn test_contributors_page(username string, repo_name string) {
 	ilog('Testing the new contributors /${username}/${repo_name}/contributors page is up')
-	contributors_page_result := http.get(prepare_url("${username}/${repo_name}/contributors")) or { exit_with_message(err.str()) }
+	contributors_page_result := http.get(prepare_url('${username}/${repo_name}/contributors')) or {
+		exit_with_message(err.str())
+	}
 
 	assert contributors_page_result.status_code == 200
 }
@@ -238,21 +244,27 @@ fn test_contributors_page(username string, repo_name string) {
 fn test_commits_page(username string, repo_name string, branch_name string) {
 	ilog('Testing the new commits /${username}/${repo_name}/${branch_name}/commits/1 page is up')
 	// Doesn't work with commits/[no 1]
-	commits_page_result := http.get(prepare_url("${username}/${repo_name}/${branch_name}/commits/1")) or { exit_with_message(err.str()) }
+	commits_page_result := http.get(prepare_url('${username}/${repo_name}/${branch_name}/commits/1')) or {
+		exit_with_message(err.str())
+	}
 
 	assert commits_page_result.status_code == 200
 }
 
 fn test_branches_page(username string, repo_name string) {
 	ilog('Testing the new branches /${username}/${repo_name}/branches page is up')
-	branches_page_result := http.get(prepare_url("${username}/${repo_name}/branches")) or { exit_with_message(err.str()) }
+	branches_page_result := http.get(prepare_url('${username}/${repo_name}/branches')) or {
+		exit_with_message(err.str())
+	}
 
 	assert branches_page_result.status_code == 200
 }
 
 fn test_api_branches_count(username string, repo_name string) {
 	ilog('Testing if api/v1/${username}/${repo_name}/branches/count works')
-	api_branches_count_result := http.get(prepare_url("api/v1/${username}/${repo_name}/branches/count")) or { exit_with_message(err.str()) }
+	api_branches_count_result := http.get(prepare_url('api/v1/${username}/${repo_name}/branches/count')) or {
+		exit_with_message(err.str())
+	}
 	// api_branches_count_result := http.fetch(
 	// 	method:  .get
 	// 	url:     prepare_url("api/v1/${username}/${repo_name}/branches/count")
@@ -268,48 +280,57 @@ fn test_api_branches_count(username string, repo_name string) {
 
 fn test_refs_page(username string, repo_name string) {
 	ilog('Testing the new refs /${username}/${repo_name}/info/refs page is up')
-	refs_page_result := http.get(prepare_url("${username}/${repo_name}/info/refs")) or { exit_with_message(err.str()) }
+	refs_page_result := http.get(prepare_url('${username}/${repo_name}/info/refs')) or {
+		exit_with_message(err.str())
+	}
 
 	assert refs_page_result.status_code == 200
 }
 
 fn test_oauth_page() {
 	ilog('Testing the new oauth /oauth page is up')
-	oauth_page_result := http.get(prepare_url("oauth")) or { exit_with_message(err.str()) }
+	oauth_page_result := http.get(prepare_url('oauth')) or { exit_with_message(err.str()) }
 
 	assert oauth_page_result.status_code == 200
 }
 
 fn test_repo_tree(username string, repo_name string, branch_name string, path string) {
 	ilog('Testing the new tree /${username}/${repo_name}/tree/${branch_name}/${path} page is up')
-	repo_tree_result := http.get(prepare_url("${username}/${repo_name}/tree/${branch_name}/${path}")) or { exit_with_message(err.str()) }
+	repo_tree_result := http.get(prepare_url('${username}/${repo_name}/tree/${branch_name}/${path}')) or {
+		exit_with_message(err.str())
+	}
 
 	assert repo_tree_result.status_code == 200
 }
+
 // fn test_issues_page(username string) {
 // 	test_endpoint_page("${username}/issues", 'issues')
 // }
 
 fn test_stars_page(username string) {
-	ilog("Testing the new stars /${username}/stars page is up")
-	stars_page_result := http.get(prepare_url("${username}/stars")) or { exit_with_message(err.str()) }
+	ilog('Testing the new stars /${username}/stars page is up')
+	stars_page_result := http.get(prepare_url('${username}/stars')) or {
+		exit_with_message(err.str())
+	}
 
 	assert stars_page_result.status_code == 200
 }
 
 fn test_settings_page(username string) {
 	ilog('Testing the new settings /${username}/settings page is up')
-	settings_page_result := http.get(prepare_url("${username}/settings")) or { exit_with_message(err.str()) }
+	settings_page_result := http.get(prepare_url('${username}/settings')) or {
+		exit_with_message(err.str())
+	}
 
 	assert settings_page_result.status_code == 200
 }
 
 fn test_blob_page(username string, repo_name string, branch_name string, path string) {
-	url := "${username}/${repo_name}/blob/${branch_name}/${path}"
+	url := '${username}/${repo_name}/blob/${branch_name}/${path}'
 	ilog('Testing the new blob /${url} page is up')
 	blob_page_result := http.fetch(
-		method:  .get
-		url:     prepare_url(url)
+		method: .get
+		url:    prepare_url(url)
 	) or { exit_with_message(err.str()) }
 
 	assert blob_page_result.status_code == 200
@@ -317,12 +338,12 @@ fn test_blob_page(username string, repo_name string, branch_name string, path st
 }
 
 fn test_repo_settings_page(username string, repo_name string) {
-	test_endpoint_page("${username}/${repo_name}/settings", 'settings')
+	test_endpoint_page('${username}/${repo_name}/settings', 'settings')
 }
 
 fn test_endpoint_page(endpoint string, pagename string) {
-	ilog('Testing the new ${pagename} /${endpoint} page is up')	
-	endpoint_result := http.get(prepare_url("${endpoint}")) or { exit_with_message(err.str()) }
+	ilog('Testing the new ${pagename} /${endpoint} page is up')
+	endpoint_result := http.get(prepare_url('${endpoint}')) or { exit_with_message(err.str()) }
 
 	assert endpoint_result.status_code == 200
 }

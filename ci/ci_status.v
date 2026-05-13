@@ -41,7 +41,7 @@ fn (s CiStatusEnum) icon() string {
 }
 
 struct CiStatus {
-	id          int    @[primary; sql: serial]
+	id          int @[primary; sql: serial]
 	repo_id     int
 	commit_hash string
 	branch      string
@@ -97,7 +97,8 @@ fn (mut app App) add_ci_status(ci CiStatus) ! {
 fn (mut app App) update_ci_status(repo_id int, commit_hash string, status CiStatusEnum) ! {
 	updated := int(time.now().unix())
 	sql app.db {
-		update CiStatus set status = status, updated_at = updated where repo_id == repo_id && commit_hash == commit_hash
+		update CiStatus set status = status, updated_at = updated where repo_id == repo_id
+		&& commit_hash == commit_hash
 	}!
 }
 
@@ -119,7 +120,8 @@ fn (mut app App) upsert_ci_status(repo_id int, commit_hash string, branch string
 	id := existing.id
 	updated := int(time.now().unix())
 	sql app.db {
-		update CiStatus set status = status, ci_run_id = ci_run_id, updated_at = updated where id == id
+		update CiStatus set status = status, ci_run_id = ci_run_id, updated_at = updated
+		where id == id
 	}!
 }
 

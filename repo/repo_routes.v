@@ -8,6 +8,9 @@ import highlight
 import validation
 import git
 import config
+import net.urllib
+
+const top_files_limit = 50
 
 @['/:username/repos']
 pub fn (mut app App) user_repos(username string) veb.Result {
@@ -236,7 +239,6 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	repo_path := os.join_path(app.config.repo_storage_path, ctx.user.username, name)
 	id := app.get_count_repo() + 1
 	mut new_repo := &Repo{
-		git_repo:       git.new_repo(repo_path)
 		name:           name
 		id:             id
 		description:    description
@@ -255,6 +257,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		// t := time.now()
 
 		new_repo.status = .cloning
+		app.clone_urls[new_repo.id] = clone_url_for_display(valid_clone_url)
 		spawn clone_repo(mut new_repo, app.config)
 		// new_repo.clone()
 		// println(time.since(t))
@@ -306,8 +309,14 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Confi
 		}
 		config: conf
 	}
+	app.load_settings()
 	app.slow_fetch_files_info(mut repo, branch, path) or {
 		eprintln('bg_fetch_files_info error: ${err}')
+	}
+	if app.settings.tree_folder_size_enabled() {
+		app.slow_fetch_folder_sizes(mut repo, branch, path) or {
+			eprintln('bg_fetch_folder_sizes error: ${err}')
+		}
 	}
 	app.db.close() or {}
 }
@@ -334,6 +343,7 @@ fn clone_repo(mut new_repo Repo, conf config.Config) {
 }
 
 pub fn (mut app App) kekw(mut ctx Context) veb.Result {
+	clone_url := ''
 	return $veb.html('templates/cloning_in_process.html')
 }
 
@@ -343,10 +353,13 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		eprintln('tree() repo ${repo_name} not found')
 		return ctx.not_found()
 	}
+	mut clone_url := ''
 	eprintln('!!! REPO STATUS = ${repo.status}')
 	if repo.status == .cloning {
+		clone_url = app.clone_urls[repo.id] or { '' }
 		return $veb.html('templates/cloning_in_process.html')
 	}
+	app.clone_urls.delete(repo.id)
 
 	_, user := app.check_username(username)
 	if !repo.is_public {
@@ -389,28 +402,50 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		ctx.current_path = ctx.current_path[1..]
 	}
 
+	tree_mode := if 'mode' in ctx.query { ctx.query['mode'] } else { 'tree' }
+	is_top_files_mode := tree_mode == 'top-files'
+	top_files := if is_top_files_mode {
+		repo.top_files(branch_name, top_files_limit)
+	} else {
+		[]File{}
+	}
+	tree_url := if path == '' {
+		'/${username}/${repo_name}/tree/${branch_name}'
+	} else {
+		'/${username}/${repo_name}/tree/${branch_name}/${path}'
+	}
+	top_files_url := '/${username}/${repo_name}/tree/${branch_name}?mode=top-files'
+
 	mut items := app.find_repository_items(repo_id, branch_name, ctx.current_path)
 	branch := app.find_repo_branch_by_name(repo.id, branch_name)
 
 	app.info('${log_prefix}: ${items.len} items found in branch ${branch_name}')
 
-	if items.len == 0 {
-		// No files in the db, fetch them from git and cache in db
-		app.info('${log_prefix}: caching items in repository with ${repo_id}')
+	show_folder_size := app.settings.tree_folder_size_enabled()
 
-		items = app.cache_repository_items(mut repo, branch_name, ctx.current_path) or {
-			app.info(err.str())
-			[]File{}
+	if !is_top_files_mode {
+		if items.len == 0 {
+			// No files in the db, fetch them from git and cache in db
+			app.info('${log_prefix}: caching items in repository with ${repo_id}')
+
+			items = app.cache_repository_items(mut repo, branch_name, ctx.current_path) or {
+				app.info(err.str())
+				[]File{}
+			}
+			// Fetch commit info in background — don't block the page
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
+		} else if items.any(it.last_msg == '') {
+			// Some files still need commit info — fetch in background
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
+		} else if show_folder_size && items.any(it.is_dir && !it.is_size_calculated) {
+			// Some folders still need size info, fetch in background
+			spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 		}
-		// Fetch commit info in background — don't block the page
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
-	} else if items.any(it.last_msg == '') {
-		// Some files still need commit info — fetch in background
-		spawn bg_fetch_files_info(repo, branch_name, ctx.current_path, app.config)
 	}
 
 	// Fetch last commit message for this directory, printed at the top of the tree
 	mut last_commit := Commit{}
+	mut dir := File{}
 	if can_up {
 		mut p := path
 		if p.ends_with('/') {
@@ -419,7 +454,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		if !p.contains('/') {
 			p = '/${p}'
 		}
-		if dir := app.find_repo_file_by_path(repo.id, branch_name, p) {
+		dir = app.find_repo_file_by_path(repo.id, branch_name, p) or { File{} }
+		if dir.id != 0 {
 			last_commit = app.find_repo_commit_by_hash(repo.id, dir.last_hash)
 		}
 	} else {
@@ -437,16 +473,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	has_commits := commits_count > 0
 
 	// Get readme after updating repository
-	mut readme := veb.RawHtml('')
 	readme_file := find_readme_file(items) or { File{} }
-
-	if readme_file.id != 0 {
-		readme_path := '${path}/${readme_file.name}'
-		readme_content := repo.read_file(branch_name, readme_path)
-		highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
-
-		readme = veb.RawHtml(highlighted_readme)
-	}
+	readme := render_readme(repo, branch_name, path, readme_file)
 
 	license_file := find_license_file(items) or { File{} }
 	mut license_file_path := ''
@@ -468,6 +496,27 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	has_ci := ci_status.id != 0
 
 	return $veb.html()
+}
+
+fn render_readme(repo Repo, branch_name string, path string, readme_file File) veb.RawHtml {
+	if readme_file.id == 0 {
+		return veb.RawHtml('')
+	}
+
+	readme_path := '${path}/${readme_file.name}'
+	readme_content := repo.read_file(branch_name, readme_path)
+	highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
+
+	return veb.RawHtml(highlighted_readme)
+}
+
+fn clone_url_for_display(clone_url string) string {
+	mut display_url := urllib.parse(clone_url) or { return clone_url }
+	display_url.user = none
+	display_url.raw_query = ''
+	display_url.fragment = ''
+	display_url.force_query = false
+	return display_url.str()
 }
 
 @['/api/v1/repos/:repo_id/star'; 'post']
@@ -539,6 +588,7 @@ pub fn (mut app App) handle_api_repo_files(mut ctx Context, repo_id_str string) 
 			last_msg:  item.last_msg
 			last_hash: item.last_hash
 			last_time: item.pretty_last_time()
+			size:      item.pretty_tree_size()
 		}
 	}
 

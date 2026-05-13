@@ -26,7 +26,8 @@ fn (mut app App) fetch_branches(repo Repo) ! {
 fn (mut app App) fetch_branch(repo Repo, branch_name string) ! {
 	last_commit_hash := repo.get_last_branch_commit_hash(branch_name)
 
-	branch_data := repo.git('log ${branch_name} -1 --pretty="%aE${log_field_separator}%cD" ${last_commit_hash}')
+	branch_data :=
+		repo.git('log ${branch_name} -1 --pretty="%aE${log_field_separator}%cD" ${last_commit_hash}')
 	log_parts := branch_data.split(log_field_separator)
 
 	author_email := log_parts[0]
@@ -68,7 +69,7 @@ fn (mut app App) create_branch_or_update(repository_id int, branch_name string, 
 		date:    date
 	}
 
-	app.debug("inserting branch: ${new_branch}")
+	app.debug('inserting branch: ${new_branch}')
 
 	sql app.db {
 		insert new_branch into Branch

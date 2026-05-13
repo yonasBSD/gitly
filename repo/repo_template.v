@@ -14,27 +14,27 @@ fn (mut app App) format_commits_count(repo Repo, branch_name string) veb.RawHtml
 	branch := app.find_repo_branch_by_name(repo.id, branch_name)
 	nr_commits := app.get_repo_commit_count(repo.id, branch.id)
 
-	return get_declension_form(nr_commits, 'Commit', 'Commits')
+	return get_declension_form(nr_commits, 'commit', 'commits')
 }
 
 fn (r &Repo) format_nr_branches() veb.RawHtml {
-	return get_declension_form(r.nr_branches, 'Branch', 'Branches')
+	return get_declension_form(r.nr_branches, 'branch', 'branches')
 }
 
 fn (r &Repo) format_nr_tags() veb.RawHtml {
-	return get_declension_form(r.nr_tags, 'Branch', 'Branches')
+	return get_declension_form(r.nr_tags, 'tag', 'tags')
 }
 
 fn (r &Repo) format_nr_open_prs() veb.RawHtml {
-	return get_declension_form(r.nr_open_prs, 'Pull request', 'Pull requests')
+	return get_declension_form(r.nr_open_prs, 'pull request', 'pull requests')
 }
 
 fn (r &Repo) format_nr_open_issues() veb.RawHtml {
-	return get_declension_form(r.nr_open_issues, 'Issue', 'Issues')
+	return get_declension_form(r.nr_open_issues, 'issue', 'issues')
 }
 
 fn (r &Repo) format_nr_contributors() veb.RawHtml {
-	return get_declension_form(r.nr_contributors, 'Contributor', 'Contributors')
+	return get_declension_form(r.nr_contributors, 'contributor', 'contributors')
 }
 
 fn (r &Repo) format_nr_topics() veb.RawHtml {
@@ -42,5 +42,5 @@ fn (r &Repo) format_nr_topics() veb.RawHtml {
 }
 
 fn (r &Repo) format_nr_releases() veb.RawHtml {
-	return get_declension_form(r.nr_releases, 'Release', 'Releases')
+	return get_declension_form(r.nr_releases, 'release', 'releases')
 }

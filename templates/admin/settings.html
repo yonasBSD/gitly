@@ -27,6 +27,14 @@
 					<input name='oauth_client_secret' type='text' placeholder='...'>
 				</div>
 				<div class="field">
+					<input name="tree_folder_size_enabled" type="checkbox"
+					@if app.settings.tree_folder_size_enabled()
+						checked
+					@end
+					>
+					<label>Display folder sizes in repository tree</label>
+				</div>
+				<div class="field">
 					<input type='submit' value='Update settings'>
 				</div>
 			</form>

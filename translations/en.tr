@@ -14,6 +14,9 @@ New repo
 repo_being_cloned_plz_wait
 Your repo is being cloned. Please wait a bit...
 -----
+repo_being_cloned_clone_url
+Clone URL:
+-----
 username
 Username
 -----
@@ -23,6 +26,7 @@ Password
 email
 Email
 -----
+
 
 
 

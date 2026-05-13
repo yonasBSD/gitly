@@ -5,8 +5,13 @@ module main
 struct Settings {
 	id int @[primary; sql: serial]
 mut:
-	oauth_client_id     string
-	oauth_client_secret string
+	oauth_client_id          string
+	oauth_client_secret      string
+	disable_tree_folder_size bool
+}
+
+fn (s Settings) tree_folder_size_enabled() bool {
+	return !s.disable_tree_folder_size
 }
 
 fn (mut app App) load_settings() {
@@ -21,7 +26,7 @@ fn (mut app App) load_settings() {
 	}
 }
 
-fn (mut app App) update_settings(oauth_client_id string, oauth_client_secret string) ! {
+fn (mut app App) update_settings(oauth_client_id string, oauth_client_secret string, tree_folder_size_enabled bool) ! {
 	settings_result := sql app.db {
 		select from Settings limit 1
 	} or { [] }
@@ -44,10 +49,13 @@ fn (mut app App) update_settings(oauth_client_id string, oauth_client_secret str
 		old_settings.oauth_client_secret
 	}
 
+	disable_tree_folder_size := !tree_folder_size_enabled
+
 	if old_settings.id == 0 {
 		new_settings := Settings{
-			oauth_client_id:     github_oauth_client_id
-			oauth_client_secret: github_oauth_client_secret
+			oauth_client_id:          github_oauth_client_id
+			oauth_client_secret:      github_oauth_client_secret
+			disable_tree_folder_size: disable_tree_folder_size
 		}
 
 		sql app.db {
@@ -55,8 +63,8 @@ fn (mut app App) update_settings(oauth_client_id string, oauth_client_secret str
 		}!
 	} else {
 		sql app.db {
-			update Settings set oauth_client_id = github_oauth_client_id, oauth_client_secret = github_oauth_client_secret
-			where id == old_settings.id
+			update Settings set oauth_client_id = github_oauth_client_id, oauth_client_secret = github_oauth_client_secret,
+			disable_tree_folder_size = disable_tree_folder_size where id == old_settings.id
 		}!
 	}
 }

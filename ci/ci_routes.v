@@ -4,8 +4,8 @@ import veb
 import api
 import json
 import net.http
-import os
 import time
+import git
 
 struct CiStatusCallback {
 	run_id      string
@@ -49,7 +49,8 @@ pub fn (mut app App) ci_runs(username string, repo_name string) veb.Result {
 	}
 
 	// Check if .gitly-ci.yml exists in the repo
-	has_ci_file := os.execute('git -C ${repo.git_dir} show ${repo.primary_branch}:.gitly-ci.yml').exit_code == 0
+	has_ci_file := git.Git.exec_in_dir(repo.git_dir,
+		['show', '${repo.primary_branch}:.gitly-ci.yml']).exit_code == 0
 
 	// Fetch runs from gitly_ci service for a complete list
 	mut ci_runs := []CiRunListItem{}
@@ -103,9 +104,7 @@ pub fn (mut app App) ci_run_detail(username string, repo_name string, run_id_str
 	}
 
 	ci_url := '${app.config.ci_service_url}/api/v1/runs/${ci_run_id}'
-	response := http.get(ci_url) or {
-		return ctx.not_found()
-	}
+	response := http.get(ci_url) or { return ctx.not_found() }
 
 	if response.status_code != 200 {
 		return ctx.not_found()
@@ -114,9 +113,7 @@ pub fn (mut app App) ci_run_detail(username string, repo_name string, run_id_str
 	ci_run_json := response.body
 
 	// Parse the response to display
-	run_data := json.decode(CiApiRunResponse, ci_run_json) or {
-		return ctx.not_found()
-	}
+	run_data := json.decode(CiApiRunResponse, ci_run_json) or { return ctx.not_found() }
 
 	ci_run := run_data.result
 
@@ -141,17 +138,13 @@ pub fn (mut app App) ci_restart_run(username string, repo_name string, run_id_st
 
 	// Call gitly_ci restart API
 	restart_url := '${app.config.ci_service_url}/api/v1/runs/${ci_run_id}/restart'
-	response := http.post(restart_url, '') or {
-		return ctx.not_found()
-	}
+	response := http.post(restart_url, '') or { return ctx.not_found() }
 
 	if response.status_code != 200 {
 		return ctx.not_found()
 	}
 
-	result := json.decode(CiApiRunResponse, response.body) or {
-		return ctx.not_found()
-	}
+	result := json.decode(CiApiRunResponse, response.body) or { return ctx.not_found() }
 
 	if result.success {
 		new_run := result.result

@@ -32,6 +32,16 @@ fn db_exec_values(db &GitlyDb, query string) ![][]string {
 	return values
 }
 
+fn db_column_exists(db &GitlyDb, table_name string, column_name string) !bool {
+	rows := db_exec_values(db,
+		'select column_name from information_schema.columns where table_name = ${sql_literal(table_name.to_lower())} and column_name = ${sql_literal(column_name)}')!
+	return rows.len > 0
+}
+
+fn db_bool_column_type() string {
+	return 'BOOLEAN NOT NULL DEFAULT false'
+}
+
 fn first_env(keys []string, fallback string) string {
 	for key in keys {
 		value := os.getenv(key)

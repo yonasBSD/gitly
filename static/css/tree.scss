@@ -11,45 +11,64 @@
 	margin-bottom: 20px;
 }
 
-/* 1. The Tab Bar (Issues, Contributors, etc.) */
-.repo-stats {
+.repo-title-bar {
 	display: flex;
-	border-bottom: 1px solid #e1e4e8;
-	margin-bottom: 20px;
-	margin-top: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0 6px;
+}
 
-	a.menu {
-		display: flex;
-		align-items: center;
-		padding: 8px 16px;
-		color: #24292e !important;
-		font-size: 14px;
-		border-bottom: 2px solid transparent;
-		transition: border-bottom 0.2s;
+.repo-settings-link {
+	margin-left: 6px;
+	font-size: 13px;
+}
 
-		&:hover {
-			border-bottom: 2px solid #d1d5da;
-			text-decoration: none;
-		}
+/* 1. The repo stats panel */
+.repo-stats {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	align-items: center;
+	border: 1px solid #d8dee4;
+	border-radius: 5px;
+	background: #ffffff;
+	margin: 8px 0 10px;
+	min-height: 36px;
+	overflow: hidden;
+}
 
-		/* Active state simulation */
-		&.active {
-			border-bottom: 2px solid #f9826c;
-			font-weight: 600;
-		}
+.repo-stat-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	color: #111111 !important;
+	font-size: 14px !important;
+	font-weight: 600;
+	line-height: 20px;
+	min-width: 0;
+	padding: 7px 8px;
+	white-space: nowrap;
 
-		svg {
-			margin-right: 8px;
-			fill: #959da5;
-		}
+	b {
+		font-weight: 700;
+	}
 
-		b {
-			margin-left: 5px;
-			background: rgba(209, 213, 218, 0.5);
-			padding: 0 6px;
-			border-radius: 20px;
-			font-size: 12px;
-		}
+	svg {
+		color: #111111;
+		flex: 0 0 auto;
+		height: 15px;
+		width: 15px;
+	}
+}
+
+a.repo-stat-item:hover {
+	background: #f6f8fa;
+	text-decoration: none;
+}
+
+@media (max-width: 760px) {
+	.repo-stats {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
@@ -67,6 +86,7 @@
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	flex-wrap: wrap;
 }
 
 .add-file-btn {
@@ -110,25 +130,39 @@
 	background-size: 10px;
 }
 
-/* Commits Link */
-.branch-specific-item {
-	a {
-		color: #586069 !important;
-		font-size: 13px !important;
-		font-weight: 600;
-		display: flex;
-		align-items: center;
+.repo-mode-switch {
+	display: inline-flex;
+	align-items: center;
+	border: 1px solid rgba(27, 31, 35, 0.15);
+	border-radius: 6px;
+	overflow: hidden;
+	background: #ffffff;
+}
 
-		&:hover {
-			color: #0366d6 !important;
-			text-decoration: none;
-		}
+.repo-mode-link {
+	display: inline-flex;
+	align-items: center;
+	height: 30px;
+	padding: 0 10px;
+	color: #24292e !important;
+	font-size: 13px !important;
+	line-height: 30px;
+	border-right: 1px solid rgba(27, 31, 35, 0.15);
+	white-space: nowrap;
 
-		svg {
-			margin-right: 4px;
-			fill: #959da5;
-		}
+	&:last-child {
+		border-right: 0;
 	}
+
+	&.active {
+		background: #f6f8fa;
+		font-weight: 600;
+	}
+}
+
+a.repo-mode-link:hover {
+	background: #f6f8fa;
+	text-decoration: none;
 }
 
 /* --- Action Buttons (Code, Star, Watch) --- */
@@ -224,8 +258,9 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	flex-wrap: wrap;
 
-	h2, p, div:not(.button-container) {
+	p, div:not(.button-container) {
 		/* Hide original text elements if purely for structure,
            or style them if they contain description */
 		//display: none;

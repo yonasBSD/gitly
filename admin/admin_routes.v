@@ -21,7 +21,10 @@ pub fn (mut app App) handle_admin_update_settings(oauth_client_id string, oauth_
 		return ctx.redirect_to_index()
 	}
 
-	app.update_gitly_settings(oauth_client_id, oauth_client_secret) or { app.info(err.str()) }
+	tree_folder_size_enabled := 'tree_folder_size_enabled' in ctx.form
+	app.update_gitly_settings(oauth_client_id, oauth_client_secret, tree_folder_size_enabled) or {
+		app.info(err.str())
+	}
 
 	return ctx.redirect('/admin')
 }
