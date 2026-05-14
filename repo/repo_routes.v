@@ -140,7 +140,6 @@ pub fn (mut app App) handle_repo_move(username string, repo_name string, dest st
 
 @['/:username/:repo_name']
 pub fn (mut app App) handle_tree(mut ctx Context, username string, repo_name string) veb.Result {
-	println('handle tree()')
 	match repo_name {
 		'repos' {
 			return app.user_repos(mut ctx, username)
@@ -354,7 +353,6 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		return ctx.not_found()
 	}
 	mut clone_url := ''
-	eprintln('!!! REPO STATUS = ${repo.status}')
 	if repo.status == .cloning {
 		clone_url = app.clone_urls[repo.id] or { '' }
 		return $veb.html('templates/cloning_in_process.html')
@@ -369,20 +367,19 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 
 	repo_id := repo.id
-	log_prefix := '${username}/${repo_name}'
 
 	// XTODO
 	// app.fetch_tags(repo) or { app.info(err.str()) }
 
-	ctx.current_path = '/${path}'
-	if ctx.current_path.contains('/favicon.svg') {
+	ctx.current_path = path
+	if path.contains('favicon.svg') {
 		return ctx.not_found()
 	}
 
-	path_parts := path.split('/')
-
 	ctx.path_split = [repo_name]
-	ctx.path_split << path_parts
+	if path != '' {
+		ctx.path_split << path.split('/')
+	}
 
 	ctx.is_tree = true
 
@@ -391,15 +388,11 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	mut up := '/'
 	can_up := path != ''
 	if can_up {
-		if path.split('/').len == 1 {
+		if !path.contains('/') {
 			up = '../..'
 		} else {
 			up = ctx.req.url.all_before_last('/')
 		}
-	}
-
-	if ctx.current_path.starts_with('/') {
-		ctx.current_path = ctx.current_path[1..]
 	}
 
 	tree_mode := if 'mode' in ctx.query { ctx.query['mode'] } else { 'tree' }
@@ -419,15 +412,11 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	mut items := app.find_repository_items(repo_id, branch_name, ctx.current_path)
 	branch := app.find_repo_branch_by_name(repo.id, branch_name)
 
-	app.info('${log_prefix}: ${items.len} items found in branch ${branch_name}')
-
 	show_folder_size := app.settings.tree_folder_size_enabled()
 
 	if !is_top_files_mode {
 		if items.len == 0 {
 			// No files in the db, fetch them from git and cache in db
-			app.info('${log_prefix}: caching items in repository with ${repo_id}')
-
 			items = app.cache_repository_items(mut repo, branch_name, ctx.current_path) or {
 				app.info(err.str())
 				[]File{}
@@ -462,12 +451,21 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		last_commit = app.find_repo_last_commit(repo.id, branch.id)
 	}
 
-	dirs := items.filter(it.is_dir)
-	files := items.filter(!it.is_dir)
-
-	items = []
-	items << dirs
-	items << files
+	mut next_dir_idx := 0
+	for scan_idx in 0 .. items.len {
+		if items[scan_idx].is_dir {
+			if scan_idx != next_dir_idx {
+				moving_dir := items[scan_idx]
+				mut move_idx := scan_idx
+				for move_idx > next_dir_idx {
+					items[move_idx] = items[move_idx - 1]
+					move_idx--
+				}
+				items[next_dir_idx] = moving_dir
+			}
+			next_dir_idx++
+		}
+	}
 
 	commits_count := app.get_repo_commit_count(repo.id, branch.id)
 	has_commits := commits_count > 0
@@ -482,7 +480,6 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	if license_file.id != 0 {
 		license_file_path = '/${username}/${repo_name}/blob/${branch_name}/${license_file.name}'
 	}
-	eprintln('license_file_path=${license_file_path}')
 
 	watcher_count := app.get_count_repo_watchers(repo_id)
 	is_repo_starred := app.check_repo_starred(repo_id, ctx.user.id)

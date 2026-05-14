@@ -7,6 +7,9 @@ enum Lang {
 	ru
 }
 
+const tr_menu_en = '<select id=select_lang><option value=en selected>English</option><option value=ru>Русский</option></select>'
+const tr_menu_ru = '<select id=select_lang><option value=en>English</option><option value=ru selected>Русский</option></select>'
+
 fn get_port(conf config.Config) int {
 	// Priority: -p flag > GITLY_PORT env > config.json port > 8080
 	for i, arg in os.args {
@@ -42,18 +45,8 @@ fn main() {
 }
 
 fn build_tr_menu(cur_lang Lang) string {
-	println('BUILD TR ${cur_lang}')
-	// mut sb := strings.new_builder()
-	// sb.write_string('<select>')
-	// TODO loop when >2 langs
-	s := '<select id=select_lang>' +
-		'<option value=en ${if cur_lang == .en { 'selected' } else { '' }}>English</option>' +
-		'<option value=ru ${if cur_lang == .ru { 'selected' } else { '' }}>Русский</option></select>'
-	/*
-	s := match cur_lang {
-		.ru { 'English' }
-		.en { 'Русский' }
+	return match cur_lang {
+		.ru { tr_menu_ru }
+		.en { tr_menu_en }
 	}
-	*/
-	return s
 }

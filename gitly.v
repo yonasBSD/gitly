@@ -92,6 +92,7 @@ fn new_app() !&App {
 	app.version = version
 
 	app.handle_static('static', true)!
+	app.serve_static('/favicon.ico', 'static/assets/favicon.svg')!
 	if !os.exists('avatars') {
 		os.mkdir('avatars')!
 	}
@@ -142,17 +143,28 @@ pub fn (mut app App) init_server() {
 }
 
 pub fn (mut app App) before_request(mut ctx Context) bool {
-	url := ctx.req.url
+	$if trace_prealloc ? {
+		unsafe { prealloc_scope_checkpoint(c'gitly before_request start') }
+	}
 	ctx.logged_in = app.is_logged_in(mut ctx)
-	app.load_settings() // TODO no need in doing this for each request
+	$if trace_prealloc ? {
+		unsafe { prealloc_scope_checkpoint(c'gitly checked login') }
+	}
 	if ctx.logged_in {
 		ctx.user = app.get_user_from_cookies(ctx) or {
 			ctx.logged_in = false
 			User{}
 		}
 	}
-	dump(url)
-	ctx.lang = Lang.from_string(ctx.get_cookie('lang') or { 'en' }) or { Lang.en }
+	$if trace_prealloc ? {
+		unsafe { prealloc_scope_checkpoint(c'gitly loaded user') }
+	}
+	lang_cookie := ctx.get_cookie('lang') or { '' }
+	ctx.lang = if lang_cookie == 'ru' { .ru } else { .en }
+
+	$if trace_prealloc ? {
+		unsafe { prealloc_scope_checkpoint(c'gitly loaded lang') }
+	}
 	return true
 }
 
@@ -292,8 +304,10 @@ fn (mut app App) send_file(filname string, content string) veb.Result {
 }
 
 fn (mut ctx Context) page_gen_time() string {
+	if ctx.page_gen_start == 0 {
+		return '<1ms'
+	}
 	diff := int(time.ticks() - ctx.page_gen_start)
-	println('DIFF=${diff}')
 	return if diff == 0 {
 		'<1ms'
 	} else {
