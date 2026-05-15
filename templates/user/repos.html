@@ -17,9 +17,9 @@
 			@if repos.len > 0
 				<div class="repo-list">
 					@for repo in repos
-						<a class="repo-card" href="/@user.username/@repo.name">
+						<div class="repo-card">
 							<div class="repo-card__header">
-								<span class="repo-card__title">@repo.name</span>
+								<a class="repo-card__title" href="/@user.username/@repo.name">@repo.name</a>
 								@if repo.is_public
 									<span class="repo-card__badge">Public</span>
 								@else
@@ -29,12 +29,25 @@
 							@if repo.description.len > 0
 								<p class="repo-card__desc">@repo.description</p>
 							@end
-							<div class="repo-card__meta">
-								<span class="repo-card__meta-item" title="Stars">&#9733; @repo.nr_stars</span>
-								<span class="repo-card__meta-item" title="Open issues">&#9679; @repo.nr_open_issues</span>
-								<span class="repo-card__meta-item" title="Branches">&#9874; @repo.nr_branches</span>
+							<div class="repo-card__footer">
+								<div class="repo-card__footer-left">
+									@if repo.lang_stats.len > 0
+										<span class="repo-card__lang">
+											<span class="repo-card__lang-dot" style="background-color:@{repo.lang_stats[0].color}"></span>
+											@repo.lang_stats[0].name
+										</span>
+									@end
+									@if repo.latest_commit_at > 0
+										<span class="repo-card__updated">Updated @{repo.last_updated_str()}</span>
+									@end
+								</div>
+								@if repo.activity_buckets.len > 0
+									<svg class="repo-card__activity" viewBox="0 0 120 28" preserveAspectRatio="none">
+										<polyline fill="none" stroke="#39d353" stroke-width="1.5" points="@{repo.activity_svg_points()}"/>
+									</svg>
+								@end
 							</div>
-						</a>
+						</div>
 					@end
 				</div>
 			@else

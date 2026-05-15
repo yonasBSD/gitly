@@ -149,5 +149,8 @@ fn (mut app App) delete_repository_files_in_branch(repository_id int, branch_nam
 }
 
 fn (mut app App) delete_repo_folder(path string) {
-	os.rmdir_all(os.real_path(path)) or { panic(err) }
+	if path == '' {
+		return
+	}
+	os.rmdir_all(os.real_path(path)) or { app.warn('failed to remove repo folder ${path}: ${err}') }
 }

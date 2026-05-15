@@ -273,6 +273,7 @@ fn (mut app App) create_tables() ! {
 fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('File', 'is_size_calculated', db_bool_column_type())!
 	app.add_missing_column('Settings', 'disable_tree_folder_size', db_bool_column_type())!
+	app.add_missing_column('Repo', 'is_deleted', db_bool_column_type())!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {

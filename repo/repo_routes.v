@@ -25,6 +25,12 @@ pub fn (mut app App) user_repos(username string) veb.Result {
 		repos = app.find_user_repos(user.id)
 	}
 
+	for mut repo in repos {
+		repo.lang_stats = app.find_repo_lang_stats(repo.id)
+		repo.latest_commit_at = app.find_repo_last_commit_time(repo.id)
+		repo.activity_buckets = app.get_repo_activity_buckets(repo.id)
+	}
+
 	return $veb.html('templates/user/repos.html')
 }
 

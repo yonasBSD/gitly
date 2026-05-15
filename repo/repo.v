@@ -18,6 +18,7 @@ struct Repo {
 	primary_branch     string
 	description        string
 	is_public          bool
+	is_deleted         bool
 	users_contributed  []string @[skip]
 	users_authorized   []string @[skip]
 	nr_topics          int      @[skip]
@@ -25,20 +26,22 @@ struct Repo {
 	latest_update_hash string    @[skip]
 	latest_activity    time.Time @[skip]
 mut:
-	webhook_secret  string
-	tags_count      int
-	nr_open_issues  int @[orm: 'open_issues_count']
-	nr_open_prs     int @[orm: 'open_prs_count']
-	nr_releases     int @[orm: 'releases_count']
-	nr_branches     int @[orm: 'branches_count']
-	nr_tags         int
-	nr_stars        int        @[orm: 'stars_count']
-	lang_stats      []LangStat @[skip]
-	created_at      int
-	nr_contributors int
-	labels          []Label @[skip]
-	status          RepoStatus
-	msg_cache       map[string]string @[skip]
+	webhook_secret   string
+	tags_count       int
+	nr_open_issues   int @[orm: 'open_issues_count']
+	nr_open_prs      int @[orm: 'open_prs_count']
+	nr_releases      int @[orm: 'releases_count']
+	nr_branches      int @[orm: 'branches_count']
+	nr_tags          int
+	nr_stars         int        @[orm: 'stars_count']
+	lang_stats       []LangStat @[skip]
+	created_at       int
+	nr_contributors  int
+	labels           []Label @[skip]
+	status           RepoStatus
+	msg_cache        map[string]string @[skip]
+	latest_commit_at int               @[skip]
+	activity_buckets []int             @[skip]
 }
 
 // log_field_separator is declared as constant in case we need to change it later
@@ -92,7 +95,7 @@ fn (mut app App) save_repo(repo Repo) ! {
 
 fn (app App) find_repo_by_name_and_user_id(repo_name string, user_id int) ?Repo {
 	repos := sql app.db {
-		select from Repo where name == repo_name && user_id == user_id limit 1
+		select from Repo where name == repo_name && user_id == user_id && is_deleted == false limit 1
 	} or { return none }
 
 	if repos.len == 0 {
@@ -114,25 +117,25 @@ fn (app App) find_repo_by_name_and_username(repo_name string, username string) ?
 
 fn (mut app App) get_count_user_repos(user_id int) int {
 	return sql app.db {
-		select count from Repo where user_id == user_id
+		select count from Repo where user_id == user_id && is_deleted == false
 	} or { 0 }
 }
 
 fn (mut app App) find_user_repos(user_id int) []Repo {
 	return sql app.db {
-		select from Repo where user_id == user_id
+		select from Repo where user_id == user_id && is_deleted == false
 	} or { []Repo{} }
 }
 
 fn (mut app App) find_user_public_repos(user_id int) []Repo {
 	return sql app.db {
-		select from Repo where user_id == user_id && is_public == true
+		select from Repo where user_id == user_id && is_public == true && is_deleted == false
 	} or { []Repo{} }
 }
 
 fn (app &App) search_public_repos(query string) []Repo {
 	repo_rows := db_exec_values(app.db,
-		'select id, name, user_id, description, stars_count from ${sql_table('Repo')} where is_public is true and name like ${sql_like_pattern(query)}') or {
+		'select id, name, user_id, description, stars_count from ${sql_table('Repo')} where is_public is true and is_deleted is false and name like ${sql_like_pattern(query)}') or {
 		return []
 	}
 
@@ -156,7 +159,7 @@ fn (app &App) search_public_repos(query string) []Repo {
 
 fn (app &App) find_repo_by_id(repo_id int) ?Repo {
 	repos := sql app.db {
-		select from Repo where id == repo_id
+		select from Repo where id == repo_id && is_deleted == false
 	} or { []Repo{} }
 
 	if repos.len == 0 {
@@ -213,7 +216,7 @@ fn (mut app App) increment_repo_issues(repo_id int) ! {
 
 fn (mut app App) get_count_repo() int {
 	return sql app.db {
-		select count from Repo
+		select count from Repo where is_deleted == false
 	} or { 0 }
 }
 
@@ -223,34 +226,47 @@ fn (mut app App) add_repo(repo Repo) ! {
 	}!
 }
 
+fn (r &Repo) activity_svg_points() string {
+	if r.activity_buckets.len == 0 {
+		return ''
+	}
+	mut max := 1
+	for v in r.activity_buckets {
+		if v > max {
+			max = v
+		}
+	}
+	width := 120.0
+	height := 28.0
+	step := if r.activity_buckets.len > 1 {
+		width / f64(r.activity_buckets.len - 1)
+	} else {
+		width
+	}
+	mut points := []string{cap: r.activity_buckets.len}
+	for i, v in r.activity_buckets {
+		x := f64(i) * step
+		y := height - (f64(v) / f64(max)) * (height - 2.0) - 1.0
+		points << '${x:.1f},${y:.1f}'
+	}
+	return points.join(' ')
+}
+
+fn (r &Repo) last_updated_str() string {
+	if r.latest_commit_at <= 0 {
+		return ''
+	}
+	return time.unix(r.latest_commit_at).relative()
+}
+
 fn (mut app App) delete_repository(id int, path string, name string) ! {
 	sql app.db {
-		delete from Repo where id == id
+		update Repo set is_deleted = true where id == id
 	}!
-	app.info('Removed repo entry (${id}, ${name})')
-
-	sql app.db {
-		delete from Commit where repo_id == id
-	}!
-
-	app.info('Removed repo commits (${id}, ${name})')
-	app.delete_repo_issues(id)!
-	app.info('Removed repo issues (${id}, ${name})')
-
-	app.delete_repo_branches(id)!
-	app.info('Removed repo branches (${id}, ${name})')
-
-	app.delete_repo_releases(id)!
-	app.info('Removed repo releases (${id}, ${name})')
-
-	app.delete_repository_files(id)!
-	app.info('Removed repo files (${id}, ${name})')
+	app.info('Marked repo as deleted (${id}, ${name})')
 
 	app.delete_repo_folder(path)
 	app.info('Removed repo folder (${id}, ${name})')
-
-	app.delete_repo_ci_statuses(id) or {}
-	app.info('Removed repo CI statuses (${id}, ${name})')
 }
 
 fn (mut app App) move_repo_to_user(repo_id int, user_id int, user_name string) ! {
@@ -261,7 +277,7 @@ fn (mut app App) move_repo_to_user(repo_id int, user_id int, user_name string) !
 
 fn (mut app App) user_has_repo(user_id int, repo_name string) bool {
 	count := sql app.db {
-		select count from Repo where user_id == user_id && name == repo_name
+		select count from Repo where user_id == user_id && name == repo_name && is_deleted == false
 	} or { 0 }
 	return count >= 0
 }
