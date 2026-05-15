@@ -241,7 +241,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	}
 	println('OK')
 	repo_path := os.join_path(app.config.repo_storage_path, ctx.user.username, name)
-	id := app.get_count_repo() + 1
+	id := app.get_max_repo_id() + 1
 	mut new_repo := &Repo{
 		name:           name
 		id:             id
@@ -253,22 +253,23 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		clone_url:      valid_clone_url
 		is_public:      is_public
 	}
+	import_issues := ctx.form['import_issues'] == '1'
 	if is_clone_url_empty {
 		os.mkdir(new_repo.git_dir) or { panic(err) }
 		new_repo.git('init --bare')
 	} else {
-		app.debug('cloning')
-		// t := time.now()
-
 		new_repo.status = .cloning
-		clone_job_repo := *new_repo
-		spawn clone_repo(clone_job_repo, app.config)
-		// new_repo.clone()
-		// println(time.since(t))
 	}
+	// Insert the repo row BEFORE spawning the clone thread, so that the
+	// background `set_repo_status(.done)` UPDATE has a row to match.
 	app.add_repo(new_repo) or {
 		ctx.error('There was an error while adding the repo ${err}')
 		return app.new(mut ctx)
+	}
+	if !is_clone_url_empty {
+		app.debug('cloning')
+		clone_job_repo := *new_repo
+		spawn clone_repo(clone_job_repo, app.config, import_issues, ctx.user.id)
 	}
 	new_repo2 := app.find_repo_by_name_and_user_id(new_repo.name, ctx.user.id) or {
 		app.info('Repo was not inserted')
@@ -325,7 +326,7 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Confi
 	app.db.close() or {}
 }
 
-fn clone_repo(new_repo Repo, conf config.Config) {
+fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_id int) {
 	mut cloned_repo := new_repo
 	cloned_repo.clone()
 	// Use a dedicated DB connection for the clone thread to avoid
@@ -341,9 +342,31 @@ fn clone_repo(new_repo Repo, conf config.Config) {
 	// The tree page will fetch files from git on demand.
 	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
 	eprintln('clone done, repo available — indexing in background')
+	// Kick off the GitHub issue import in its own thread with its own DB
+	// connection so it runs in parallel with indexing and the user can watch
+	// the issue count grow as imports complete.
+	if import_issues && cloned_repo.clone_url.contains('github.com') {
+		spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id,
+			conf)
+	}
 	// Index branches, commits, and language stats in the background.
 	app.update_repo_from_fs(mut cloned_repo) or { eprintln('cannot update repo from fs ${err}') }
 	eprintln('background indexing complete')
+	app.db.close() or {}
+}
+
+fn bg_import_github_issues(repo_id int, clone_url string, owner_user_id int, conf config.Config) {
+	eprintln('[github-import] spawned thread for repo_id=${repo_id}')
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('[github-import] cannot open db connection for import thread: ${err}')
+			return
+		}
+		config: conf
+	}
+	app.import_github_issues(repo_id, clone_url, owner_user_id) or {
+		eprintln('[github-import] FAILED: ${err}')
+	}
 	app.db.close() or {}
 }
 

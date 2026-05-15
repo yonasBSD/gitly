@@ -194,4 +194,46 @@ Insights, дашборды value stream и метрики DORA
 open_source_outro
 В Gitly другой подход: каждая функция — часть общей кодовой базы с открытым исходным кодом. Нет Enterprise Edition, нет платных модулей и нет отдельного «premium»-репозитория.
 -----
+new_repo_title
+Создать новый репозиторий
+-----
+new_repo_name
+Название
+-----
+new_repo_name_hint
+Хорошие названия репозиториев короткие и запоминающиеся.
+-----
+new_repo_description
+Описание
+-----
+new_repo_optional
+(необязательно)
+-----
+new_repo_clone_url
+URL для клонирования
+-----
+new_repo_clone_hint
+(только если вы хотите клонировать существующий репозиторий)
+-----
+new_repo_import_issues
+Импортировать issues с GitHub
+-----
+new_repo_visibility
+Видимость репозитория
+-----
+new_repo_public
+Публичный
+-----
+new_repo_public_desc
+Любой пользователь в интернете может видеть этот репозиторий.
+-----
+new_repo_private
+Приватный
+-----
+new_repo_private_desc
+Вы выбираете, кто может видеть этот репозиторий и коммитить в него.
+-----
+new_repo_create
+Создать репозиторий
+-----
 

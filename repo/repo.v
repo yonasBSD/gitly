@@ -220,6 +220,16 @@ fn (mut app App) get_count_repo() int {
 	} or { 0 }
 }
 
+fn (mut app App) get_max_repo_id() int {
+	rows := sql app.db {
+		select from Repo order by id desc limit 1
+	} or { return 0 }
+	if rows.len == 0 {
+		return 0
+	}
+	return rows[0].id
+}
+
 fn (mut app App) add_repo(repo Repo) ! {
 	sql app.db {
 		insert repo into Repo

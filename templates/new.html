@@ -6,45 +6,77 @@
 	<body>
 		@include 'layout/header.html'
 
-		<div class="content">
-			<h1>New repository</h1>
-
-			<div class='form-error'>
-				@ctx.form_error
+		<div class="content new-repo">
+			<div class="new-repo__header">
+				<h1>%new_repo_title</h1>
 			</div>
 
-			<div class="form">
-				<form method='post'>
-					@app.config.hostname/@ctx.user.username/
-					<input type='text' name='name'required autofocus maxlength=@max_repo_name_len>
+			@if ctx.form_error != ''
+				<div class='form-error'>@ctx.form_error</div>
+			@end
 
-					<div class='field'>
-						<p>Description <i>(optional)</i>:</p>
-						<input type='text' name='description'>
+			<form class="new-repo__form" method='post'>
+				<div class="new-repo__field">
+					<label class="new-repo__label" for="name">%new_repo_name <span class="new-repo__req">*</span></label>
+					<div class="new-repo__name-row">
+						<span class="new-repo__owner">@app.config.hostname/@ctx.user.username/</span>
+						<input class="new-repo__name-input" id="name" type='text' name='name' required autofocus maxlength=@max_repo_name_len placeholder="my-awesome-project">
 					</div>
+					<p class="new-repo__hint">%new_repo_name_hint</p>
+				</div>
 
-					<div class='field'>
-						<p>Clone URL <i>(only if you want to clone an existing repository)</i>:</p>
-						<input type='text' name='clone_url' placeholder='https://github.com/vlang/gitly'>
-					</div>
+				<div class="new-repo__field">
+					<label class="new-repo__label" for="description">%new_repo_description <span class="new-repo__optional">%new_repo_optional</span></label>
+					<input id="description" type='text' name='description'>
+				</div>
 
-					<div class='field'>
-						<p>Repository visibility:</p>
-						<div>
-							<input type="radio" id="public" name="repo_visibility" value="public" checked>
-							<label for="public">Public</label>
-						</div>
+				<div class="new-repo__field">
+					<label class="new-repo__label" for="clone_url">%new_repo_clone_url <span class="new-repo__optional">%new_repo_clone_hint</span></label>
+					<input id='clone_url' type='text' name='clone_url' placeholder='https://github.com/vlang/gitly'>
+				</div>
 
-						<div>
-							<input type="radio" id="private" name="repo_visibility" value="private">
-							<label for="private">Private</label>
-						</div>
-					</div>
+				<div class='new-repo__field new-repo__field--inline' id='import_issues_field' style='display:none'>
+					<label class="new-repo__checkbox">
+						<input type='checkbox' name='import_issues' value='1'>
+						<span>%new_repo_import_issues</span>
+					</label>
+				</div>
 
-					<input type='submit' class='btn-info' value='Create'>
-				</form>
-			</div>
+				<div class="new-repo__field">
+					<p class="new-repo__label">%new_repo_visibility</p>
+					<label class="new-repo__option">
+						<input type="radio" name="repo_visibility" value="public" checked>
+						<span class="new-repo__option-body">
+							<span class="new-repo__option-title">%new_repo_public</span>
+							<span class="new-repo__option-desc">%new_repo_public_desc</span>
+						</span>
+					</label>
+					<label class="new-repo__option">
+						<input type="radio" name="repo_visibility" value="private">
+						<span class="new-repo__option-body">
+							<span class="new-repo__option-title">%new_repo_private</span>
+							<span class="new-repo__option-desc">%new_repo_private_desc</span>
+						</span>
+					</label>
+				</div>
+
+				<div class="new-repo__actions">
+					<input type='submit' class='new-repo__submit' value='%new_repo_create'>
+				</div>
+			</form>
 		</div>
+
+		<script>
+			(function() {
+				var input = document.getElementById('clone_url');
+				var field = document.getElementById('import_issues_field');
+				function toggle() {
+					field.style.display = input.value.toLowerCase().includes('github.com') ? '' : 'none';
+				}
+				input.addEventListener('input', toggle);
+				toggle();
+			})();
+		</script>
 
 		@js '/js/block-form.js'
 		@include 'layout/footer.html'

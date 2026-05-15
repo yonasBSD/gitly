@@ -5,6 +5,7 @@ module main
 import veb
 import json
 import net.http
+import time
 // import veb.auth as oauth
 import veb.oauth
 
@@ -13,6 +14,127 @@ struct GitHubUser {
 	name     string
 	email    string
 	avatar   string @[json: 'avatar_url']
+}
+
+struct GitHubIssueAuthor {
+	login string
+}
+
+struct GitHubPullRequestRef {
+	url string
+}
+
+struct GitHubIssue {
+	number       int
+	title        string
+	body         string
+	state        string
+	user         GitHubIssueAuthor
+	pull_request GitHubPullRequestRef
+}
+
+fn parse_github_owner_repo(clone_url string) ?(string, string) {
+	mut s := clone_url.trim_space()
+	for prefix in ['https://', 'http://', 'git@'] {
+		if s.starts_with(prefix) {
+			s = s[prefix.len..]
+			break
+		}
+	}
+	s = s.trim_string_left('github.com')
+	s = s.trim_left(':/')
+	s = s.trim_string_right('.git')
+	s = s.trim('/')
+	parts := s.split('/')
+	if parts.len < 2 || parts[0] == '' || parts[1] == '' {
+		return none
+	}
+	return parts[0], parts[1]
+}
+
+// Returns the local user id for a GitHub login, creating an unregistered
+// "shadow" user (no password, no email, just the username and GitHub avatar)
+// when one does not yet exist.
+fn (mut app App) find_or_create_github_shadow_user(github_login string) !int {
+	if u := app.get_user_by_username(github_login) {
+		return u.id
+	}
+	user := User{
+		username:        github_login
+		github_username: github_login
+		is_github:       true
+		is_registered:   false
+		avatar:          'https://github.com/${github_login}.png'
+		created_at:      time.now()
+	}
+	app.add_user(user)!
+	created := app.get_user_by_username(github_login) or {
+		return error('shadow user not found after insert: ${github_login}')
+	}
+	return created.id
+}
+
+fn (mut app App) import_github_issues(repo_id int, clone_url string, owner_user_id int) ! {
+	eprintln('[github-import] starting for repo_id=${repo_id} clone_url=${clone_url} owner_user_id=${owner_user_id}')
+	owner, name := parse_github_owner_repo(clone_url) or {
+		eprintln('[github-import] ERROR: cannot parse github url: ${clone_url}')
+		return error('cannot parse github url: ${clone_url}')
+	}
+	eprintln('[github-import] parsed owner=${owner} name=${name}')
+	mut page := 1
+	mut total := 0
+	for page <= 100 {
+		url := 'https://api.github.com/repos/${owner}/${name}/issues?state=open&per_page=100&page=${page}'
+		eprintln('[github-import] GET ${url}')
+		mut req := http.new_request(.get, url, '')
+		req.add_header(.user_agent, 'gitly')
+		req.add_header(.accept, 'application/vnd.github+json')
+		resp := req.do() or {
+			eprintln('[github-import] ERROR: request failed: ${err}')
+			return error('github api request failed: ${err}')
+		}
+		eprintln('[github-import] page=${page} status=${resp.status_code} body_len=${resp.body.len}')
+		if resp.status_code != 200 {
+			eprintln('[github-import] ERROR body: ${resp.body}')
+			return error('github api ${resp.status_code}: ${resp.body}')
+		}
+		issues := json.decode([]GitHubIssue, resp.body) or {
+			eprintln('[github-import] ERROR: cannot decode response: ${err}')
+			eprintln('[github-import] response body was: ${resp.body#[..1000]}')
+			return error('cannot decode github issues: ${err}')
+		}
+		eprintln('[github-import] decoded ${issues.len} issues on page ${page}')
+		if issues.len == 0 {
+			break
+		}
+		for gi in issues {
+			// GitHub returns PRs in the issues endpoint; skip them.
+			if gi.pull_request.url != '' {
+				eprintln('[github-import] skipping PR #${gi.number}')
+				continue
+			}
+			mut author_id := owner_user_id
+			if gi.user.login != '' {
+				author_id = app.find_or_create_github_shadow_user(gi.user.login) or {
+					eprintln('[github-import] cannot resolve author @${gi.user.login}: ${err}')
+					owner_user_id
+				}
+			}
+			app.add_issue(repo_id, author_id, gi.title, gi.body) or {
+				eprintln('[github-import] ERROR inserting issue #${gi.number}: ${err}')
+				continue
+			}
+			app.increment_repo_issues(repo_id) or {
+				eprintln('[github-import] cannot bump issue count: ${err}')
+			}
+			total++
+		}
+		if issues.len < 100 {
+			break
+		}
+		page++
+	}
+	eprintln('[github-import] done: imported ${total} issues into repo ${repo_id}')
 }
 
 @['/oauth']

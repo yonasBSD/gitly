@@ -194,4 +194,46 @@ Insights, value stream dashboards and DORA metrics
 open_source_outro
 Gitly takes a different approach: every feature is part of the same open-source codebase. There is no Enterprise Edition, no paywalled module, and no separate "premium" repository.
 -----
+new_repo_title
+Create a new repository
+-----
+new_repo_name
+Name
+-----
+new_repo_name_hint
+Great repository names are short and memorable.
+-----
+new_repo_description
+Description
+-----
+new_repo_optional
+(optional)
+-----
+new_repo_clone_url
+Clone URL
+-----
+new_repo_clone_hint
+(only if you want to clone an existing repository)
+-----
+new_repo_import_issues
+Import issues from GitHub
+-----
+new_repo_visibility
+Repository visibility
+-----
+new_repo_public
+Public
+-----
+new_repo_public_desc
+Anyone on the internet can see this repository.
+-----
+new_repo_private
+Private
+-----
+new_repo_private_desc
+You choose who can see and commit to this repository.
+-----
+new_repo_create
+Create repository
+-----
 
