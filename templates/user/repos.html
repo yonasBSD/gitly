@@ -7,31 +7,39 @@
 		@include '../layout/header.html'
 
 		<div class="content">
-			<div class='avatar'>
-				<img src="@{app.prepare_user_avatar_url(user.avatar)}">
+			<div class="repos-header">
+				<div class="avatar">
+					<img src="@{app.prepare_user_avatar_url(user.avatar)}">
+				</div>
+				<h1>@{user.username}'s repositories</h1>
 			</div>
 
-			<h1>@{user.username}'s repositories</h1>
-
-				@if repos.len > 0
+			@if repos.len > 0
+				<div class="repo-list">
 					@for repo in repos
-						<div class="list-item">
-							<a href="/@user.username/@repo.name">
-								<h3>@repo.name</h3>
-							</a>
+						<a class="repo-card" href="/@user.username/@repo.name">
+							<div class="repo-card__header">
+								<span class="repo-card__title">@repo.name</span>
+								@if repo.is_public
+									<span class="repo-card__badge">Public</span>
+								@else
+									<span class="repo-card__badge repo-card__badge--private">Private</span>
+								@end
+							</div>
 							@if repo.description.len > 0
-								<p><i>@repo.description</i></p>
+								<p class="repo-card__desc">@repo.description</p>
 							@end
-							@if repo.is_public
-								<p><b>Public</b></p>
-							@else
-								<p><b>Private</b></p>
-							@end
-						</div>
+							<div class="repo-card__meta">
+								<span class="repo-card__meta-item" title="Stars">&#9733; @repo.nr_stars</span>
+								<span class="repo-card__meta-item" title="Open issues">&#9679; @repo.nr_open_issues</span>
+								<span class="repo-card__meta-item" title="Branches">&#9874; @repo.nr_branches</span>
+							</div>
+						</a>
 					@end
-				@else
-					<h2>No repositories</h2>
-				@end
+				</div>
+			@else
+				<p class="repos-empty">No repositories yet.</p>
+			@end
 		</div>
 
 		@include '../layout/footer.html'
