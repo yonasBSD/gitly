@@ -26,3 +26,172 @@ password
 email
 Электронная почта
 -----
+index_intro
+Gitly — это платформа для разработки с открытым исходным кодом:
+-----
+index_source_hosting
+Хостинг исходного кода
+-----
+index_project_management
+Управление проектами
+-----
+index_ci_cd
+CI и CD
+-----
+index_main_features
+Основные возможности:
+-----
+index_feature_light_fast
+Лёгкий и быстрый
+-----
+index_feature_minimal_ram
+Минимальный расход оперативной памяти (отлично работает на самом дешёвом инстансе AWS Lightsail за $3.5)
+-----
+index_feature_easy_deploy
+Простое развёртывание (один бинарник <1 МБ со встроенными шаблонами)
+-----
+index_feature_no_js
+Работает без JavaScript
+-----
+index_feature_lang_stats
+Подробная статистика языков для каждой директории
+-----
+index_feature_top_files
+Функция «Top files» для обзора проекта
+-----
+index_feature_fast_ci
+Очень быстрый CI с предварительно закешированными зависимостями
+-----
+index_feature_pr_no_fork
+Отправка pull request без форка репозитория
+-----
+index_open_source
+Открытый исходный код
+-----
+index_all_open_source
+Все возможности с открытым исходным кодом
+-----
+index_min_ram
+Минимум RAM
+-----
+index_cheapest_server
+Самый дешёвый сервер
+-----
+index_works_no_js
+Работает без JS
+-----
+index_detailed_lang_stats
+Подробная статистика языков
+-----
+index_install_size
+Размер установки
+-----
+index_load_time
+Время загрузки главной страницы репозитория vlang/v
+-----
+index_ci_features_header
+Возможности CI
+-----
+index_cpu_cores
+Кол-во ядер CPU
+-----
+index_dep_cache
+Встроенный кеш зависимостей
+-----
+index_separate_instance
+Отдельный инстанс с возможностью подключения по SSH
+-----
+index_instant_start
+Мгновенный запуск при коммите/PR
+-----
+index_stop_ci
+Простой способ остановить весь запуск CI (вручную или при новом коммите/PR/force push)
+-----
+index_logs_storage_time
+Срок хранения логов CI
+-----
+index_basic_ci_minutes
+Минут CI в базовом тарифе
+-----
+index_price_per_user
+Цена за пользователя в месяц
+-----
+index_yes
+Да
+-----
+index_no
+Нет
+-----
+index_partially
+Частично
+-----
+index_three_months
+3 месяца
+-----
+index_six_months
+6 месяцев
+-----
+index_check_action
+Посмотрите Gitly в действии — откройте репозиторий языка V:
+-----
+open_source_title
+Какие функции GitLab не являются открытым исходным кодом
+-----
+open_source_intro
+GitLab часто представляют как альтернативу GitHub с открытым исходным кодом. На самом деле под лицензией MIT распространяется только Community Edition (CE). Большинство функций, которые GitLab активно рекламирует и продаёт, находятся в проприетарной Enterprise Edition (EE), распространяемой под несвободной source-available лицензией. Если вы развернули у себя бесплатную CE, этих функций у вас нет.
+-----
+open_source_ee_only_title
+Неполный список функций, доступных только в EE (проприетарных):
+-----
+open_source_feat_advanced_search
+Расширенный поиск (поиск по коду между проектами на базе Elasticsearch)
+-----
+open_source_feat_mr_approvals
+Несколько правил подтверждения merge request и обязательные ревьюеры
+-----
+open_source_feat_security_scanning
+SAST, DAST, сканирование контейнеров и поиск секретов
+-----
+open_source_feat_dependency_scanning
+Сканирование зависимостей и проверка лицензий
+-----
+open_source_feat_compliance
+Compliance-фреймворки и панели соответствия
+-----
+open_source_feat_audit_events
+Полные журналы аудита и отчёты аудита
+-----
+open_source_feat_epics
+Эпики и многоуровневые эпики
+-----
+open_source_feat_roadmaps
+Дорожные карты и представления планирования по вехам
+-----
+open_source_feat_portfolio
+Портфельная аналитика и аналитика value stream
+-----
+open_source_feat_protected_envs
+Защищённые окружения и подтверждения деплоев
+-----
+open_source_feat_geo
+Geo-репликация между несколькими регионами
+-----
+open_source_feat_dr
+Аварийное восстановление (Disaster Recovery)
+-----
+open_source_feat_group_saml
+SAML SSO и SCIM-провижининг на уровне групп
+-----
+open_source_feat_ldap_sync
+Синхронизация групп LDAP и интеграция с Kerberos
+-----
+open_source_feat_push_rules
+Push-правила и обязательные конфигурации пайплайнов
+-----
+open_source_feat_insights
+Insights, дашборды value stream и метрики DORA
+-----
+open_source_outro
+В Gitly другой подход: каждая функция — часть общей кодовой базы с открытым исходным кодом. Нет Enterprise Edition, нет платных модулей и нет отдельного «premium»-репозитория.
+-----
+

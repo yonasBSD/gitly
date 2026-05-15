@@ -166,6 +166,11 @@ pub fn (mut app App) before_request(mut ctx Context) bool {
 	return true
 }
 
+@['/open-source']
+pub fn (mut app App) open_source() veb.Result {
+	return $veb.html()
+}
+
 @['/']
 pub fn (mut app App) index() veb.Result {
 	user_count := app.get_users_count() or { 0 }
