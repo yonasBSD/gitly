@@ -9,25 +9,47 @@
 		<div class="content">
 			@include '../layout/repo_menu.html'
 
-			.form-error {
-				@ctx.form_error
-			}
+			<h1 class="settings-title">Settings</h1>
 
-			<form action="/@ctx.user.username/@repo.name/settings" method="post">
-				<input type="password" name="webhook_secret" value="@repo.webhook_secret" placeholder="WebhookSecret">
-				<input type="submit" value="Update repo">
-			</form>
+			@if ctx.form_error != ''
+				<div class="form-error">@ctx.form_error</div>
+			@end
 
-			<form action="/@ctx.user.username/@repo.name/delete" method="post">
-				<input type="text" name="verify" placeholder="Type your repo path username/reponame" required>
-				<input type="submit" value="Delete repo">
-			</form>
+			<section class="settings-section">
+				<h2 class="settings-section__title">Webhook</h2>
+				<p class="settings-section__desc">Set a secret to verify deliveries from your git provider.</p>
+				<form class="settings-form" action="/@ctx.user.username/@repo.name/settings" method="post">
+					<input type="password" name="webhook_secret" value="@repo.webhook_secret" placeholder="Webhook secret">
+					<input type="submit" class="settings-form__submit" value="Update repo">
+				</form>
+			</section>
 
-			<form action="/@ctx.user.username/@repo.name/move" method="post">
-				<input type="text" name="dest" placeholder="Destination username" required>
-				<input type="text" name="verify" placeholder="Type your repo path username/reponame" required>
-				<input type="submit" value="Move repo">
-			</form>
+			<section class="settings-section settings-section--danger">
+				<h2 class="settings-section__title">Danger zone</h2>
+
+				<div class="danger-action">
+					<div class="danger-action__info">
+						<h3 class="danger-action__title">Transfer ownership</h3>
+						<p class="danger-action__desc">Move this repository to another user. Type the full path to confirm.</p>
+					</div>
+					<form class="settings-form danger-action__form" action="/@ctx.user.username/@repo.name/move" method="post">
+						<input type="text" name="dest" placeholder="New owner username" required>
+						<input type="text" name="verify" placeholder="@ctx.user.username/@repo.name" required>
+						<input type="submit" class="settings-form__submit settings-form__submit--danger" value="Move repo">
+					</form>
+				</div>
+
+				<div class="danger-action">
+					<div class="danger-action__info">
+						<h3 class="danger-action__title">Delete this repository</h3>
+						<p class="danger-action__desc">Once deleted, the repository is gone. Type the full path to confirm.</p>
+					</div>
+					<form class="settings-form danger-action__form" action="/@ctx.user.username/@repo.name/delete" method="post">
+						<input type="text" name="verify" placeholder="@ctx.user.username/@repo.name" required>
+						<input type="submit" class="settings-form__submit settings-form__submit--danger" value="Delete repo">
+					</form>
+				</div>
+			</section>
 		</div>
 
 		@include '../layout/footer.html'
