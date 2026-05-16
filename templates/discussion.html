@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="pr-header">
+				<h1 class="pr-header__title">@{discussion.formatted_title()} <span class="pr-header__num">#@discussion.id</span></h1>
+				<div class="pr-header__meta">
+					<span class="issue-label">@{discussion.category_label()}</span>
+					@if discussion.is_answered
+						<span class="issue-label issue-label--answered">%discussion_answered</span>
+					@end
+					@if discussion.is_locked
+						<span class="issue-label">%discussion_locked</span>
+					@end
+					<span>%discussion_opened @{discussion.relative_time()} %pr_by</span>
+					<a class="issue-row__author" href="/@author.username">@author.username</a>
+				</div>
+			</div>
+
+			<div class="pr-body">
+				<div class="avatar-with-user-info">
+					<img src="@{app.prepare_user_avatar_url(author.avatar)}">
+					<span>
+						<a href="/@author.username"><i>@author.username</i></a>
+						<p>@discussion.body</p>
+					</span>
+				</div>
+			</div>
+
+			@for c in comments
+				<div class="avatar-with-user-info issue-comment-post">
+					<img src="@{app.prepare_user_avatar_url(c.user.avatar)}">
+					<span>
+						<a href="/@c.user.username"><i>@c.user.username</i></a> <i>@{c.item.relative()}</i>
+						@if c.item.id == discussion.answer_id
+							<span class="issue-label issue-label--answered">%discussion_answered</span>
+						@end
+						<p>@c.item.text</p>
+						@if ctx.logged_in && is_owner && discussion.category == 'qa' && c.item.id != discussion.answer_id
+							<form method="post" action="/@repo.user_name/@repo.name/discussions/@discussion.id/answer/@c.item.id" class="inline-form">
+								<button type="submit" class="link-button">%discussion_answer</button>
+							</form>
+						@end
+					</span>
+				</div>
+			@end
+
+			@if ctx.logged_in && !discussion.is_locked
+				<form method="post" class="form vertical-form comment-post-form" action="/@repo.user_name/@repo.name/discussions/@discussion.id/comments">
+					<textarea class="input-comment" name="text" placeholder="%discussion_reply_placeholder" required></textarea>
+					<input type="submit" class="comment-post-submit" name="submit" value="%discussion_reply_button">
+				</form>
+			@end
+
+			@if ctx.logged_in && is_owner
+				<div class="pr-actions">
+					<form method="post" action="/@repo.user_name/@repo.name/discussions/@discussion.id/lock" class="pr-action-form">
+						@if discussion.is_locked
+							<button type="submit" class="pr-action">%discussion_unlock</button>
+						@else
+							<button type="submit" class="pr-action">%discussion_lock</button>
+						@end
+					</form>
+					<form method="post" action="/@repo.user_name/@repo.name/discussions/@discussion.id/delete" class="pr-action-form">
+						<button type="submit" class="pr-action pr-action--close">%discussion_delete</button>
+					</form>
+				</div>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>
