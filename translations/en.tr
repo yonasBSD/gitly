@@ -200,9 +200,6 @@ Create a new repository
 new_repo_name
 Name
 -----
-new_repo_name_hint
-Great repository names are short and memorable.
------
 new_repo_description
 Description
 -----
@@ -259,6 +256,12 @@ tag|tags|tags
 -----
 topics_count
 discussion|discussions|discussions
+-----
+stars_count
+star|stars|stars
+-----
+watchers_count
+watcher|watchers|watchers
 -----
 ci_label
 CI
@@ -682,5 +685,86 @@ This token is shown only once. Copy it now:
 -----
 api_docs
 API documentation
+-----
+repo_delete_warning
+This repo will be permanently removed with no way to revert this action.
+-----
+repo_delete_public_intro
+It's a public repository with:
+-----
+repo_delete_public_outro
+All of them will be lost.
+-----
+repo_delete_confirm_question
+Are you sure you want to continue?
+-----
+repo_delete_confirm_yes
+Yes, delete repository
+-----
+repo_delete_cancel
+Cancel
+-----
+settings_title
+Settings
+-----
+danger_zone
+Danger zone
+-----
+transfer_ownership
+Transfer ownership
+-----
+transfer_ownership_desc
+Move this repository to another user. Type the full path to confirm.
+-----
+new_owner_username
+New owner username
+-----
+move_repo
+Move repo
+-----
+delete_repo_title
+Delete this repository
+-----
+delete_repo_desc
+Once deleted, the repository is gone. Type the full path to confirm.
+-----
+delete_repo
+Delete repo
+-----
+header_search_placeholder
+Search...
+-----
+header_login
+Log in
+-----
+header_register
+Register
+-----
+header_profile
+Profile
+-----
+header_repositories
+Repositories
+-----
+header_issues
+Issues
+-----
+header_stars
+Stars
+-----
+header_feed
+Feed
+-----
+header_settings
+Settings
+-----
+header_admin_panel
+Admin Panel
+-----
+header_signed_in_as
+Signed in as
+-----
+header_sign_out
+Sign out
 -----
 

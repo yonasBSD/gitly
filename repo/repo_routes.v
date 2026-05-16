@@ -581,7 +581,8 @@ pub fn (mut app App) handle_api_repo_watch(mut ctx Context, repo_id_str string) 
 }
 
 // API: get file listing with commit info for a directory (used by JS polling)
-@['/api/v1/repos/:repo_id_str/files']
+// Path uses /tree/files to avoid colliding with /api/v1/repos/:username/:repo_name.
+@['/api/v1/repos/:repo_id_str/tree/files']
 pub fn (mut app App) handle_api_repo_files(mut ctx Context, repo_id_str string) veb.Result {
 	repo_id := repo_id_str.int()
 	repo := app.find_repo_by_id(repo_id) or { return ctx.json_error('Not found') }

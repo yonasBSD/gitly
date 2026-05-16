@@ -14,12 +14,12 @@
 			@include 'layout/repo_menu.html'
 
 			<div class="issue-main-post">
-				<h1>@issue.title #@issue.id</h1>
+				<h1>@{issue.formatted_title()} #@issue.id</h1>
 				<div class="avatar-with-user-info">
 					<img src="@{app.prepare_user_avatar_url(issue_author.avatar)}">
 					<span>
 						<i>by</i> <a href="/@issue_author.username"><i>@issue_author.username</i></a>
-						<p>@issue.text</p>
+						<div class="markdown-body">@{issue.formatted_body()}</div>
 					</span>
 				</div>
 			</div>

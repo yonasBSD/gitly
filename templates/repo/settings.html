@@ -9,7 +9,7 @@
 		<div class="content">
 			@include '../layout/repo_menu.html'
 
-			<h1 class="settings-title">Settings</h1>
+			<h1 class="settings-title">%settings_title</h1>
 
 			@if ctx.form_error != ''
 				<div class="form-error">@ctx.form_error</div>
@@ -22,31 +22,86 @@
 			</section>
 
 			<section class="settings-section settings-section--danger">
-				<h2 class="settings-section__title">Danger zone</h2>
+				<h2 class="settings-section__title">%danger_zone</h2>
 
 				<div class="danger-action">
 					<div class="danger-action__info">
-						<h3 class="danger-action__title">Transfer ownership</h3>
-						<p class="danger-action__desc">Move this repository to another user. Type the full path to confirm.</p>
+						<h3 class="danger-action__title">%transfer_ownership</h3>
+						<p class="danger-action__desc">%transfer_ownership_desc</p>
 					</div>
 					<form class="settings-form danger-action__form" action="/@ctx.user.username/@repo.name/move" method="post">
-						<input type="text" name="dest" placeholder="New owner username" required>
+						<input type="text" name="dest" placeholder="%new_owner_username" required>
 						<input type="text" name="verify" placeholder="@ctx.user.username/@repo.name" required>
-						<input type="submit" class="settings-form__submit settings-form__submit--danger" value="Move repo">
+						<input type="submit" class="settings-form__submit settings-form__submit--danger" value="%move_repo">
 					</form>
 				</div>
 
 				<div class="danger-action">
 					<div class="danger-action__info">
-						<h3 class="danger-action__title">Delete this repository</h3>
-						<p class="danger-action__desc">Once deleted, the repository is gone. Type the full path to confirm.</p>
+						<h3 class="danger-action__title">%delete_repo_title</h3>
+						<p class="danger-action__desc">%delete_repo_desc</p>
 					</div>
-					<form class="settings-form danger-action__form" action="/@ctx.user.username/@repo.name/delete" method="post">
-						<input type="text" name="verify" placeholder="@ctx.user.username/@repo.name" required>
-						<input type="submit" class="settings-form__submit settings-form__submit--danger" value="Delete repo">
+					<form id="delete-repo-form" class="settings-form danger-action__form" action="/@ctx.user.username/@repo.name/delete" method="post" data-expected-path="@ctx.user.username/@repo.name">
+						<input id="delete-repo-verify" type="text" name="verify" placeholder="@ctx.user.username/@repo.name" autocomplete="off" required>
+						<input id="delete-repo-submit" type="submit" class="settings-form__submit settings-form__submit--danger" value="%delete_repo" disabled>
 					</form>
 				</div>
 			</section>
+
+			<div id="delete-repo-modal" class="confirm-modal" hidden>
+				<div class="confirm-modal__dialog confirm-modal__dialog--danger" role="alertdialog" aria-modal="true" aria-labelledby="delete-repo-modal-title">
+					<p id="delete-repo-modal-title" class="confirm-modal__alert">%repo_delete_warning</p>
+					@if repo.is_public
+						<p class="confirm-modal__intro">%repo_delete_public_intro</p>
+						<ul class="confirm-modal__stats">
+							<li>@repo.format_nr_stars(ctx.lang)</li>
+							<li>@app.format_nr_watchers(repo.id, ctx.lang)</li>
+						</ul>
+						<p class="confirm-modal__outro">%repo_delete_public_outro</p>
+					@end
+					<p class="confirm-modal__question">%repo_delete_confirm_question</p>
+					<div class="confirm-modal__actions">
+						<button type="button" class="confirm-modal__btn" data-delete-repo-cancel>%repo_delete_cancel</button>
+						<button type="button" class="confirm-modal__btn confirm-modal__btn--danger" data-delete-repo-confirm>%repo_delete_confirm_yes</button>
+					</div>
+				</div>
+			</div>
+
+			<script>
+				(function () {
+					var form = document.getElementById('delete-repo-form');
+					var modal = document.getElementById('delete-repo-modal');
+					if (!form || !modal) return;
+					var verify = document.getElementById('delete-repo-verify');
+					var submit = document.getElementById('delete-repo-submit');
+					var expected = form.getAttribute('data-expected-path');
+					var cancel = modal.querySelector('[data-delete-repo-cancel]');
+					var confirm = modal.querySelector('[data-delete-repo-confirm]');
+					var confirmed = false;
+					function syncSubmitState() {
+						submit.disabled = verify.value.trim() !== expected;
+					}
+					verify.addEventListener('input', syncSubmitState);
+					syncSubmitState();
+					form.addEventListener('submit', function (e) {
+						if (confirmed) return;
+						e.preventDefault();
+						if (submit.disabled) return;
+						modal.hidden = false;
+					});
+					cancel.addEventListener('click', function () {
+						modal.hidden = true;
+					});
+					confirm.addEventListener('click', function () {
+						confirmed = true;
+						modal.hidden = true;
+						form.submit();
+					});
+					modal.addEventListener('click', function (e) {
+						if (e.target === modal) modal.hidden = true;
+					});
+				})();
+			</script>
 		</div>
 
 		@include '../layout/footer.html'

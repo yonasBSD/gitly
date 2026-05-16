@@ -158,7 +158,14 @@ pub fn (mut app App) before_request(mut ctx Context) bool {
 		unsafe { prealloc_scope_checkpoint(c'gitly loaded user') }
 	}
 	lang_cookie := ctx.get_cookie('lang') or { '' }
-	ctx.lang = if lang_cookie == 'ru' { .ru } else { .en }
+	ctx.lang = match lang_cookie {
+		'ru' { Lang.ru }
+		'es' { Lang.es }
+		'jp' { Lang.jp }
+		'cn' { Lang.cn }
+		'pt' { Lang.pt }
+		else { Lang.en }
+	}
 
 	$if trace_prealloc ? {
 		unsafe { prealloc_scope_checkpoint(c'gitly loaded lang') }

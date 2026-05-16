@@ -6,9 +6,10 @@
 	<body>
 		@include 'layout/header.html'
 
-		<div class="content new-repo">
+		<div class="content">
+			<div class="new-repo">
 			<div class="new-repo__header">
-				<h1>%new_repo_title</h1>
+				<h1>%new_repo_title pepehands</h1>
 			</div>
 
 			@if ctx.form_error != ''
@@ -22,7 +23,6 @@
 						<span class="new-repo__owner">@app.config.hostname/@ctx.user.username/</span>
 						<input class="new-repo__name-input" id="name" type='text' name='name' required autofocus maxlength=@max_repo_name_len placeholder="my-awesome-project">
 					</div>
-					<p class="new-repo__hint">%new_repo_name_hint</p>
 				</div>
 
 				<div class="new-repo__field">
@@ -64,6 +64,7 @@
 					<input type='submit' class='new-repo__submit' value='%new_repo_create'>
 				</div>
 			</form>
+			</div>
 		</div>
 
 		<script>

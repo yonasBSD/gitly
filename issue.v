@@ -4,6 +4,7 @@ module main
 
 import time
 import veb
+import highlight
 
 struct Issue {
 	id int @[primary; sql: serial]
@@ -161,20 +162,19 @@ fn html_escape_text(s string) string {
 	return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
 }
 
-// formatted_title HTML-escapes the issue title and converts `backtick`-quoted
-// segments into <code> spans so titles like `unknown method or field: ` + "`db.pg.Row.val`" + `` render nicely.
+// formatted_title renders the issue title as inline markdown so titles like
+// `unknown method or field: ` + "`db.pg.Row.val`" + `` get <code> spans and
+// other inline markup. The wrapping <p> tag added by the markdown converter is
+// stripped so the title stays inline.
 fn (i &Issue) formatted_title() veb.RawHtml {
-	parts := i.title.split('`')
-	mut out := ''
-	for idx, p in parts {
-		if idx % 2 == 0 {
-			out += html_escape_text(p)
-		} else if idx == parts.len - 1 {
-			// Unmatched trailing backtick: keep as literal.
-			out += '`' + html_escape_text(p)
-		} else {
-			out += '<code>' + html_escape_text(p) + '</code>'
-		}
+	rendered := highlight.convert_markdown_to_html(i.title).trim_space()
+	if rendered.starts_with('<p>') && rendered.ends_with('</p>') {
+		return rendered[3..rendered.len - 4]
 	}
-	return out
+	return rendered
+}
+
+// formatted_body renders the issue text as markdown.
+fn (i &Issue) formatted_body() veb.RawHtml {
+	return highlight.convert_markdown_to_html(i.text)
 }

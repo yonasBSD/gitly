@@ -65,3 +65,11 @@ fn (r &Repo) format_nr_topics(lang Lang) veb.RawHtml {
 fn (r &Repo) format_nr_releases(lang Lang) veb.RawHtml {
 	return format_count(r.nr_releases, 'releases_count', lang)
 }
+
+fn (r &Repo) format_nr_stars(lang Lang) veb.RawHtml {
+	return format_count(r.nr_stars, 'stars_count', lang)
+}
+
+fn (mut app App) format_nr_watchers(repo_id int, lang Lang) veb.RawHtml {
+	return format_count(app.get_count_repo_watchers(repo_id), 'watchers_count', lang)
+}

@@ -5,10 +5,18 @@ import config
 enum Lang {
 	en
 	ru
+	es
+	jp
+	cn
+	pt
 }
 
-const tr_menu_en = '<select id=select_lang><option value=en selected>English</option><option value=ru>Русский</option></select>'
-const tr_menu_ru = '<select id=select_lang><option value=en>English</option><option value=ru selected>Русский</option></select>'
+const tr_menu_en = '<select id=select_lang><option value=en selected>English</option><option value=ru>Русский</option><option value=es>Español</option><option value=jp>日本語</option><option value=cn>中文</option><option value=pt>Português</option></select>'
+const tr_menu_ru = '<select id=select_lang><option value=en>English</option><option value=ru selected>Русский</option><option value=es>Español</option><option value=jp>日本語</option><option value=cn>中文</option><option value=pt>Português</option></select>'
+const tr_menu_es = '<select id=select_lang><option value=en>English</option><option value=ru>Русский</option><option value=es selected>Español</option><option value=jp>日本語</option><option value=cn>中文</option><option value=pt>Português</option></select>'
+const tr_menu_jp = '<select id=select_lang><option value=en>English</option><option value=ru>Русский</option><option value=es>Español</option><option value=jp selected>日本語</option><option value=cn>中文</option><option value=pt>Português</option></select>'
+const tr_menu_cn = '<select id=select_lang><option value=en>English</option><option value=ru>Русский</option><option value=es>Español</option><option value=jp>日本語</option><option value=cn selected>中文</option><option value=pt>Português</option></select>'
+const tr_menu_pt = '<select id=select_lang><option value=en>English</option><option value=ru>Русский</option><option value=es>Español</option><option value=jp>日本語</option><option value=cn>中文</option><option value=pt selected>Português</option></select>'
 
 fn get_port(conf config.Config) int {
 	// Priority: -p flag > GITLY_PORT env > config.json port > 8080
@@ -48,5 +56,9 @@ fn build_tr_menu(cur_lang Lang) string {
 	return match cur_lang {
 		.ru { tr_menu_ru }
 		.en { tr_menu_en }
+		.es { tr_menu_es }
+		.jp { tr_menu_jp }
+		.cn { tr_menu_cn }
+		.pt { tr_menu_pt }
 	}
 }

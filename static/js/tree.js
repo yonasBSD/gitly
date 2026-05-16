@@ -116,54 +116,51 @@ if (watchButtonEl) {
   if (!hasMissingInfo()) return;
 
   const path = typeof CURRENT_PATH !== "undefined" ? CURRENT_PATH : "";
-  const apiUrl = "/api/v1/repos/" + REPO_ID + "/files?branch=" +
+  const apiUrl = "/api/v1/repos/" + REPO_ID + "/tree/files?branch=" +
     encodeURIComponent(BRANCH_NAME) + "&path=" + encodeURIComponent(path);
 
   let attempts = 0;
-  const maxAttempts = 30;
+  const maxAttempts = 60;
+
+  function applyFiles(files) {
+    for (const file of files) {
+      if (file.last_msg) {
+        const msgEl = findDataEl("data-msg-for", file.name);
+        if (msgEl) {
+          const link = msgEl.querySelector("a");
+          if (link && link.textContent.trim() === "") {
+            link.textContent = file.last_msg;
+            if (file.last_hash) {
+              link.href = "/" + REPO_USER + "/" + REPO_NAME + "/commit/" + file.last_hash;
+            }
+          }
+        }
+      }
+      const timeEl = findDataEl("data-time-for", file.name);
+      if (timeEl && timeEl.textContent.trim() === "" && file.last_time) {
+        timeEl.textContent = file.last_time;
+      }
+      if (TREE_FOLDER_SIZE_ENABLED && file.size) {
+        const sizeEl = findDataEl("data-size-for", file.name);
+        if (sizeEl && sizeEl.textContent.trim() === "") {
+          sizeEl.textContent = file.size;
+        }
+      }
+    }
+  }
 
   function poll() {
     attempts++;
     fetch(apiUrl)
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        if (!data.success || !data.result) return;
-
-        let stillMissing = false;
-        for (const file of data.result) {
-          const sizeEl = TREE_FOLDER_SIZE_ENABLED ? findDataEl("data-size-for", file.name) : null;
-          if (!file.last_msg || (sizeEl && !file.size)) {
-            stillMissing = true;
-          }
-          if (file.last_msg) {
-            const msgEl = findDataEl("data-msg-for", file.name);
-            if (msgEl) {
-              const link = msgEl.querySelector("a");
-              if (link && link.textContent.trim() === "") {
-                link.textContent = file.last_msg;
-                if (file.last_hash) {
-                  link.href = "/" + REPO_USER + "/" + REPO_NAME + "/commit/" + file.last_hash;
-                }
-              }
-            }
-          }
-          if (sizeEl && file.size) {
-            if (sizeEl && sizeEl.textContent.trim() === "") {
-              sizeEl.textContent = file.size;
-            }
-          }
-          const timeEl = findDataEl("data-time-for", file.name);
-          if (timeEl && timeEl.textContent.trim() === "" && file.last_time) {
-            timeEl.textContent = file.last_time;
-          }
-        }
-
-        if (stillMissing && attempts < maxAttempts) {
-          setTimeout(poll, 2000);
+        if (data && data.success && Array.isArray(data.result)) {
+          applyFiles(data.result);
         }
       })
-      .catch(function() {
-        if (attempts < maxAttempts) {
+      .catch(function() {})
+      .finally(function() {
+        if (hasMissingInfo() && attempts < maxAttempts) {
           setTimeout(poll, 2000);
         }
       });

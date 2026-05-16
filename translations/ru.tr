@@ -195,13 +195,10 @@ open_source_outro
 В Gitly другой подход: каждая функция — часть общей кодовой базы с открытым исходным кодом. Нет Enterprise Edition, нет платных модулей и нет отдельного «premium»-репозитория.
 -----
 new_repo_title
-Создать новый репозиторий
+Создать новый репозиторий KEKW
 -----
 new_repo_name
 Название
------
-new_repo_name_hint
-Хорошие названия репозиториев короткие и запоминающиеся.
 -----
 new_repo_description
 Описание
@@ -259,6 +256,12 @@ tags_count
 -----
 topics_count
 обсуждение|обсуждения|обсуждений
+-----
+stars_count
+звезда|звезды|звёзд
+-----
+watchers_count
+наблюдатель|наблюдателя|наблюдателей
 -----
 ci_label
 CI
@@ -682,5 +685,86 @@ api_token_show_once
 -----
 api_docs
 Документация API
+-----
+repo_delete_warning
+Этот репозиторий будет удалён навсегда без возможности восстановления.
+-----
+repo_delete_public_intro
+Это публичный репозиторий со следующей статистикой:
+-----
+repo_delete_public_outro
+Всё это будет потеряно.
+-----
+repo_delete_confirm_question
+Вы уверены, что хотите продолжить?
+-----
+repo_delete_confirm_yes
+Да, удалить репозиторий
+-----
+repo_delete_cancel
+Отмена
+-----
+settings_title
+Настройки
+-----
+danger_zone
+Опасная зона
+-----
+transfer_ownership
+Передать владение
+-----
+transfer_ownership_desc
+Перенести этот репозиторий другому пользователю. Введите полный путь для подтверждения.
+-----
+new_owner_username
+Имя нового владельца
+-----
+move_repo
+Передать репозиторий
+-----
+delete_repo_title
+Удалить этот репозиторий
+-----
+delete_repo_desc
+После удаления репозиторий пропадёт. Введите полный путь для подтверждения.
+-----
+delete_repo
+Удалить репозиторий
+-----
+header_search_placeholder
+Поиск...
+-----
+header_login
+Войти
+-----
+header_register
+Регистрация
+-----
+header_profile
+Профиль
+-----
+header_repositories
+Репозитории
+-----
+header_issues
+Задачи
+-----
+header_stars
+Звёзды
+-----
+header_feed
+Лента
+-----
+header_settings
+Настройки
+-----
+header_admin_panel
+Панель администратора
+-----
+header_signed_in_as
+Вы вошли как
+-----
+header_sign_out
+Выйти
 -----
 
