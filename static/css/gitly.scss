@@ -1796,11 +1796,13 @@ form {
 	background-color: $white;
 }
 
-.pr-diff__hunk-header td {
+.pr-diff__hunk-header td,
+.pr-diff__hunk-header td code {
 	background-color: #ddf4ff;
 	color: #57606a;
 	padding: 4px 12px;
 	font-size: 12px;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .pr-diff__row td {
@@ -1808,6 +1810,8 @@ form {
 	white-space: pre;
 	vertical-align: top;
 	line-height: 1.5;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12px;
 }
 
 .pr-diff__row--context td { background-color: $white; }
@@ -1833,8 +1837,24 @@ form {
 
 	pre {
 		margin: 0;
-		font-family: inherit;
+		font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 12px;
 		white-space: pre;
+	}
+
+	b {
+		font-weight: 600;
+		color: #cf222e;
+	}
+
+	u {
+		text-decoration: none;
+		color: #0a3069;
+	}
+
+	i {
+		font-style: normal;
+		color: #6e7781;
 	}
 }
 

@@ -59,7 +59,7 @@
 											<td class='pr-diff__lineno'>@{dline.old_line_str()}</td>
 											<td class='pr-diff__lineno'>@{dline.new_line_str()}</td>
 											<td class='pr-diff__sign'>@{dline.sign()}</td>
-											<td class='pr-diff__content'><pre>@dline.content</pre></td>
+											<td class='pr-diff__content'><pre>@{render_diff_line(dline.content, fd.path)}</pre></td>
 										</tr>
 										@{render_inline_comments(fd.path, dline, comments_by_key)}
 										@if ctx.logged_in && pr.is_open() && dline.kind != 'context'

@@ -2,6 +2,15 @@
 // Use of this source code is governed by a GPL license that can be found in the LICENSE file.
 module main
 
+import veb
+import highlight
+
+// render_diff_line is a template helper that returns the diff line's
+// content with single-line syntax highlighting applied.
+fn render_diff_line(content string, file_path string) veb.RawHtml {
+	return veb.RawHtml(highlight.highlight_line(content, file_path))
+}
+
 struct FileDiff {
 mut:
 	path       string
