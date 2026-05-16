@@ -720,8 +720,27 @@ fn (r &Repo) lookup_file_via_git(branch string, path string) ?File {
 		return none
 	}
 	for line in git_result.output.split_into_lines() {
-		if file := r.parse_top_file_line(line, branch) {
-			return file
+		tab_pos := line.index('\t') or { continue }
+		meta := line[..tab_pos]
+		item_path := line[tab_pos + 1..]
+		meta_parts := meta.fields()
+		if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+			continue
+		}
+		item_name := item_path.after('/')
+		if item_name == '' {
+			continue
+		}
+		parent_path_raw := os.dir(item_path)
+		parent_path := if parent_path_raw == '.' { '' } else { parent_path_raw }
+		return File{
+			name:               item_name
+			parent_path:        parent_path
+			repo_id:            r.id
+			branch:             branch
+			is_dir:             false
+			size:               meta_parts[3].int()
+			is_size_calculated: true
 		}
 	}
 	return none
