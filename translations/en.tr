@@ -236,4 +236,175 @@ You choose who can see and commit to this repository.
 new_repo_create
 Create repository
 -----
+commits_count
+commit|commits|commits
+-----
+issues_count
+issue|issues|issues
+-----
+prs_count
+pull request|pull requests|pull requests
+-----
+contributors_count
+contributor|contributors|contributors
+-----
+branches_count
+branch|branches|branches
+-----
+releases_count
+release|releases|releases
+-----
+tags_count
+tag|tags|tags
+-----
+topics_count
+discussion|discussions|discussions
+-----
+ci_label
+CI
+-----
+pr_pull_requests
+Pull requests
+-----
+pr_new
+New pull request
+-----
+pr_tab_open
+Open
+-----
+pr_tab_merged
+Merged
+-----
+pr_tab_closed
+Closed
+-----
+pr_none
+No pull requests.
+-----
+pr_status_open
+Open
+-----
+pr_status_merged
+Merged
+-----
+pr_status_closed
+Closed
+-----
+pr_wants_to_merge
+wants to merge
+-----
+pr_into
+into
+-----
+pr_conversation
+Conversation
+-----
+pr_files_changed
+Files changed
+-----
+pr_files_changed_label
+files changed
+-----
+pr_commits_label
+commits
+-----
+pr_review_approved
+approved
+-----
+pr_review_changes_requested
+requested changes
+-----
+pr_review_commented
+commented
+-----
+pr_commented
+commented
+-----
+pr_leave_comment
+Leave a comment
+-----
+pr_comment_button
+Comment
+-----
+pr_merge
+Merge pull request
+-----
+pr_close
+Close pull request
+-----
+pr_reopen
+Reopen pull request
+-----
+pr_open_title
+Open a pull request
+-----
+pr_compare_desc
+Compare two branches in this repository and propose a merge. Forks are not required.
+-----
+pr_base
+base
+-----
+pr_compare
+compare
+-----
+pr_choose_branch
+(choose a branch)
+-----
+pr_compare_button
+Compare
+-----
+pr_no_commits_between
+No commits between these branches.
+-----
+pr_title_placeholder
+Title
+-----
+pr_description_placeholder
+Describe the changes (optional)
+-----
+pr_create
+Create pull request
+-----
+pr_commits_heading
+Commits
+-----
+pr_by
+by
+-----
+pr_no_file_changes
+No file changes detected.
+-----
+pr_binary_file
+Binary file not shown.
+-----
+pr_line_comment_placeholder
+Add a review comment on this line (optional)
+-----
+pr_overall_review_placeholder
+Overall review comment (optional)
+-----
+pr_review_action_comment
+Comment
+-----
+pr_review_action_approve
+Approve
+-----
+pr_review_action_request_changes
+Request changes
+-----
+pr_submit_review
+Submit review
+-----
+pr_your_pulls
+Your pull requests
+-----
+pr_none_user
+You haven't opened any pull requests yet.
+-----
+pr_opened
+opened
+-----
+pr_comments_title
+Comments
+-----
 

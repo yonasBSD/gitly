@@ -215,6 +215,12 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table Issue
 	}!
+	sql app.db {
+		create table Label
+	}!
+	sql app.db {
+		create table IssueLabel
+	}!
 	//"created_at int default (strftime('%s', 'now'))"
 	sql app.db {
 		create table Commit
@@ -267,6 +273,18 @@ fn (mut app App) create_tables() ! {
 	}!
 	sql app.db {
 		create table CiStatus
+	}!
+	sql app.db {
+		create table PullRequest
+	}!
+	sql app.db {
+		create table PrComment
+	}!
+	sql app.db {
+		create table PrReview
+	}!
+	sql app.db {
+		create table PrReviewComment
 	}!
 }
 

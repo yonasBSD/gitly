@@ -236,4 +236,175 @@ new_repo_private_desc
 new_repo_create
 Создать репозиторий
 -----
+commits_count
+коммит|коммита|коммитов
+-----
+issues_count
+задача|задачи|задач
+-----
+prs_count
+пулреквест|пулреквеста|пулреквестов
+-----
+contributors_count
+участник|участника|участников
+-----
+branches_count
+ветка|ветки|веток
+-----
+releases_count
+релиз|релиза|релизов
+-----
+tags_count
+тег|тега|тегов
+-----
+topics_count
+обсуждение|обсуждения|обсуждений
+-----
+ci_label
+CI
+-----
+pr_pull_requests
+Пулреквесты
+-----
+pr_new
+Новый пулреквест
+-----
+pr_tab_open
+Открытые
+-----
+pr_tab_merged
+Слитые
+-----
+pr_tab_closed
+Закрытые
+-----
+pr_none
+Нет пулреквестов.
+-----
+pr_status_open
+Открыт
+-----
+pr_status_merged
+Слит
+-----
+pr_status_closed
+Закрыт
+-----
+pr_wants_to_merge
+хочет слить
+-----
+pr_into
+в
+-----
+pr_conversation
+Обсуждение
+-----
+pr_files_changed
+Изменённые файлы
+-----
+pr_files_changed_label
+файлов изменено
+-----
+pr_commits_label
+коммитов
+-----
+pr_review_approved
+одобрил
+-----
+pr_review_changes_requested
+запросил изменения
+-----
+pr_review_commented
+прокомментировал
+-----
+pr_commented
+прокомментировал
+-----
+pr_leave_comment
+Оставьте комментарий
+-----
+pr_comment_button
+Комментировать
+-----
+pr_merge
+Слить пулреквест
+-----
+pr_close
+Закрыть пулреквест
+-----
+pr_reopen
+Снова открыть пулреквест
+-----
+pr_open_title
+Открыть пулреквест
+-----
+pr_compare_desc
+Сравните две ветки в этом репозитории и предложите слияние. Форк не требуется.
+-----
+pr_base
+база
+-----
+pr_compare
+сравнить
+-----
+pr_choose_branch
+(выберите ветку)
+-----
+pr_compare_button
+Сравнить
+-----
+pr_no_commits_between
+Между этими ветками нет коммитов.
+-----
+pr_title_placeholder
+Заголовок
+-----
+pr_description_placeholder
+Описание изменений (необязательно)
+-----
+pr_create
+Создать пулреквест
+-----
+pr_commits_heading
+Коммиты
+-----
+pr_by
+от
+-----
+pr_no_file_changes
+Изменения файлов не обнаружены.
+-----
+pr_binary_file
+Бинарный файл не отображается.
+-----
+pr_line_comment_placeholder
+Добавить комментарий к строке (необязательно)
+-----
+pr_overall_review_placeholder
+Общий комментарий к ревью (необязательно)
+-----
+pr_review_action_comment
+Комментарий
+-----
+pr_review_action_approve
+Одобрить
+-----
+pr_review_action_request_changes
+Запросить изменения
+-----
+pr_submit_review
+Отправить ревью
+-----
+pr_your_pulls
+Ваши пулреквесты
+-----
+pr_none_user
+Вы пока не создавали пулреквестов.
+-----
+pr_opened
+открыт
+-----
+pr_comments_title
+Комментарии
+-----
 

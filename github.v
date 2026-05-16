@@ -24,6 +24,12 @@ struct GitHubPullRequestRef {
 	url string
 }
 
+struct GitHubLabel {
+	name        string
+	color       string
+	description string
+}
+
 struct GitHubIssue {
 	number       int
 	title        string
@@ -31,6 +37,7 @@ struct GitHubIssue {
 	state        string
 	user         GitHubIssueAuthor
 	pull_request GitHubPullRequestRef
+	labels       []GitHubLabel
 }
 
 fn parse_github_owner_repo(clone_url string) ?(string, string) {
@@ -120,12 +127,28 @@ fn (mut app App) import_github_issues(repo_id int, clone_url string, owner_user_
 					owner_user_id
 				}
 			}
-			app.add_issue(repo_id, author_id, gi.title, gi.body) or {
+			issue_id := app.add_issue_returning_id(repo_id, author_id, gi.title, gi.body) or {
 				eprintln('[github-import] ERROR inserting issue #${gi.number}: ${err}')
 				continue
 			}
 			app.increment_repo_issues(repo_id) or {
 				eprintln('[github-import] cannot bump issue count: ${err}')
+			}
+			for gl in gi.labels {
+				if gl.name == '' {
+					continue
+				}
+				color := if gl.color == '' { 'cccccc' } else { gl.color }
+				label_id := app.find_or_create_label(repo_id, gl.name, color) or {
+					eprintln('[github-import] cannot create label ${gl.name}: ${err}')
+					continue
+				}
+				if label_id == 0 {
+					continue
+				}
+				app.add_issue_label(issue_id, label_id) or {
+					eprintln('[github-import] cannot link label ${gl.name} to issue #${gi.number}: ${err}')
+				}
 			}
 			total++
 		}

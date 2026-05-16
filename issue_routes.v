@@ -83,6 +83,7 @@ pub fn (mut app App) issues(mut ctx Context, username string, repo_name string, 
 	for i = 0; i < repo_issues.len; i++ {
 		issue = repo_issues[i]
 		user = app.get_user_by_id(issue.author_id) or { continue }
+		issue.labels = app.get_issue_labels(issue.id)
 		issues_with_users << IssueWithUser{
 			item: issue
 			user: user

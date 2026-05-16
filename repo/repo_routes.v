@@ -152,6 +152,9 @@ pub fn (mut app App) handle_tree(mut ctx Context, username string, repo_name str
 		'issues' {
 			return app.handle_get_user_issues(mut ctx, username)
 		}
+		'pulls' {
+			return app.handle_get_user_pulls(mut ctx, username)
+		}
 		'settings' {
 			return app.user_settings(mut ctx, username)
 		}
@@ -346,8 +349,7 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_
 	// connection so it runs in parallel with indexing and the user can watch
 	// the issue count grow as imports complete.
 	if import_issues && cloned_repo.clone_url.contains('github.com') {
-		spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id,
-			conf)
+		spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id, conf)
 	}
 	// Index branches, commits, and language stats in the background.
 	app.update_repo_from_fs(mut cloned_repo) or { eprintln('cannot update repo from fs ${err}') }

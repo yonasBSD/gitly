@@ -27,7 +27,16 @@
 								<path fill="#1a7f37" fill-rule="evenodd" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
 							</svg>
 							<div class="issue-row__body">
-								<a class="issue-row__title" href="/@repo.user_name/@repo.name/issue/@issue_with_user.item.id">@issue_with_user.item.title</a>
+								<div class="issue-row__heading">
+									<a class="issue-row__title" href="/@repo.user_name/@repo.name/issue/@issue_with_user.item.id">@{issue_with_user.item.formatted_title()}</a>
+									@if issue_with_user.item.labels.len > 0
+										<span class="issue-row__labels">
+											@for label in issue_with_user.item.labels
+												<span class="issue-label" style="background-color: #@label.color">@label.name</span>
+											@end
+										</span>
+									@end
+								</div>
 								<div class="issue-row__meta">
 									<span>#@issue_with_user.item.id</span>
 									<span>opened @issue_with_user.item.relative_time() by</span>
