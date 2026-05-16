@@ -26,7 +26,172 @@ Password
 email
 Email
 -----
-
-
-
+index_intro
+Gitly is an open-source development platform that has the following features
+-----
+index_source_hosting
+Source code hosting
+-----
+index_project_management
+Project management
+-----
+index_ci_cd
+CI & CD
+-----
+index_main_features
+Main features:
+-----
+index_feature_light_fast
+Light and fast
+-----
+index_feature_minimal_ram
+Minimal amount of RAM usage (works great on the cheapest $3.5 AWS Lightsail instance)
+-----
+index_feature_easy_deploy
+Easy to deploy (a single <1 MB binary that includes compiled templates)
+-----
+index_feature_no_js
+Works without JavaScript
+-----
+index_feature_lang_stats
+Detailed language stats for each directory
+-----
+index_feature_top_files
+"Top files" feature to give an overview of the project
+-----
+index_feature_fast_ci
+Very fast CI with pre-cached dependencies
+-----
+index_feature_pr_no_fork
+Submitting a pull request without forking the repository
+-----
+index_open_source
+Open source
+-----
+index_all_open_source
+All features are open source
+-----
+index_min_ram
+Minimum RAM
+-----
+index_cheapest_server
+Cheapest server
+-----
+index_works_no_js
+Works without JS
+-----
+index_detailed_lang_stats
+Detailed language stats
+-----
+index_install_size
+Installation size
+-----
+index_load_time
+Time to load vlang/v repo main page
+-----
+index_ci_features_header
+CI features
+-----
+index_cpu_cores
+# CPU cores
+-----
+index_dep_cache
+Built-in dependency cache
+-----
+index_separate_instance
+A separate instance with an option to SSH to
+-----
+index_instant_start
+Instant start on commit/PR
+-----
+index_stop_ci
+An easy way to stop entire CI run (manually or on new commit/PR/force push)
+-----
+index_logs_storage_time
+CI logs storage time
+-----
+index_basic_ci_minutes
+CI minutes in a basic package
+-----
+index_price_per_user
+Price per user per month
+-----
+index_yes
+Yes
+-----
+index_no
+No
+-----
+index_partially
+Partially
+-----
+index_three_months
+3 months
+-----
+index_six_months
+6 months
+-----
+index_check_action
+Check out Gitly in action by browsing the V language repo:
+-----
+open_source_title
+What GitLab features are not open source
+-----
+open_source_intro
+GitLab is often presented as the open-source alternative to GitHub. In reality, only the Community Edition (CE) is open source under the MIT license. Most of the features GitLab actually advertises and sells live in the proprietary Enterprise Edition (EE), which is released under a non-free source-available license. If you self-host the free CE, you do not get them.
+-----
+open_source_ee_only_title
+A non-exhaustive list of EE-only (proprietary) features:
+-----
+open_source_feat_advanced_search
+Advanced search (Elasticsearch-powered code search across projects)
+-----
+open_source_feat_mr_approvals
+Multiple merge request approval rules and required approvers
+-----
+open_source_feat_security_scanning
+SAST, DAST, container scanning and secret detection
+-----
+open_source_feat_dependency_scanning
+Dependency scanning and license compliance
+-----
+open_source_feat_compliance
+Compliance frameworks and compliance dashboards
+-----
+open_source_feat_audit_events
+Full audit events and audit reports
+-----
+open_source_feat_epics
+Epics and multi-level epics
+-----
+open_source_feat_roadmaps
+Roadmaps and milestone planning views
+-----
+open_source_feat_portfolio
+Portfolio and value stream analytics
+-----
+open_source_feat_protected_envs
+Protected environments and deployment approvals
+-----
+open_source_feat_geo
+Geo replication across multiple regions
+-----
+open_source_feat_dr
+Disaster recovery
+-----
+open_source_feat_group_saml
+Group-level SAML SSO and SCIM provisioning
+-----
+open_source_feat_ldap_sync
+LDAP group sync and Kerberos integration
+-----
+open_source_feat_push_rules
+Push rules and required pipeline configurations
+-----
+open_source_feat_insights
+Insights, value stream dashboards and DORA metrics
+-----
+open_source_outro
+Gitly takes a different approach: every feature is part of the same open-source codebase. There is no Enterprise Edition, no paywalled module, and no separate "premium" repository.
+-----
 

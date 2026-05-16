@@ -8,7 +8,6 @@ import highlight
 import validation
 import git
 import config
-import net.urllib
 
 const top_files_limit = 50
 
@@ -24,6 +23,12 @@ pub fn (mut app App) user_repos(username string) veb.Result {
 
 	if user.id == ctx.user.id {
 		repos = app.find_user_repos(user.id)
+	}
+
+	for mut repo in repos {
+		repo.lang_stats = app.find_repo_lang_stats(repo.id)
+		repo.latest_commit_at = app.find_repo_last_commit_time(repo.id)
+		repo.activity_buckets = app.get_repo_activity_buckets(repo.id)
 	}
 
 	return $veb.html('templates/user/repos.html')
@@ -256,8 +261,8 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		// t := time.now()
 
 		new_repo.status = .cloning
-		app.clone_urls[new_repo.id] = clone_url_for_display(valid_clone_url)
-		spawn clone_repo(mut new_repo, app.config)
+		clone_job_repo := *new_repo
+		spawn clone_repo(clone_job_repo, app.config)
 		// new_repo.clone()
 		// println(time.since(t))
 	}
@@ -320,8 +325,9 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Confi
 	app.db.close() or {}
 }
 
-fn clone_repo(mut new_repo Repo, conf config.Config) {
-	new_repo.clone()
+fn clone_repo(new_repo Repo, conf config.Config) {
+	mut cloned_repo := new_repo
+	cloned_repo.clone()
 	// Use a dedicated DB connection for the clone thread to avoid
 	// sharing a connection across threads.
 	mut app := &App{
@@ -333,10 +339,10 @@ fn clone_repo(mut new_repo Repo, conf config.Config) {
 	}
 	// Mark repo as done immediately so the user can browse it.
 	// The tree page will fetch files from git on demand.
-	app.set_repo_status(new_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
+	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
 	eprintln('clone done, repo available — indexing in background')
 	// Index branches, commits, and language stats in the background.
-	app.update_repo_from_fs(mut new_repo) or { eprintln('cannot update repo from fs ${err}') }
+	app.update_repo_from_fs(mut cloned_repo) or { eprintln('cannot update repo from fs ${err}') }
 	eprintln('background indexing complete')
 	app.db.close() or {}
 }
@@ -354,10 +360,8 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 	mut clone_url := ''
 	if repo.status == .cloning {
-		clone_url = app.clone_urls[repo.id] or { '' }
 		return $veb.html('templates/cloning_in_process.html')
 	}
-	app.clone_urls.delete(repo.id)
 
 	_, user := app.check_username(username)
 	if !repo.is_public {
@@ -505,15 +509,6 @@ fn render_readme(repo Repo, branch_name string, path string, readme_file File) v
 	highlighted_readme, _, _ := highlight.highlight_text(readme_content, readme_path, false)
 
 	return veb.RawHtml(highlighted_readme)
-}
-
-fn clone_url_for_display(clone_url string) string {
-	mut display_url := urllib.parse(clone_url) or { return clone_url }
-	display_url.user = none
-	display_url.raw_query = ''
-	display_url.fragment = ''
-	display_url.force_query = false
-	return display_url.str()
 }
 
 @['/api/v1/repos/:repo_id/star'; 'post']

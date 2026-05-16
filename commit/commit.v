@@ -137,3 +137,32 @@ fn (mut app App) find_repo_last_commit(repo_id int, branch_id int) Commit {
 
 	return commits.first()
 }
+
+fn (app App) find_repo_last_commit_time(repo_id int) int {
+	commits := sql app.db {
+		select from Commit where repo_id == repo_id order by created_at desc limit 1
+	} or { return 0 }
+	if commits.len == 0 {
+		return 0
+	}
+	return commits[0].created_at
+}
+
+const activity_weeks = 12
+
+fn (app App) get_repo_activity_buckets(repo_id int) []int {
+	week_seconds := 7 * 24 * 3600
+	now := int(time.now().unix())
+	cutoff := now - activity_weeks * week_seconds
+	commits := sql app.db {
+		select from Commit where repo_id == repo_id && created_at >= cutoff
+	} or { []Commit{} }
+	mut buckets := []int{len: activity_weeks}
+	for c in commits {
+		idx := (c.created_at - cutoff) / week_seconds
+		if idx >= 0 && idx < activity_weeks {
+			buckets[idx]++
+		}
+	}
+	return buckets
+}

@@ -28,12 +28,11 @@ pub struct App {
 pub mut:
 	db GitlyDb
 mut:
-	version    string
-	logger     log.Log
-	config     config.Config
-	settings   Settings
-	port       int
-	clone_urls map[int]string
+	version  string
+	logger   log.Log
+	config   config.Config
+	settings Settings
+	port     int
 }
 
 pub struct Context {
@@ -62,7 +61,6 @@ fn new_app() !&App {
 		db:         connect_db(conf)!
 		config:     conf
 		started_at: time.now().unix()
-		clone_urls: map[int]string{}
 	}
 
 	set_rand_crypto_safe_seed()
@@ -168,6 +166,11 @@ pub fn (mut app App) before_request(mut ctx Context) bool {
 	return true
 }
 
+@['/open-source']
+pub fn (mut app App) open_source() veb.Result {
+	return $veb.html()
+}
+
 @['/']
 pub fn (mut app App) index() veb.Result {
 	user_count := app.get_users_count() or { 0 }
@@ -270,6 +273,7 @@ fn (mut app App) create_tables() ! {
 fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('File', 'is_size_calculated', db_bool_column_type())!
 	app.add_missing_column('Settings', 'disable_tree_folder_size', db_bool_column_type())!
+	app.add_missing_column('Repo', 'is_deleted', db_bool_column_type())!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {

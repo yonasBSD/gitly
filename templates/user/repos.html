@@ -7,31 +7,52 @@
 		@include '../layout/header.html'
 
 		<div class="content">
-			<div class='avatar'>
-				<img src="@{app.prepare_user_avatar_url(user.avatar)}">
+			<div class="repos-header">
+				<div class="avatar">
+					<img src="@{app.prepare_user_avatar_url(user.avatar)}">
+				</div>
+				<h1>@{user.username}'s repositories</h1>
 			</div>
 
-			<h1>@{user.username}'s repositories</h1>
-
-				@if repos.len > 0
+			@if repos.len > 0
+				<div class="repo-list">
 					@for repo in repos
-						<div class="list-item">
-							<a href="/@user.username/@repo.name">
-								<h3>@repo.name</h3>
-							</a>
+						<div class="repo-card">
+							<div class="repo-card__header">
+								<a class="repo-card__title" href="/@user.username/@repo.name">@repo.name</a>
+								@if repo.is_public
+									<span class="repo-card__badge">Public</span>
+								@else
+									<span class="repo-card__badge repo-card__badge--private">Private</span>
+								@end
+							</div>
 							@if repo.description.len > 0
-								<p><i>@repo.description</i></p>
+								<p class="repo-card__desc">@repo.description</p>
 							@end
-							@if repo.is_public
-								<p><b>Public</b></p>
-							@else
-								<p><b>Private</b></p>
-							@end
+							<div class="repo-card__footer">
+								<div class="repo-card__footer-left">
+									@if repo.lang_stats.len > 0
+										<span class="repo-card__lang">
+											<span class="repo-card__lang-dot" style="background-color:@{repo.lang_stats[0].color}"></span>
+											@repo.lang_stats[0].name
+										</span>
+									@end
+									@if repo.latest_commit_at > 0
+										<span class="repo-card__updated">Updated @{repo.last_updated_str()}</span>
+									@end
+								</div>
+								@if repo.activity_buckets.len > 0
+									<svg class="repo-card__activity" viewBox="0 0 120 28" preserveAspectRatio="none">
+										<polyline fill="none" stroke="#39d353" stroke-width="1.5" points="@{repo.activity_svg_points()}"/>
+									</svg>
+								@end
+							</div>
 						</div>
 					@end
-				@else
-					<h2>No repositories</h2>
-				@end
+				</div>
+			@else
+				<p class="repos-empty">No repositories yet.</p>
+			@end
 		</div>
 
 		@include '../layout/footer.html'

@@ -70,7 +70,11 @@
 }
 
 .files--with-size .file {
-	grid-template-columns: 20px minmax(150px, 25%) 90px 1fr 140px;
+	grid-template-columns: 20px minmax(150px, 25%) 1fr 140px 90px;
+}
+
+.files--with-size .file-size {
+	grid-column: 5;
 }
 
 .files--top-files .file {
@@ -165,7 +169,6 @@
 	text-align: right;
 	font-size: 13px;
 	white-space: nowrap;
-	padding-right: 10px;
 }
 
 /* Time */
@@ -173,4 +176,5 @@
 	color: #6a737d !important;
 	text-align: right;
 	font-size: 13px;
+	padding-right: 10px;
 }
