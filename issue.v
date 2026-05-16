@@ -49,12 +49,17 @@ fn (mut app App) add_issue(repo_id int, author_id int, title string, text string
 }
 
 fn (mut app App) add_issue_returning_id(repo_id int, author_id int, title string, text string) !int {
+	return app.add_imported_issue_returning_id(repo_id, author_id, title, text,
+		int(time.now().unix()))!
+}
+
+fn (mut app App) add_imported_issue_returning_id(repo_id int, author_id int, title string, text string, created_at int) !int {
 	issue := Issue{
 		title:      title
 		text:       text
 		repo_id:    repo_id
 		author_id:  author_id
-		created_at: int(time.now().unix())
+		created_at: created_at
 	}
 
 	sql app.db {

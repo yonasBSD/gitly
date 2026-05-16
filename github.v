@@ -47,9 +47,18 @@ struct GitHubIssue {
 	title        string
 	body         string
 	state        string
+	created_at   string
 	user         GitHubIssueAuthor
 	pull_request GitHubPullRequestRef
 	labels       []GitHubLabel
+}
+
+fn parse_github_timestamp(s string) int {
+	if s == '' {
+		return int(time.now().unix())
+	}
+	t := time.parse_iso8601(s) or { return int(time.now().unix()) }
+	return int(t.unix())
 }
 
 fn parse_github_owner_repo(clone_url string) ?(string, string) {
@@ -236,7 +245,9 @@ fn (mut app App) import_github_issues(repo_id int, clone_url string, owner_user_
 					owner_user_id
 				}
 			}
-			issue_id := app.add_issue_returning_id(repo_id, author_id, gi.title, gi.body) or {
+			created_at := parse_github_timestamp(gi.created_at)
+			issue_id := app.add_imported_issue_returning_id(repo_id, author_id, gi.title, gi.body,
+				created_at) or {
 				eprintln('[github-import] ERROR inserting issue #${gi.number}: ${err}')
 				continue
 			}
