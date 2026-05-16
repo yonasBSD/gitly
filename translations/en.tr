@@ -854,3 +854,39 @@ New issues
 admin_stats_last_n_days
 Last 30 days
 -----
+commit_committed
+committed
+-----
+commit_view_patch
+View patch
+-----
+commit_files_changed
+files changed
+-----
+commit_additions
+additions
+-----
+commit_deletions
+deletions
+-----
+commit_no_changes
+No file changes in this commit.
+-----
+commit_binary_file
+Binary file not shown.
+-----
+commit_file_new
+new file
+-----
+commit_file_deleted
+deleted
+-----
+commit_file_renamed
+renamed
+-----
+commits_on
+Commits on
+-----
+browse_repo_at_point
+Browse repository at this point
+-----

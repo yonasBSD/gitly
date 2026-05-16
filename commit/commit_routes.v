@@ -1,7 +1,6 @@
 module main
 
 import veb
-import highlight
 import time
 import api
 
@@ -46,16 +45,13 @@ pub fn (mut app App) commits(mut ctx Context, username string, repo_name string,
 
 	mut commits := app.find_repo_commits_as_page(repo.id, branch.id, offset)
 
-	msg := if b_author { 'by' } else { 'on' }
-
 	mut d_commits := map[string][]Commit{}
+	mut author_avatars := map[int]string{}
+	mut author_usernames := map[int]string{}
 	for commit in commits {
 		date := time.unix(commit.created_at)
-		day := date.day
-		month := date.month
-		year := date.year
 		author := commit.author_id.str()
-		date_s := '${day}.${month}.${year}'
+		date_s := date.custom_format('MMMM D, YYYY')
 
 		if b_author {
 			if author !in d_commits {
@@ -67,6 +63,13 @@ pub fn (mut app App) commits(mut ctx Context, username string, repo_name string,
 				d_commits[date_s] = []Commit{}
 			}
 			d_commits[date_s] << commit
+		}
+
+		if commit.author_id != 0 && commit.author_id !in author_avatars {
+			if user := app.get_user_by_id(commit.author_id) {
+				author_avatars[commit.author_id] = app.prepare_user_avatar_url(user.avatar)
+				author_usernames[commit.author_id] = user.username
+			}
 		}
 	}
 
@@ -88,20 +91,14 @@ pub fn (mut app App) commit(mut ctx Context, username string, repo_name string, 
 
 	patch_url := '/${username}/${repo_name}/commit/${hash}.patch'
 	commit := app.find_repo_commit_by_hash(repo.id, hash)
-	changes := commit.get_changes(repo)
+	raw_diff := repo.git('show --no-color --pretty=format: ${commit.hash}')
+	file_diffs := parse_unified_diff(raw_diff)
 
 	mut all_adds := 0
 	mut all_dels := 0
-	mut sources := map[string]veb.RawHtml{}
-	mut change := Change{}
-	mut highlighted_src := ''
-	mut i := 0
-	for i = 0; i < changes.len; i++ {
-		change = changes[i]
-		all_adds += change.additions
-		all_dels += change.deletions
-		highlighted_src, _, _ = highlight.highlight_text(change.message, change.file, true)
-		sources[change.file] = veb.RawHtml(highlighted_src)
+	for fd in file_diffs {
+		all_adds += fd.additions
+		all_dels += fd.deletions
 	}
 
 	return $veb.html()

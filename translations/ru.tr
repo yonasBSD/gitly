@@ -854,3 +854,39 @@ admin_stats_new_issues
 admin_stats_last_n_days
 За 30 дней
 -----
+commit_committed
+закоммитил
+-----
+commit_view_patch
+Посмотреть патч
+-----
+commit_files_changed
+файлов изменено
+-----
+commit_additions
+добавлений
+-----
+commit_deletions
+удалений
+-----
+commit_no_changes
+В этом коммите нет изменений файлов.
+-----
+commit_binary_file
+Бинарный файл не отображается.
+-----
+commit_file_new
+новый файл
+-----
+commit_file_deleted
+удалён
+-----
+commit_file_renamed
+переименован
+-----
+commits_on
+Коммиты от
+-----
+browse_repo_at_point
+Посмотреть репозиторий на этот момент
+-----

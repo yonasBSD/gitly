@@ -9,25 +9,73 @@
 		<div class="content">
 			@include 'layout/repo_menu.html'
 
-			<div class="commit-info-block">
-				span.additions {
-					Additions: @all_adds
-				}
-
-				span.deletions {
-					Deletions: @all_dels
-				}
-
-				<span>
-					<a href="@patch_url">View patch</a>
-				</span>
-			</div>
-
-			@for _, src in sources
-				<div class="commit-file-diff">
-					<pre>@src</pre>
+			<div class="commit-page">
+				<div class="commit-page__header">
+					<h1 class="commit-page__title">@commit.message</h1>
+					<div class="commit-page__meta">
+						<span class="commit-page__author">@commit.author</span>
+						<span class="commit-page__time">%commit_committed @commit.relative()</span>
+						<span class="commit-page__sep">·</span>
+						<code class="commit-page__hash">@commit.hash</code>
+						<a class="commit-page__browse" href="/@repo.user_name/@repo.name/tree/@commit.hash" title="%browse_repo_at_point" aria-label="%browse_repo_at_point">
+							<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M4.72 3.22a.75.75 0 0 1 1.06 1.06L2.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L.47 8.53a.75.75 0 0 1 0-1.06Zm6.56 0a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06L13.94 8l-3.72-3.72a.75.75 0 0 1 0-1.06Z"/></svg>
+						</a>
+						<a class="commit-page__patch" href="@patch_url">%commit_view_patch</a>
+					</div>
+					<div class="commit-page__stats">
+						<span class="commit-page__files">@file_diffs.len %commit_files_changed</span>
+						<span class="commit-page__adds">+@all_adds</span>
+						<span class="commit-page__dels">-@all_dels</span>
+					</div>
 				</div>
-			@end
+
+				@if file_diffs.len == 0
+					<div class="commit-page__empty">%commit_no_changes</div>
+				@else
+					@for fd in file_diffs
+						<div class="pr-diff" id="diff-@fd.path">
+							<div class="pr-diff__header">
+								<span class="pr-diff__path">
+									@if fd.is_renamed && fd.old_path != fd.path
+										<span class="pr-diff__tag">%commit_file_renamed</span>
+										<span class="pr-diff__oldpath">@fd.old_path &rarr;</span>
+									@end
+									@fd.path
+									@if fd.is_new
+										<span class="pr-diff__tag pr-diff__tag--new">%commit_file_new</span>
+									@end
+									@if fd.is_deleted
+										<span class="pr-diff__tag pr-diff__tag--deleted">%commit_file_deleted</span>
+									@end
+								</span>
+								<span class="pr-diff__counts">
+									<span class="pr-diff__add">+@fd.additions</span>
+									<span class="pr-diff__del">-@fd.deletions</span>
+								</span>
+							</div>
+							@if fd.is_binary
+								<div class="pr-diff__binary">%commit_binary_file</div>
+							@else
+								<table class="pr-diff__table">
+									@for hunk in fd.hunks
+										<tr class="pr-diff__hunk-header">
+											<td colspan="4"><code>@hunk.header</code></td>
+										</tr>
+										@for dline in hunk.lines
+											<tr class="pr-diff__row pr-diff__row--@dline.kind">
+												<td class="pr-diff__lineno">@{dline.old_line_str()}</td>
+												<td class="pr-diff__lineno">@{dline.new_line_str()}</td>
+												<td class="pr-diff__sign">@{dline.sign()}</td>
+												<td class="pr-diff__content"><pre>@{render_diff_line(dline.content, fd.path)}</pre></td>
+											</tr>
+										@end
+									@end
+								</table>
+							@end
+						</div>
+					@end
+				@end
+			</div>
 		</div>
 
 		@include 'layout/footer.html'

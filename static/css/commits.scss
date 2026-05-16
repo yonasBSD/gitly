@@ -1,31 +1,76 @@
 .commit-day-title {
-	color: #767676;
-	padding: 30px 0 10px 0;
+	color: $gray-dark;
+	font-size: 13px;
+	padding: 24px 0 10px 0;
+}
+
+.clog-block {
+	border: 1px solid $gray;
+	border-radius: $medium-radius;
+	overflow: hidden;
+	background-color: $white;
 }
 
 .clog {
-	border: 1px solid $gray;
-	padding: 10px;
-	border-top: 0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	border-top: 1px solid $gray;
 }
 
 .clog:first-child {
-	border-top: 1px solid $gray;
-	border-top-left-radius: $medium-radius !important;
-	border-top-right-radius: $medium-radius !important;
+	border-top: 0;
 }
 
-.clog:last-child {
-	border-bottom-left-radius: $medium-radius !important;
-	border-bottom-right-radius: $medium-radius !important;
+.clog-avatar-link {
+	flex: 0 0 auto;
+	display: block;
+	line-height: 0;
 }
 
 img.clog-avatar {
 	border-radius: $small-radius;
-	width: 35px;
-	//display: inline-block;
-	float: left;
-	margin-right: 10px;
+	width: 20px;
+	height: 20px;
+	object-fit: cover;
+	display: block;
+}
+
+.clog-actions {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.clog-browse {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border: 1px solid $gray;
+	border-radius: $small-radius;
+	background-color: $white;
+	color: $gray-dark;
+	text-decoration: none;
+}
+
+.clog-browse:hover {
+	color: $link-color;
+	border-color: $link-color;
+}
+
+.clog-browse svg {
+	width: 14px;
+	height: 14px;
+	display: block;
+}
+
+.clog-body {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 .clog-msg {
@@ -36,66 +81,193 @@ img.clog-avatar {
 	a {
 		color: $black !important;
 		font-size: 15px;
-		font-weight: 700;
+		font-weight: 600;
 	}
-	padding-bottom: 5px;
+}
+
+.clog-meta {
+	font-size: 12px;
+	color: $gray-dark;
+	margin-top: 4px;
+}
+
+.clog-author {
+	color: $black;
+	font-weight: 600;
+	text-decoration: none;
+	margin-right: 6px;
+}
+
+a.clog-author:hover {
+	color: $link-color;
 }
 
 .clog-time {
-	font-size: 11px;
+	font-size: 12px;
 	color: $gray-dark;
 }
 
-.commit-info-block {
-	border: 1px solid #dfdfdf;
-	border-radius: 3px;
-	padding: 10px;
+.clog-hash {
+	flex: 0 0 auto;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	background-color: $gray-light;
+	border: 1px solid $gray;
+	border-radius: $small-radius;
+	padding: 2px 8px;
+	font-size: 12px;
+	color: $black;
+	text-decoration: none;
 }
 
-.commit-file-diff {
-	margin-top: 10px;
+.clog-hash:hover {
+	color: $link-color;
+	border-color: $link-color;
+}
 
-	pre {
-		overflow-y: hidden;
-		overflow-x: scroll;
-	}
+.commit-page {
+	margin-top: 16px;
+}
 
-	pre > *{
-		font-family:Roboto-Mono, Menlo;
-	}
+.commit-page__header {
+	border: 1px solid $gray;
+	border-radius: $medium-radius;
+	padding: 14px 16px;
+	background-color: #f6f8fa;
+	margin-bottom: 16px;
+}
 
-	.hl_table a {
-		padding-right: 5px;
-		padding-left: 5px;
-		float: right;
-	}
+.commit-page__title {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0 0 8px 0;
+	color: $black;
+	line-height: 1.4;
+}
 
-	.hl_table {
-		width: 1000px;
-		border: 1px solid #dfdfdf;
-		border-radius: 3px;
-	}
+.commit-page__meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	font-size: 13px;
+	color: $gray-dark;
+	margin-bottom: 10px;
+}
 
-	.hl_table b {
-		color: rgb(150, 77, 0);
-	}
+.commit-page__author {
+	font-weight: 600;
+	color: $black;
+}
 
-	.hl_table u {
-		color: rgb(0, 124, 255);
-		text-decoration: none;
-	}
+.commit-page__sep {
+	color: $gray;
+}
 
-	.hl_table i {
-		color: rgb(3, 125, 3);
-	}
+.commit-page__hash {
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	background-color: $white;
+	border: 1px solid $gray;
+	border-radius: $small-radius;
+	padding: 1px 6px;
+	font-size: 12px;
+	color: $black;
+}
 
-	.a {
-		background-color: #90fb90;
-	}
+.commit-page__browse {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border: 1px solid $gray;
+	border-radius: $small-radius;
+	background-color: $white;
+	color: $gray-dark;
+	text-decoration: none;
+}
 
-	.d {
-		background-color: #f27e7e;
-	}
+.commit-page__browse:hover {
+	color: $link-color;
+	border-color: $link-color;
+}
+
+.commit-page__browse svg {
+	width: 14px;
+	height: 14px;
+	display: block;
+}
+
+.commit-page__patch {
+	margin-left: auto;
+	font-size: 13px;
+	color: $link-color;
+	text-decoration: none;
+}
+
+.commit-page__patch:hover {
+	text-decoration: underline;
+}
+
+.commit-page__stats {
+	display: flex;
+	gap: 12px;
+	font-size: 13px;
+	font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.commit-page__files {
+	color: $black;
+}
+
+.commit-page__adds {
+	color: #1f883d;
+	font-weight: 600;
+}
+
+.commit-page__dels {
+	color: #cf222e;
+	font-weight: 600;
+}
+
+.commit-page__empty {
+	padding: 24px;
+	text-align: center;
+	color: $gray-dark;
+	border: 1px solid $gray;
+	border-radius: $medium-radius;
+	background-color: $white;
+}
+
+.pr-diff__tag {
+	display: inline-block;
+	font-size: 11px;
+	font-family: system-ui, sans-serif;
+	font-weight: 500;
+	padding: 1px 6px;
+	margin-left: 6px;
+	border-radius: 10px;
+	background-color: $gray-light;
+	color: $gray-dark;
+	border: 1px solid $gray;
+	vertical-align: middle;
+}
+
+.pr-diff__tag--new {
+	background-color: #dafbe1;
+	color: #1f883d;
+	border-color: #aceebb;
+}
+
+.pr-diff__tag--deleted {
+	background-color: #ffebe9;
+	color: #cf222e;
+	border-color: #ffcecb;
+}
+
+.pr-diff__oldpath {
+	color: $gray-dark;
+	font-weight: 400;
+	margin-right: 4px;
 }
 
 .buttons {
