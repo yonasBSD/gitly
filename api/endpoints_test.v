@@ -134,7 +134,7 @@ fn ensure_gitly_binary() {
 		return
 	}
 	log.info('building ${test_binary} ...')
-	res := os.execute('v -d use_libbacktrace -d use_openssl -o ${test_binary} .')
+	res := os.execute('v -d sqlite -d use_libbacktrace -d use_openssl -o ${test_binary} .')
 	if res.exit_code != 0 {
 		fail('failed to build gitly: ${res.output}')
 	}
