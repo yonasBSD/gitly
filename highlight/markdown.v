@@ -116,9 +116,9 @@ fn sanitize_html_tags_with_re(re string, code string) string {
 		last_found_index = matched_start_index + tag.len
 
 		tag_parts := matched.get_all()
-		tag_name := tag_parts[0].trim_space().to_lower()
-		tag_attributes := tag_parts[1].trim_space()
-		tag_content := tag_parts[2].trim_space()
+		tag_name := tag_parts[1].trim_space().to_lower()
+		tag_attributes := tag_parts[2].trim_space()
+		tag_content := if tag_parts.len > 3 { tag_parts[3].trim_space() } else { '' }
 		is_allowed_tag := allowed_tags.contains(tag_name)
 
 		if !is_allowed_tag {
@@ -167,8 +167,8 @@ fn sanitize_html_attributes(attributes string) string {
 		last_found_index += matched_start_index + attribute.len
 
 		attribute_parts := matched.get_all()
-		attribute_name := attribute_parts[0].trim_space().to_lower()
-		attribute_value := attribute_parts[1].trim_space()
+		attribute_name := attribute_parts[1].trim_space().to_lower()
+		attribute_value := attribute_parts[2].trim_space()
 
 		is_allowed_attribute := allowed_attributes.contains(attribute_name)
 		is_unallowed_schemas := unallowed_schemas.any(attribute_value.starts_with(it))
