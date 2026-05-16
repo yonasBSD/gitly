@@ -15,12 +15,13 @@
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 0 6px;
+	gap: 8px;
+	min-height: 50px;
 }
 
 .repo-settings-link {
-	margin-left: 6px;
-	font-size: 13px;
+	font-size: 14px;
+	line-height: 1;
 }
 
 /* 1. The repo stats panel */
@@ -123,11 +124,46 @@ a.repo-stat-item:hover {
 	font-size: 14px;
 	font-weight: 500;
 	line-height: 20px;
+	max-width: 200px;
 	padding: 5px 35px 5px 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
 	background-repeat: no-repeat;
 	background-position: right 8px center;
 	background-size: 10px;
+}
+
+.branches-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	color: #24292e !important;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	padding: 5px 10px;
+	border: 1px solid rgba(27, 31, 35, 0.15);
+	border-radius: 6px;
+	background: #fafbfc;
+	white-space: nowrap;
+
+	svg {
+		color: #24292e;
+		height: 14px;
+		width: 14px;
+		flex: 0 0 auto;
+	}
+
+	b {
+		font-weight: 600;
+	}
+
+	&:hover {
+		background: #f3f4f6;
+		text-decoration: none;
+	}
 }
 
 .repo-mode-switch {
@@ -253,23 +289,214 @@ a.repo-mode-link:hover {
 .repo-code-container:hover .repo-clone-dropdown {
 	display: block;
 }
-/* Repo About / Actions Section */
-.repo-about {
+/* Repo Actions (Star / Watch buttons in the top bar) */
+.repo-actions {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	flex-wrap: wrap;
 
-	p, div:not(.button-container) {
-		/* Hide original text elements if purely for structure,
-           or style them if they contain description */
-		//display: none;
-	}
-
-	/* Show buttons explicitly */
 	button {
 		display: inline-flex;
-		width: auto !important; /* Override global 50% */
+		width: auto !important;
+	}
+}
+
+/* Two-column layout for the top of the repo (files + sidebar) */
+.repo-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 296px;
+	gap: 24px;
+	align-items: start;
+}
+
+.repo-main {
+	min-width: 0;
+}
+
+.repo-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.sidebar-section {
+	border-bottom: 1px solid #eaecef;
+	padding-bottom: 16px;
+
+	&:last-child {
+		border-bottom: 0;
+		padding-bottom: 0;
+	}
+}
+
+.sidebar-section-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+
+	h3 {
+		font-size: 14px;
+		font-weight: 600;
+		color: #24292e;
+		margin: 0;
+
+		a {
+			color: inherit;
+			&:hover { color: #0366d6; text-decoration: none; }
+		}
+	}
+}
+
+.sidebar-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 6px;
+	background: #eaecef;
+	color: #24292e;
+	border-radius: 9px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.sidebar-description {
+	font-size: 14px;
+	color: #57606a;
+	margin: 0 0 12px;
+	line-height: 1.5;
+}
+
+.sidebar-description--empty {
+	font-style: italic;
+	color: #8b949e;
+}
+
+.sidebar-meta {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	li {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+		color: #57606a;
+
+		svg {
+			color: #57606a;
+			flex: 0 0 auto;
+		}
+
+		a {
+			color: #57606a;
+			font-weight: 500;
+			&:hover { color: #0366d6; text-decoration: underline; }
+		}
+	}
+}
+
+.sidebar-empty {
+	font-size: 13px;
+	color: #8b949e;
+	margin: 0;
+	font-style: italic;
+}
+
+.sponsor-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #24292e !important;
+	background: #fafbfc;
+	border: 1px solid rgba(27, 31, 35, 0.15);
+	border-radius: 6px;
+
+	&:hover {
+		background: #f3f4f6;
+		text-decoration: none;
+	}
+}
+
+.sidebar-release-latest {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	color: #24292e !important;
+
+	.sidebar-release-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0 7px;
+		height: 20px;
+		background: #2ea44f;
+		color: #fff;
+		font-size: 11px;
+		font-weight: 600;
+		border-radius: 999px;
+	}
+
+	.sidebar-release-name {
+		font-weight: 600;
+		font-size: 14px;
+	}
+
+	.sidebar-release-date {
+		color: #57606a;
+		font-size: 12px;
+		flex-basis: 100%;
+	}
+
+	&:hover .sidebar-release-name {
+		color: #0366d6;
+	}
+}
+
+.sidebar-release-more {
+	display: inline-block;
+	margin-top: 8px;
+	font-size: 13px;
+	color: #0366d6;
+
+	&:hover { text-decoration: underline; }
+}
+
+.sidebar-contributors {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.sidebar-contributor {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	overflow: hidden;
+	background: #f6f8fa;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+}
+
+@media (max-width: 960px) {
+	.repo-layout {
+		grid-template-columns: minmax(0, 1fr);
 	}
 }
 

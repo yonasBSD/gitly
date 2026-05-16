@@ -29,6 +29,11 @@
 						@end
 					</select>
 
+					<a class="branches-link" href="/@repo.user_name/@repo.name/branches">
+						<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M384 144c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 36.4 24.3 67.1 57.5 76.8-.6 16.1-4.2 28.5-11 36.9-15.4 19.2-49.3 22.4-85.2 25.7-28.2 2.6-57.4 5.4-81.3 16.9v-144c32.5-10.2 56-40.5 56-76.3 0-44.2-35.8-80-80-80S0 35.8 0 80c0 35.8 23.5 66.1 56 76.3v199.3C23.5 365.9 0 396.2 0 432c0 44.2 35.8 80 80 80s80-35.8 80-80c0-34-21.2-63.1-51.2-74.6 3.1-5.2 7.8-9.8 14.9-13.4 16.2-8.2 40.4-10.4 66.1-12.8 42.2-3.9 90-8.4 118.2-43.4 14-17.4 21.1-39.8 21.6-67.9 31.6-10.8 54.4-40.7 54.4-75.9zM80 64c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16zm0 384c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16-7.2 16-16 16zm224-320c8.8 0 16 7.2 16 16s-7.2 16-16 16-16-7.2-16-16 7.2-16 16-16z"></path></svg>
+						@repo.format_nr_branches(ctx.lang)
+					</a>
+
 					<div class="repo-mode-switch">
 						@if is_top_files_mode
 							<a class="repo-mode-link" href="@tree_url">Tree</a>
@@ -57,42 +62,28 @@
 				</span>
 
 				@if is_top_directory
-					<div class="repo-about">
-						<p>@repo.description</p>
-
-						@if readme.len > 0
-							<div>
-								<a href="#readme">Readme</a>
-							</div>
-						@end
-
-						@if license_file_path.len > 0
-							<div>
-								<a href="@{license_file_path}">License</a>
-							</div>
-						@end
-
+					<div class="repo-actions">
 						@if is_repo_starred
 							<button class="star-button">
 								@include 'svgs/unstar.html'
-								Starred @{repo.nr_stars}
+								%starred @{repo.nr_stars}
 							</button>
 						@else
 							<button class="star-button">
 								@include 'svgs/star.html'
-								Star @{repo.nr_stars}
+								%star_action @{repo.nr_stars}
 							</button>
 						@end
 
 						@if is_repo_watcher
 							<button class="watch-button">
 								@include 'svgs/unwatch.html'
-								Unwatch @{watcher_count}
+								%unwatch_action @{watcher_count}
 							</button>
 						@else
 							<button class="watch-button">
 								@include 'svgs/watch.html'
-								Watch @{watcher_count}
+								%watch_action @{watcher_count}
 							</button>
 						@end
 					</div>
@@ -101,6 +92,11 @@
 
 			@if !is_top_files_mode
 				@include './layout/tree_path.html'
+			@end
+
+			@if is_top_directory
+				<div class="repo-layout">
+					<div class="repo-main">
 			@end
 
 			@if has_commits && repo.lang_stats.len > 0
@@ -207,7 +203,7 @@
 										@file.pretty_tree_size()
 									</span>
 								@else
-									<span class="file-size"></span>
+									<span class="file-size">@file.pretty_size()</span>
 								@end
 							@end
 						</div>
@@ -219,6 +215,101 @@
 						@readme
 					</div>
 				@end
+			@end
+
+			@if is_top_directory
+					</div>
+
+					<aside class="repo-sidebar">
+						<section class="sidebar-section">
+							<div class="sidebar-section-header">
+								<h3>%about_section</h3>
+							</div>
+							@if repo.description != ''
+								<p class="sidebar-description">@repo.description</p>
+							@else
+								<p class="sidebar-description sidebar-description--empty">%no_description</p>
+							@end
+							<ul class="sidebar-meta">
+								@if readme.len > 0
+									<li>
+										<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"/></svg>
+										<a href="#readme">%readme_link</a>
+									</li>
+								@end
+								@if license_file_path.len > 0
+									<li>
+										<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M8.75.75V2h.985c.304 0 .603.08.867.231l1.29.736c.038.022.08.033.124.033h2.234a.75.75 0 0 1 0 1.5h-.427l2.111 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.006.005-.01.01-.045.04c-.21.176-.441.327-.686.45C14.556 10.78 13.88 11 13 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L12.178 4.5h-.162c-.305 0-.604-.079-.868-.231l-1.29-.736a.245.245 0 0 0-.124-.033H8.75V13h2.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5h2.5V3.5h-.984a.244.244 0 0 0-.124.033l-1.289.737c-.265.15-.564.23-.869.23h-.162l2.112 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.016.015-.045.04c-.21.176-.441.327-.686.45C4.556 10.78 3.88 11 3 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L2.178 4.5H1.75a.75.75 0 0 1 0-1.5h2.234a.249.249 0 0 0 .125-.033l1.288-.737c.265-.15.564-.23.869-.23h.984V.75a.75.75 0 0 1 1.5 0Zm2.945 8.477c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L13 6.327Zm-10 0c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L3 6.327Z"/></svg>
+										<a href="@{license_file_path}">%license_link</a>
+									</li>
+								@end
+								<li>
+									<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg>
+									@repo.nr_stars %stars_label
+								</li>
+								<li>
+									<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"/></svg>
+									@watcher_count %watching_label
+								</li>
+							</ul>
+						</section>
+
+						<section class="sidebar-section">
+							<div class="sidebar-section-header">
+								<h3><a href="#sponsor">%sponsor_section</a></h3>
+							</div>
+							<a class="sponsor-button" href="#sponsor">
+								<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="#bf3989" d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002ZM4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.58 20.58 0 0 0 8 13.393a20.58 20.58 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"/></svg>
+								%sponsor_action
+							</a>
+						</section>
+
+						<section class="sidebar-section">
+							<div class="sidebar-section-header">
+								<h3><a href="/@repo.user_name/@repo.name/releases">%releases_section</a></h3>
+								@if repo.nr_releases > 0
+									<span class="sidebar-count">@repo.nr_releases</span>
+								@end
+							</div>
+							@if sidebar_releases.len > 0
+								<a class="sidebar-release-latest" href="/@repo.user_name/@repo.name/releases">
+									<span class="sidebar-release-badge">%latest_label</span>
+									<span class="sidebar-release-name">@sidebar_releases[0].tag_name</span>
+									<span class="sidebar-release-date">@sidebar_releases[0].date.relative()</span>
+								</a>
+								@if sidebar_releases.len > 1
+									<a class="sidebar-release-more" href="/@repo.user_name/@repo.name/releases">
+										+ @{sidebar_releases.len - 1} %releases_more
+									</a>
+								@end
+							@else
+								<p class="sidebar-empty">%no_releases</p>
+							@end
+						</section>
+
+						<section class="sidebar-section">
+							<div class="sidebar-section-header">
+								<h3><a href="/@repo.user_name/@repo.name/contributors">%contributors_section</a></h3>
+								@if repo.nr_contributors > 0
+									<span class="sidebar-count">@repo.nr_contributors</span>
+								@end
+							</div>
+							@if sidebar_contributors.len > 0
+								<div class="sidebar-contributors">
+									@for contributor in sidebar_contributors
+										@if contributor.is_registered
+											<a class="sidebar-contributor" href="/@contributor.username" title="@contributor.username">
+												<img src="@{app.prepare_user_avatar_url(contributor.avatar)}" alt="@contributor.username">
+											</a>
+										@end
+									@end
+								</div>
+							@else
+								<p class="sidebar-empty">%no_contributors</p>
+							@end
+						</section>
+					</aside>
+				</div>
 			@end
 
 		</div>

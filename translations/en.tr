@@ -890,3 +890,57 @@ Commits on
 browse_repo_at_point
 Browse repository at this point
 -----
+about_section
+About
+-----
+no_description
+No description provided.
+-----
+readme_link
+Readme
+-----
+license_link
+License
+-----
+stars_label
+stars
+-----
+watching_label
+watching
+-----
+sponsor_section
+Sponsor this project
+-----
+sponsor_action
+Sponsor
+-----
+releases_section
+Releases
+-----
+contributors_section
+Contributors
+-----
+latest_label
+Latest
+-----
+releases_more
+more releases
+-----
+no_releases
+No releases published
+-----
+no_contributors
+No contributors yet
+-----
+star_action
+Star
+-----
+starred
+Starred
+-----
+watch_action
+Watch
+-----
+unwatch_action
+Unwatch
+-----

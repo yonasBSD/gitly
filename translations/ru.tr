@@ -890,3 +890,57 @@ commits_on
 browse_repo_at_point
 Посмотреть репозиторий на этот момент
 -----
+about_section
+О проекте
+-----
+no_description
+Описание не предоставлено.
+-----
+readme_link
+Readme
+-----
+license_link
+Лицензия
+-----
+stars_label
+звёзд
+-----
+watching_label
+наблюдают
+-----
+sponsor_section
+Поддержать проект
+-----
+sponsor_action
+Поддержать
+-----
+releases_section
+Релизы
+-----
+contributors_section
+Контрибьюторы
+-----
+latest_label
+Последний
+-----
+releases_more
+других релизов
+-----
+no_releases
+Релизов пока нет
+-----
+no_contributors
+Контрибьюторов пока нет
+-----
+star_action
+В избранное
+-----
+starred
+В избранном
+-----
+watch_action
+Наблюдать
+-----
+unwatch_action
+Не наблюдать
+-----

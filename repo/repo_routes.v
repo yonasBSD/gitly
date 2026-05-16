@@ -4,6 +4,7 @@ import veb
 import api
 import crypto.sha1
 import os
+import time
 import highlight
 import validation
 import git
@@ -544,6 +545,35 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		app.find_ci_status_for_branch(repo_id, branch_name) or { CiStatus{} }
 	}
 	has_ci := ci_status.id != 0
+
+	mut sidebar_contributors := []User{}
+	mut sidebar_releases := []Release{}
+	if is_top_directory {
+		all_contributors := app.find_repo_registered_contributor(repo_id)
+		sidebar_contributors = if all_contributors.len > 12 {
+			all_contributors[..12]
+		} else {
+			all_contributors
+		}
+
+		rels := app.find_repo_releases_as_page(repo_id, 0)
+		tags := app.get_all_repo_tags(repo_id)
+		for rel in rels {
+			mut r := rel
+			for tag in tags {
+				if tag.id == rel.tag_id {
+					r.tag_name = tag.name
+					r.tag_hash = tag.hash
+					r.date = time.unix(tag.created_at)
+					break
+				}
+			}
+			sidebar_releases << r
+			if sidebar_releases.len >= 3 {
+				break
+			}
+		}
+	}
 
 	return $veb.html()
 }
