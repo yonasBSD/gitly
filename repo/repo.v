@@ -652,6 +652,14 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 		return none
 	}
 
+	lower_path := item_path.to_lower()
+	for segment in lower_path.split('/') {
+		if segment == 'thirdparty' || segment == '3rdparty' || segment == 'third_party'
+			|| segment == 'third-party' {
+			return none
+		}
+	}
+
 	item_name := item_path.after('/')
 	if item_name == '' {
 		return none
