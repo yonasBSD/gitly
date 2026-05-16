@@ -77,6 +77,43 @@
 	grid-column: 5;
 }
 
+.file.file-total {
+	grid-template-columns: 1fr auto;
+
+	&:hover {
+		background-color: #fff;
+		cursor: default;
+	}
+
+	.file-size {
+		grid-column: 2;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		color: #24292e !important;
+		font-size: 14px;
+
+		svg {
+			fill: currentColor;
+			color: #6a737d;
+			width: 14px;
+			height: 14px;
+		}
+
+		b {
+			font-weight: 600;
+		}
+	}
+}
+
+.files--with-size .file.file-total {
+	grid-template-columns: 1fr auto;
+
+	.file-size {
+		grid-column: 2;
+	}
+}
+
 .files--top-files .file {
 	grid-template-columns: 20px minmax(0, 1fr) 110px;
 }

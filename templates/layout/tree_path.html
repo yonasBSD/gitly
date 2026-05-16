@@ -1,9 +1,0 @@
-<div class="tree-path">
-  @for i, p in ctx.path_split
-    <a href="/@repo.user_name/@{ctx.make_path(branch_name, i)}">@p</a>
-
-    @if i < ctx.path_split.len - 1
-      /
-    @end
-  @end
-</div>

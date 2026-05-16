@@ -275,13 +275,22 @@ a.repo-author, a.repo-name {
 }
 
 .repo-visibility {
-	border: 2px solid $black;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 2px 10px;
+	border: 1px solid $gray;
 	border-radius: 2em;
-	background-color: $black;
-	color: #fff;
-	margin-left: 5px;
-	font-size: 14px;
-	padding: 4px;
+	color: $gray-dark;
+	background-color: $white;
+	line-height: 1.6;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.repo-visibility--private {
+	color: #9a6700;
+	border-color: #d4a72c;
+	background-color: #fff8c5;
 }
 
 .slash {

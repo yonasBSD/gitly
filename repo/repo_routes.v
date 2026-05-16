@@ -504,6 +504,7 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 
 	ctx.is_tree = true
+	ctx.branch = branch_name
 
 	app.increment_repo_views(repo.id) or { app.info(err.str()) }
 

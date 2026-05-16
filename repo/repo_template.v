@@ -105,7 +105,7 @@ fn (r &Repo) format_size() veb.RawHtml {
 	if bytes <= 0 {
 		return veb.RawHtml('')
 	}
-	num, unit := format_iec_size_parts(bytes)
+	num, unit := format_repo_size_parts(bytes)
 	return veb.RawHtml('<b>${num}</b> ${unit}')
 }
 
@@ -129,7 +129,7 @@ fn (r &Repo) disk_size_bytes() i64 {
 	return total_kib * 1024
 }
 
-fn format_iec_size_parts(bytes i64) (string, string) {
+fn format_repo_size_parts(bytes i64) (string, string) {
 	if bytes < 1024 {
 		return bytes.str(), 'B'
 	}
