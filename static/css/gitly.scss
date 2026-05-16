@@ -1116,6 +1116,22 @@ form {
 	}
 }
 
+.issues-header__actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.issues-header__milestones {
+	color: $gray-dark;
+	font-size: 13px;
+	font-weight: 500;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
 .issues-header__new {
 	background-color: #1f883d;
 	color: $white !important;

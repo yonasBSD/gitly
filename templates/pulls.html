@@ -11,9 +11,14 @@
 
 			<div class="issues-header">
 				<h1 class="issues-header__title">%pr_pull_requests</h1>
-				@if ctx.logged_in
-					<a class="issues-header__new" href='/@repo.user_name/@repo.name/compare'>%pr_new</a>
-				@end
+				<div class="issues-header__actions">
+					@if repo.milestones_enabled()
+						<a class="issues-header__milestones" href="/@repo.user_name/@repo.name/milestones">%milestones</a>
+					@end
+					@if ctx.logged_in
+						<a class="issues-header__new" href='/@repo.user_name/@repo.name/compare'>%pr_new</a>
+					@end
+				</div>
 			</div>
 
 			<div class="pr-tabs">
