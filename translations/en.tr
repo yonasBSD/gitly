@@ -767,3 +767,33 @@ Signed in as
 header_sign_out
 Sign out
 -----
+admin_stats_running_since
+Gitly runs since
+-----
+admin_stats_total_users
+Registered users
+-----
+admin_stats_total_repos
+Repositories
+-----
+admin_stats_total_commits
+Commits
+-----
+admin_stats_total_issues
+Issues
+-----
+admin_stats_new_users
+New users
+-----
+admin_stats_new_repos
+New repositories
+-----
+admin_stats_commits
+Commits
+-----
+admin_stats_new_issues
+New issues
+-----
+admin_stats_last_n_days
+Last 30 days
+-----

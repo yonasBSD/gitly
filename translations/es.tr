@@ -767,3 +767,33 @@ Sesión iniciada como
 header_sign_out
 Cerrar sesión
 -----
+admin_stats_running_since
+Gitly funciona desde hace
+-----
+admin_stats_total_users
+Usuarios registrados
+-----
+admin_stats_total_repos
+Repositorios
+-----
+admin_stats_total_commits
+Commits
+-----
+admin_stats_total_issues
+Incidencias
+-----
+admin_stats_new_users
+Nuevos usuarios
+-----
+admin_stats_new_repos
+Nuevos repositorios
+-----
+admin_stats_commits
+Commits
+-----
+admin_stats_new_issues
+Nuevas incidencias
+-----
+admin_stats_last_n_days
+Últimos 30 días
+-----

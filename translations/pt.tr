@@ -767,3 +767,33 @@ Conectado como
 header_sign_out
 Sair
 -----
+admin_stats_running_since
+Gitly em execução há
+-----
+admin_stats_total_users
+Usuários cadastrados
+-----
+admin_stats_total_repos
+Repositórios
+-----
+admin_stats_total_commits
+Commits
+-----
+admin_stats_total_issues
+Issues
+-----
+admin_stats_new_users
+Novos usuários
+-----
+admin_stats_new_repos
+Novos repositórios
+-----
+admin_stats_commits
+Commits
+-----
+admin_stats_new_issues
+Novas issues
+-----
+admin_stats_last_n_days
+Últimos 30 dias
+-----

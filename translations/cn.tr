@@ -767,3 +767,33 @@ header_signed_in_as
 header_sign_out
 退出登录
 -----
+admin_stats_running_since
+Gitly 运行时间
+-----
+admin_stats_total_users
+注册用户
+-----
+admin_stats_total_repos
+仓库
+-----
+admin_stats_total_commits
+提交
+-----
+admin_stats_total_issues
+问题
+-----
+admin_stats_new_users
+新用户
+-----
+admin_stats_new_repos
+新仓库
+-----
+admin_stats_commits
+提交
+-----
+admin_stats_new_issues
+新问题
+-----
+admin_stats_last_n_days
+最近 30 天
+-----
