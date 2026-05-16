@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			<h1>%api_tokens</h1>
+
+			@if new_token != ''
+				<div class="api-token-show">
+					<p>%api_token_show_once</p>
+					<pre><code>@new_token</code></pre>
+				</div>
+			@end
+
+			<form method='post' action='/@username/settings/api-tokens' class="form">
+				<div class="field">
+					<input type='text' name='name' placeholder='%api_token_name' required>
+				</div>
+				<div class="field">
+					<button type='submit' class='settings-form__submit'>%api_token_create</button>
+				</div>
+			</form>
+
+			@if tokens.len == 0
+				<p>%api_token_none</p>
+			@else
+				<ul class="api-token-list">
+					@for t in tokens
+						<li class="api-token-row">
+							<strong>@t.name</strong>
+							<form method='post' action='/@username/settings/api-tokens/@t.id/delete' class="inline-form">
+								<button type='submit' class='link-button'>%api_token_revoke</button>
+							</form>
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>
