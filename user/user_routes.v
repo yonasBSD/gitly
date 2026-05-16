@@ -182,80 +182,87 @@ pub fn (mut app App) register(mut ctx Context) veb.Result {
 	return $veb.html()
 }
 
+fn (mut app App) register_failed(mut ctx Context, no_redirect string, msg string) veb.Result {
+	if no_redirect == '1' {
+		ctx.res.set_status(.bad_request)
+		return ctx.text(msg)
+	}
+	ctx.error(msg)
+	return app.register(mut ctx)
+}
+
 @['/register'; post]
 pub fn (mut app App) handle_register(mut ctx Context, username string, email string, password string, no_redirect string) veb.Result {
 	user_count := app.get_users_count() or {
-		ctx.error('Failed to register')
-		return app.register(mut ctx)
+		eprintln('[register] get_users_count failed: ${err}')
+		return app.register_failed(mut ctx, no_redirect, 'Failed to register: ${err}')
 	}
 	no_users := user_count == 0
 	println('USERNAME=${username}')
 
 	if username in ['login', 'register', 'new', 'new_post', 'oauth'] {
-		ctx.error('Username `${username}` is not available')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'Username `${username}` is not available')
 	}
 
 	user_chars := username.bytes()
 
 	if user_chars.len > max_username_len {
-		ctx.error('Username is too long (max. ${max_username_len})')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect,
+			'Username is too long (max. ${max_username_len})')
 	}
 
 	if username.contains('--') {
-		ctx.error('Username cannot contain two hyphens')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'Username cannot contain two hyphens')
 	}
 
 	if user_chars[0] == `-` || user_chars.last() == `-` {
-		ctx.error('Username cannot begin or end with a hyphen')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect,
+			'Username cannot begin or end with a hyphen')
 	}
 
 	for ch in user_chars {
 		if !ch.is_letter() && !ch.is_digit() && ch != `-` {
-			ctx.error('Username cannot contain special characters')
-			return app.register(mut ctx)
+			return app.register_failed(mut ctx, no_redirect,
+				'Username cannot contain special characters')
 		}
 	}
 
 	is_username_valid := validation.is_username_valid(username)
 
 	if !is_username_valid {
-		ctx.error('Username is not valid')
-
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'Username is not valid')
 	}
 
 	if password == '' {
-		ctx.error('Password cannot be empty')
-
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'Password cannot be empty')
 	}
 
 	salt := generate_salt()
 	hashed_password := hash_password_with_salt(password, salt)
 
 	if username == '' || email == '' {
-		ctx.error('Username or Email cannot be emtpy')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'Username or Email cannot be emtpy')
 	}
 
 	// TODO: refactor
 	is_registered := app.register_user(username, hashed_password, salt, [email], false, no_users) or {
-		ctx.error('Failed to register')
-		return app.register(mut ctx)
+		eprintln('[register] register_user failed for username=${username} email=${email}: ${err}')
+		msg := if is_unique_constraint_error(err) {
+			'Username `${username}` or email `${email}` is already in use'
+		} else {
+			'Failed to register: ${err.msg()}'
+		}
+		return app.register_failed(mut ctx, no_redirect, msg)
 	}
 
 	if !is_registered {
-		ctx.error('Failed to register')
-		return app.register(mut ctx)
+		eprintln('[register] register_user returned false for username=${username} email=${email} (user already exists or insertion mismatch — see prior info logs)')
+		return app.register_failed(mut ctx, no_redirect,
+			'Failed to register: user already exists or could not be inserted')
 	}
 
 	user := app.get_user_by_username(username) or {
-		ctx.error('User already exists')
-		return app.register(mut ctx)
+		return app.register_failed(mut ctx, no_redirect, 'User already exists')
 	}
 
 	if no_users {
@@ -265,8 +272,8 @@ pub fn (mut app App) handle_register(mut ctx Context, username string, email str
 	client_ip := 'ip' // ctx.ip() // XTODO
 
 	app.auth_user(mut ctx, user, client_ip) or {
-		ctx.error('Failed to register')
-		return app.register(mut ctx)
+		eprintln('[register] auth_user failed for username=${username}: ${err}')
+		return app.register_failed(mut ctx, no_redirect, 'Failed to register: ${err}')
 	}
 	app.add_security_log(user_id: user.id, kind: .registered) or { app.info(err.str()) }
 
