@@ -27,9 +27,10 @@
 
 /* 1. The repo stats panel */
 .repo-stats {
-	display: grid;
-	grid-template-columns: repeat(7, minmax(0, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
+	justify-content: space-evenly;
 	border: 1px solid #d8dee4;
 	border-radius: 5px;
 	background: #ffffff;
@@ -70,7 +71,7 @@ a.repo-stat-item:hover {
 
 @media (max-width: 760px) {
 	.repo-stats {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		justify-content: space-around;
 	}
 }
 
