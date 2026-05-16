@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="issues-header">
+				<h1 class="issues-header__title">%milestones</h1>
+				@if ctx.logged_in && repo.user_id == ctx.user.id
+					<a class="issues-header__new" href="/@repo.user_name/@repo.name/milestones/new">%milestone_new</a>
+				@end
+			</div>
+
+			@if milestones.len == 0
+				<div class="issues-empty">%milestone_none</div>
+			@else
+				<ul class="milestone-list">
+					@for m in milestones
+						<li class="milestone-row">
+							<a class="milestone-row__title" href="/@repo.user_name/@repo.name/milestones/@m.id">@m.title</a>
+							@if m.is_closed
+								<span class="issue-label">%milestone_status_closed</span>
+							@else
+								<span class="issue-label">%milestone_status_open</span>
+							@end
+							@if m.due_date != 0
+								<span class="milestone-row__due">%milestone_due_date @m.due_date_str()</span>
+							@end
+							<p class="milestone-row__desc">@m.description</p>
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

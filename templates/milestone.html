@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="pr-header">
+				<h1 class="pr-header__title">@milestone.title</h1>
+				<div class="pr-header__meta">
+					@if milestone.is_closed
+						<span class="pr-status-badge pr-status--closed">%milestone_status_closed</span>
+					@else
+						<span class="pr-status-badge pr-status--open">%milestone_status_open</span>
+					@end
+					@if milestone.due_date != 0
+						<span>%milestone_due_date @milestone.due_date_str()</span>
+					@end
+				</div>
+			</div>
+
+			<div class="pr-body">
+				<p>@milestone.description</p>
+			</div>
+
+			@if can_edit
+				<div class="pr-actions">
+					@if milestone.is_closed
+						<form method="post" action="/@repo.user_name/@repo.name/milestones/@milestone.id/reopen" class="pr-action-form">
+							<button type="submit" class="pr-action">%milestone_reopen</button>
+						</form>
+					@else
+						<form method="post" action="/@repo.user_name/@repo.name/milestones/@milestone.id/close" class="pr-action-form">
+							<button type="submit" class="pr-action">%milestone_close</button>
+						</form>
+					@end
+					<form method="post" action="/@repo.user_name/@repo.name/milestones/@milestone.id/delete" class="pr-action-form">
+						<button type="submit" class="pr-action pr-action--close">%milestone_delete</button>
+					</form>
+				</div>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>
