@@ -69,11 +69,27 @@ pub fn (mut app App) user(mut ctx Context, username string) veb.Result {
 		return ctx.not_found()
 	}
 	is_page_owner := username == ctx.user.username
-	repos := if is_page_owner {
-		app.find_user_repos(user.id)
-	} else {
-		app.find_user_public_repos(user.id)
+	mut repos := app.find_user_profile_repos(user.id, is_page_owner)
+	for mut repo in repos {
+		repo.lang_stats = app.find_repo_lang_stats(repo.id)
+		repo.latest_commit_at = app.find_repo_last_commit_time(repo.id)
 	}
+	activity_days := 365
+	activity_buckets := app.get_user_daily_activity(user.id, activity_days)
+	mut activity_total := 0
+	mut activity_max := 0
+	for v in activity_buckets {
+		activity_total += v
+		if v > activity_max {
+			activity_max = v
+		}
+	}
+	activity_oldest := time.now().add_days(-(activity_days - 1))
+	// Render as a 7-row grid (Mon top → Sun bottom), columns are weeks.
+	// We need to pad leading cells so the first day lands on its weekday row.
+	activity_leading := activity_oldest.day_of_week() - 1
+	activity_start_label := activity_oldest.md()
+	activity_end_label := time.now().md()
 	activities := app.find_activities(user.id)
 	return $veb.html()
 }

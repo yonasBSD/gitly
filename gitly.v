@@ -333,6 +333,7 @@ fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('Repo', 'disable_projects', db_bool_column_type())!
 	app.add_missing_column('Repo', 'disable_milestones', db_bool_column_type())!
 	app.add_missing_column('Repo', 'disable_wiki', db_bool_column_type())!
+	app.add_missing_column('Repo', 'is_pinned', db_bool_column_type())!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {

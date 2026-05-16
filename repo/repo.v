@@ -47,6 +47,7 @@ mut:
 	disable_projects    bool
 	disable_milestones  bool
 	disable_wiki        bool
+	is_pinned           bool
 }
 
 fn (r &Repo) discussions_enabled() bool {
@@ -152,6 +153,40 @@ fn (mut app App) find_user_public_repos(user_id int) []Repo {
 	return sql app.db {
 		select from Repo where user_id == user_id && is_public == true && is_deleted == false
 	} or { []Repo{} }
+}
+
+const profile_repos_limit = 6
+
+fn (mut app App) find_user_pinned_repos(user_id int, include_private bool) []Repo {
+	limit := profile_repos_limit
+	if include_private {
+		return sql app.db {
+			select from Repo where user_id == user_id && is_pinned == true && is_deleted == false limit limit
+		} or { []Repo{} }
+	}
+	return sql app.db {
+		select from Repo where user_id == user_id && is_pinned == true && is_public == true
+		&& is_deleted == false limit limit
+	} or { []Repo{} }
+}
+
+fn (mut app App) find_user_top_repos_by_stars(user_id int, include_private bool, l int) []Repo {
+	if include_private {
+		return sql app.db {
+			select from Repo where user_id == user_id && is_deleted == false order by nr_stars desc limit l
+		} or { []Repo{} }
+	}
+	return sql app.db {
+		select from Repo where user_id == user_id && is_public == true && is_deleted == false order by nr_stars desc limit l
+	} or { []Repo{} }
+}
+
+fn (mut app App) find_user_profile_repos(user_id int, include_private bool) []Repo {
+	pinned := app.find_user_pinned_repos(user_id, include_private)
+	if pinned.len > 0 {
+		return pinned
+	}
+	return app.find_user_top_repos_by_stars(user_id, include_private, profile_repos_limit)
 }
 
 fn (app &App) search_public_repos(query string) []Repo {

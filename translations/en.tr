@@ -944,3 +944,48 @@ Watch
 unwatch_action
 Unwatch
 -----
+user_edit_profile
+Edit profile
+-----
+user_pinned_repos
+Pinned repositories
+-----
+user_view_all_repos
+View all
+-----
+user_no_repos
+No repositories yet.
+-----
+user_repo_public
+Public
+-----
+user_repo_private
+Private
+-----
+user_contributions_in_year
+contributions in the last year
+-----
+user_commits_label
+commits
+-----
+user_heatmap_less
+Less
+-----
+user_heatmap_more
+More
+-----
+user_contribution_activity
+Contribution activity
+-----
+user_activity_joined
+Joined Gitly
+-----
+user_activity_first_repo
+First repository
+-----
+user_activity_first_issue
+First issue
+-----
+user_activity_on
+on
+-----

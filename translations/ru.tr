@@ -944,3 +944,48 @@ watch_action
 unwatch_action
 Не наблюдать
 -----
+user_edit_profile
+Изменить профиль
+-----
+user_pinned_repos
+Закреплённые репозитории
+-----
+user_view_all_repos
+Все
+-----
+user_no_repos
+Репозиториев пока нет.
+-----
+user_repo_public
+Публичный
+-----
+user_repo_private
+Приватный
+-----
+user_contributions_in_year
+коммитов за последний год
+-----
+user_commits_label
+коммитов
+-----
+user_heatmap_less
+Меньше
+-----
+user_heatmap_more
+Больше
+-----
+user_contribution_activity
+Активность
+-----
+user_activity_joined
+Регистрация в Gitly
+-----
+user_activity_first_repo
+Первый репозиторий
+-----
+user_activity_first_issue
+Первый ишью
+-----
+user_activity_on
+от
+-----

@@ -112,3 +112,24 @@ fn (app App) get_repo_activity_buckets(repo_id int) []int {
 	}
 	return buckets
 }
+
+// get_user_daily_activity returns commit counts per day for the given user
+// over the past `days` days. Index 0 is the oldest day, index `days-1` is today.
+fn (app App) get_user_daily_activity(user_id int, days int) []int {
+	day_seconds := 24 * 3600
+	now := time.now()
+	// Anchor to the start of today (local), so today is always the last bucket.
+	today_start := i64(time.new(year: now.year, month: now.month, day: now.day).unix())
+	cutoff := int(today_start) - (days - 1) * day_seconds
+	commits := sql app.db {
+		select from Commit where author_id == user_id && created_at >= cutoff
+	} or { []Commit{} }
+	mut buckets := []int{len: days}
+	for c in commits {
+		idx := (c.created_at - cutoff) / day_seconds
+		if idx >= 0 && idx < days {
+			buckets[idx]++
+		}
+	}
+	return buckets
+}

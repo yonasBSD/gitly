@@ -452,3 +452,22 @@ pub fn (mut app App) get_user_from_cookies(ctx &Context) ?User {
 	mut user := app.get_user_by_id(token.user_id) or { return none }
 	return user
 }
+
+// activity_level maps a per-day commit count to a heatmap intensity level 0..4,
+// scaled by the user's busiest day across the window.
+fn activity_level(count int, max int) int {
+	if count <= 0 || max <= 0 {
+		return 0
+	}
+	ratio := f64(count) / f64(max)
+	if ratio > 0.75 {
+		return 4
+	}
+	if ratio > 0.5 {
+		return 3
+	}
+	if ratio > 0.25 {
+		return 2
+	}
+	return 1
+}
