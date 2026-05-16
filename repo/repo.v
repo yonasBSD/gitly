@@ -7,6 +7,7 @@ import time
 import git
 import highlight
 import validation
+import config
 
 struct Repo {
 	id                 int @[primary; sql: serial]
@@ -319,13 +320,18 @@ fn (mut app App) user_has_repo(user_id int, repo_name string) bool {
 	return count >= 0
 }
 
-fn (mut app App) update_repo_from_fs(mut repo Repo) ! {
+fn (mut app App) update_repo_from_fs(mut repo Repo, recompute_lang_stats bool) ! {
 	println('UPDATE REPO FROM FS')
 	repo_id := repo.id
 
 	app.db.exec('BEGIN TRANSACTION')!
 
-	repo.analyze_lang(app)!
+	// Language analysis reads every file in the repo and is slow on large
+	// repos; callers on the git push hot path pass `false` and run it in a
+	// background thread instead, so the git client is not blocked.
+	if recompute_lang_stats {
+		repo.analyze_lang(app)!
+	}
 
 	app.info(repo.nr_contributors.str())
 	app.fetch_branches(repo)!
@@ -481,11 +487,40 @@ fn (mut app App) update_repo_branch_data(mut repo Repo, branch_name string) ! {
 }
 
 // TODO: tags and other stuff
+// update_repo_after_push runs on the request thread after a git push so that
+// new commits appear in the UI immediately. It skips language analysis,
+// which is slow and runs in bg_recompute_lang_stats instead.
 fn (mut app App) update_repo_after_push(repo_id int, branch_name string) ! {
 	mut repo := app.find_repo_by_id(repo_id) or { return }
 
-	app.update_repo_from_fs(mut repo)!
+	app.update_repo_from_fs(mut repo, false)!
 	app.delete_repository_files_in_branch(repo_id, branch_name)!
+}
+
+// bg_recompute_lang_stats recomputes language statistics for a repo in a
+// background thread. It opens its own sqlite connection (matching the
+// clone_repo / bg_fetch_files_info pattern) because the shared App.db
+// handle is not safe for concurrent use across threads.
+fn bg_recompute_lang_stats(repo_id int, conf config.Config) {
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('bg_recompute_lang_stats: cannot open ${db_backend_name()} db: ${err}')
+			return
+		}
+		config: conf
+	}
+	app.load_settings()
+	defer {
+		app.db.close() or {}
+	}
+
+	repo := app.find_repo_by_id(repo_id) or {
+		eprintln('bg_recompute_lang_stats: repo ${repo_id} not found')
+		return
+	}
+	repo.analyze_lang(app) or {
+		eprintln('bg_recompute_lang_stats: analyze_lang failed for repo ${repo_id}: ${err}')
+	}
 }
 
 fn (r &Repo) analyze_lang(app &App) ! {

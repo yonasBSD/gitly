@@ -72,6 +72,11 @@ fn (mut app App) handle_git_receive_pack(username string, git_repo_name string) 
 		return ctx.server_error('There was an error while updating the repo')
 	}
 
+	// Language analysis reads every file in the repo and is slow; run it in
+	// a background thread with its own DB connection so the git client is
+	// not blocked.
+	spawn bg_recompute_lang_stats(repo.id, app.config)
+
 	// Trigger CI if .gitly-ci.yml exists in the repo
 	spawn app.trigger_ci_if_configured(repo.id, branch_name)
 

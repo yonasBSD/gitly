@@ -314,7 +314,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	// Update only cloned repositories
 	/*
 	if !is_clone_url_empty {
-		app.update_repo_from_fs(mut new_repo) or {
+		app.update_repo_from_fs(mut new_repo, true) or {
 			ctx.error('There was an error while cloning the repo')
 			return app.new(mut ctx)
 		}
@@ -374,7 +374,9 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_
 		spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id, conf)
 	}
 	// Index branches, commits, and language stats in the background.
-	app.update_repo_from_fs(mut cloned_repo) or { eprintln('cannot update repo from fs ${err}') }
+	app.update_repo_from_fs(mut cloned_repo, true) or {
+		eprintln('cannot update repo from fs ${err}')
+	}
 	eprintln('background indexing complete')
 	app.db.close() or {}
 }
