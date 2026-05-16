@@ -72,6 +72,7 @@ fn repo_id() int {
 
 fn testsuite_begin() {
 	chdir_to_project_root()
+	kill_test_gitly()
 	cleanup_test_state()
 	ensure_gitly_binary()
 	spawn_test_gitly()
