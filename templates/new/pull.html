@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include '../layout/head.html'
+	</head>
+	<body>
+		@include '../layout/header.html'
+
+		.form-error {
+			@ctx.form_error
+		}
+
+		<div class="content">
+			@include '../layout/repo_menu.html'
+
+			<h1>%pr_open_title</h1>
+			<p class="pr-compare-desc">%pr_compare_desc</p>
+
+			@if error_msg != ''
+				<div class="form-error">@error_msg</div>
+			@end
+
+			<form method='get' class='pr-compare-form' action='/@repo.user_name/@repo.name/compare'>
+				<label class='pr-compare-label'>
+					%pr_base
+					<select name='base'>
+						@for branch in branches
+							@if branch.name == base
+								<option value='@branch.name' selected>@branch.name</option>
+							@else
+								<option value='@branch.name'>@branch.name</option>
+							@end
+						@end
+					</select>
+				</label>
+				<span class='pr-compare-arrow'>&larr;</span>
+				<label class='pr-compare-label'>
+					%pr_compare
+					<select name='head'>
+						<option value=''>%pr_choose_branch</option>
+						@for branch in branches
+							@if branch.name == head
+								<option value='@branch.name' selected>@branch.name</option>
+							@else
+								<option value='@branch.name'>@branch.name</option>
+							@end
+						@end
+					</select>
+				</label>
+				<button type='submit' class='pr-compare-btn'>%pr_compare_button</button>
+			</form>
+
+			@if has_compare
+				@if commits.len == 0
+					<div class="issues-empty">%pr_no_commits_between</div>
+				@else
+					<div class="pr-compare-summary">
+						<strong>@commits.len</strong> %pr_commits_label &middot;
+						<strong>@file_diffs.len</strong> %pr_files_changed_label
+					</div>
+
+					<form method='post' class='pr-new-form' action='/@repo.user_name/@repo.name/pulls'>
+						<input type='hidden' name='head' value='@head'>
+						<input type='hidden' name='base' value='@base'>
+						<div class="field">
+							<input type='text' name='title' placeholder='%pr_title_placeholder' value='@suggested_title' required>
+						</div>
+						<div class="field">
+							<textarea name='description' placeholder='%pr_description_placeholder' rows='6'></textarea>
+						</div>
+						<div class="field">
+							<button type='submit' class='pr-new-submit'>%pr_create</button>
+						</div>
+					</form>
+
+					<h3>%pr_commits_heading</h3>
+					<ul class='pr-commits'>
+						@for c in commits
+							<li class='pr-commit'>
+								<code class='pr-commit__hash'>@c.hash</code>
+								<span class='pr-commit__msg'>@c.message</span>
+								<span class='pr-commit__author'>%pr_by @c.author</span>
+							</li>
+						@end
+					</ul>
+
+					<h3>%pr_files_changed</h3>
+					<ul class='pr-files-summary'>
+						@for fd in file_diffs
+							<li class='pr-file-summary'>
+								<a href='#diff-@fd.path'>@fd.path</a>
+								<span class='pr-file-summary__add'>+@fd.additions</span>
+								<span class='pr-file-summary__del'>-@fd.deletions</span>
+							</li>
+						@end
+					</ul>
+				@end
+			@end
+		</div>
+
+		@include '../layout/footer.html'
+	</body>
+</html>

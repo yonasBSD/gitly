@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			<div class="issues-header">
+				<h1 class="issues-header__title">%pr_your_pulls</h1>
+			</div>
+
+			@if prs_with_repo.len == 0
+				<div class="issues-empty">%pr_none_user</div>
+			@else
+				<ul class="issue-list">
+					@for pr in prs_with_repo
+						<li class="issue-row">
+							<svg class="issue-row__icon" viewBox="0 0 16 16" aria-hidden="true">
+								<path fill="#1f883d" d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Z"/>
+							</svg>
+							<div class="issue-row__body">
+								<div class="issue-row__heading">
+									<a class="issue-row__title" href="/@pr.repo_author/@pr.repo_name/pull/@pr.id">@{pr.formatted_title()}</a>
+									@if pr.is_open()
+										<span class="pr-status-badge pr-status--open">%pr_status_open</span>
+									@else if pr.is_merged()
+										<span class="pr-status-badge pr-status--merged">%pr_status_merged</span>
+									@else
+										<span class="pr-status-badge pr-status--closed">%pr_status_closed</span>
+									@end
+								</div>
+								<div class="issue-row__meta">
+									<a href="/@pr.repo_author/@pr.repo_name">@pr.repo_author/@pr.repo_name</a>
+									<span>&middot; #@pr.id &middot; %pr_opened @pr.relative_time()</span>
+								</div>
+							</div>
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="pr-header">
+				<h1 class="pr-header__title">@{pr.formatted_title()} <span class="pr-header__num">#@pr.id</span></h1>
+				<div class="pr-header__meta">
+					@if pr.is_open()
+						<span class="pr-status-badge pr-status--open">%pr_status_open</span>
+					@else if pr.is_merged()
+						<span class="pr-status-badge pr-status--merged">%pr_status_merged</span>
+					@else
+						<span class="pr-status-badge pr-status--closed">%pr_status_closed</span>
+					@end
+					<a class="issue-row__author" href="/@author.username">@author.username</a>
+					<code>@pr.head_branch</code>
+					<span>&rarr;</span>
+					<code>@pr.base_branch</code>
+				</div>
+				<div class="pr-header__actions">
+					<a class="pr-tab-link" href="/@repo.user_name/@repo.name/pull/@pr.id">%pr_conversation</a>
+					<a class="pr-tab-link pr-tab-link--active" href="/@repo.user_name/@repo.name/pull/@pr.id/files">%pr_files_changed</a>
+				</div>
+			</div>
+
+			@if file_diffs.len == 0
+				<div class="issues-empty">%pr_no_file_changes</div>
+			@else
+				@if ctx.logged_in
+					<form method='post' class='pr-review-form' action='/@repo.user_name/@repo.name/pull/@pr.id/review'>
+				@end
+
+				@for fd in file_diffs
+					<div class='pr-diff' id='diff-@fd.path'>
+						<div class='pr-diff__header'>
+							<span class='pr-diff__path'>@fd.path</span>
+							<span class='pr-diff__counts'>
+								<span class='pr-diff__add'>+@fd.additions</span>
+								<span class='pr-diff__del'>-@fd.deletions</span>
+							</span>
+						</div>
+						@if fd.is_binary
+							<div class='pr-diff__binary'>%pr_binary_file</div>
+						@else
+							<table class='pr-diff__table'>
+								@for hunk in fd.hunks
+									<tr class='pr-diff__hunk-header'>
+										<td colspan='4'><code>@hunk.header</code></td>
+									</tr>
+									@for dline in hunk.lines
+										<tr class='pr-diff__row pr-diff__row--@dline.kind'>
+											<td class='pr-diff__lineno'>@{dline.old_line_str()}</td>
+											<td class='pr-diff__lineno'>@{dline.new_line_str()}</td>
+											<td class='pr-diff__sign'>@{dline.sign()}</td>
+											<td class='pr-diff__content'><pre>@dline.content</pre></td>
+										</tr>
+										@{render_inline_comments(fd.path, dline, comments_by_key)}
+										@if ctx.logged_in && pr.is_open() && dline.kind != 'context'
+											<tr class='pr-diff__commentrow'>
+												<td colspan='4'>
+													<textarea name='@{dline.comment_field_name(fd.path)}' placeholder='%pr_line_comment_placeholder' rows='2' class='pr-diff__commentbox'></textarea>
+												</td>
+											</tr>
+										@end
+									@end
+								@end
+							</table>
+						@end
+					</div>
+				@end
+
+				@if ctx.logged_in
+						<div class='pr-review-submit'>
+							<textarea name='body' placeholder='%pr_overall_review_placeholder' rows='3'></textarea>
+							<div class='pr-review-actions'>
+								<label><input type='radio' name='state' value='comment' checked> %pr_review_action_comment</label>
+								<label><input type='radio' name='state' value='approved'> %pr_review_action_approve</label>
+								<label><input type='radio' name='state' value='changes_requested'> %pr_review_action_request_changes</label>
+								<button type='submit' class='pr-action pr-action--review'>%pr_submit_review</button>
+							</div>
+						</div>
+					</form>
+				@end
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

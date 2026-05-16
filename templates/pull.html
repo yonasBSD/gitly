@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="pr-header">
+				<h1 class="pr-header__title">@{pr.formatted_title()} <span class="pr-header__num">#@pr.id</span></h1>
+				<div class="pr-header__meta">
+					@if pr.is_open()
+						<span class="pr-status-badge pr-status--open">%pr_status_open</span>
+					@else if pr.is_merged()
+						<span class="pr-status-badge pr-status--merged">%pr_status_merged</span>
+					@else
+						<span class="pr-status-badge pr-status--closed">%pr_status_closed</span>
+					@end
+					<a class="issue-row__author" href="/@author.username">@author.username</a>
+					<span>%pr_wants_to_merge</span>
+					<code>@pr.head_branch</code>
+					<span>%pr_into</span>
+					<code>@pr.base_branch</code>
+					<span>&middot; @{pr.relative_time()}</span>
+				</div>
+				<div class="pr-header__actions">
+					<a class="pr-tab-link" href="/@repo.user_name/@repo.name/pull/@pr.id">%pr_conversation</a>
+					<a class="pr-tab-link" href="/@repo.user_name/@repo.name/pull/@pr.id/files">%pr_files_changed</a>
+					<span class="pr-tab-link pr-tab-link--info">@commits.len %pr_commits_label</span>
+				</div>
+			</div>
+
+			<div class="pr-body">
+				<div class="avatar-with-user-info">
+					<img src="@{app.prepare_user_avatar_url(author.avatar)}">
+					<span>
+						<a href="/@author.username"><i>@author.username</i></a>
+						<p>@pr.description</p>
+					</span>
+				</div>
+			</div>
+
+			@for entry in timeline
+				@if entry.kind == 'comment'
+					<div class="avatar-with-user-info issue-comment-post">
+						<img src="@{app.prepare_user_avatar_url(entry.user.avatar)}">
+						<span>
+							<a href="/@entry.user.username"><i>@entry.user.username</i></a> <i>%pr_commented @{entry.comment.relative()}</i>
+							<p>@entry.comment.text</p>
+						</span>
+					</div>
+				@else
+					<div class="pr-review-block">
+						<div class="pr-review-header">
+							<img src="@{app.prepare_user_avatar_url(entry.user.avatar)}">
+							<span>
+								<a href="/@entry.user.username"><i>@entry.user.username</i></a>
+								@if entry.review.state == 1
+									<i>%pr_review_approved @{entry.review.relative()}</i>
+								@else if entry.review.state == 2
+									<i>%pr_review_changes_requested @{entry.review.relative()}</i>
+								@else
+									<i>%pr_review_commented @{entry.review.relative()}</i>
+								@end
+							</span>
+						</div>
+						@if entry.review.body != ''
+							<p class="pr-review-body">@entry.review.body</p>
+						@end
+						@if entry.rcomments.len > 0
+							<ul class="pr-review-comments">
+								@for rc in entry.rcomments
+									<li class="pr-review-comment">
+										<code>@rc.item.file_path : @rc.item.line_number</code>
+										<p>@rc.item.text</p>
+									</li>
+								@end
+							</ul>
+						@end
+					</div>
+				@end
+			@end
+
+			@if ctx.logged_in
+				<form method='post' class='form vertical-form comment-post-form' action='/@repo.user_name/@repo.name/pull/@pr.id/comments'>
+					<textarea class='input-comment' name='text' placeholder='%pr_leave_comment' required></textarea>
+					<input type='submit' class="comment-post-submit" name='submit' value='%pr_comment_button'>
+				</form>
+			@end
+
+			@if ctx.logged_in
+				<div class="pr-actions">
+					@if can_merge
+						<form method='post' action='/@repo.user_name/@repo.name/pull/@pr.id/merge' class='pr-action-form'>
+							<button type='submit' class='pr-action pr-action--merge'>%pr_merge</button>
+						</form>
+					@end
+					@if can_close
+						<form method='post' action='/@repo.user_name/@repo.name/pull/@pr.id/close' class='pr-action-form'>
+							<button type='submit' class='pr-action pr-action--close'>%pr_close</button>
+						</form>
+					@end
+					@if can_reopen
+						<form method='post' action='/@repo.user_name/@repo.name/pull/@pr.id/reopen' class='pr-action-form'>
+							<button type='submit' class='pr-action'>%pr_reopen</button>
+						</form>
+					@end
+				</div>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="issues-header">
+				<h1 class="issues-header__title">%pr_pull_requests</h1>
+				@if ctx.logged_in
+					<a class="issues-header__new" href='/@repo.user_name/@repo.name/compare'>%pr_new</a>
+				@end
+			</div>
+
+			<div class="pr-tabs">
+				<a class="@tab_open_class" href="/@repo.user_name/@repo.name/pulls/open">%pr_tab_open</a>
+				<a class="@tab_merged_class" href="/@repo.user_name/@repo.name/pulls/merged">%pr_tab_merged</a>
+				<a class="@tab_closed_class" href="/@repo.user_name/@repo.name/pulls/closed">%pr_tab_closed</a>
+			</div>
+
+			@if prs_with_users.len == 0
+				<div class="issues-empty">%pr_none</div>
+			@else
+				<ul class="issue-list">
+					@for pwu in prs_with_users
+						<li class="issue-row">
+							<svg class="issue-row__icon" viewBox="0 0 16 16" aria-hidden="true">
+								<path fill="#1f883d" d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"/>
+							</svg>
+							<div class="issue-row__body">
+								<div class="issue-row__heading">
+									<a class="issue-row__title" href="/@repo.user_name/@repo.name/pull/@pwu.pr.id">@{pwu.pr.formatted_title()}</a>
+									@if pwu.pr.is_open()
+										<span class="pr-status-badge pr-status--open">%pr_status_open</span>
+									@else if pwu.pr.is_merged()
+										<span class="pr-status-badge pr-status--merged">%pr_status_merged</span>
+									@else
+										<span class="pr-status-badge pr-status--closed">%pr_status_closed</span>
+									@end
+								</div>
+								<div class="issue-row__meta">
+									<span>#@pwu.pr.id</span>
+									<span>@pwu.pr.head_branch &rarr; @pwu.pr.base_branch</span>
+									<span>%pr_opened @pwu.pr.relative_time() %pr_by</span>
+									<a class="issue-row__author" href="/@pwu.user.username">@pwu.user.username</a>
+								</div>
+							</div>
+							@if pwu.pr.comments_count > 0
+								<a class="issue-row__comments" href="/@repo.user_name/@repo.name/pull/@pwu.pr.id" title="%pr_comments_title">
+									<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 2.75A1.75 1.75 0 0 1 2.75 1h10.5A1.75 1.75 0 0 1 15 2.75v8.5A1.75 1.75 0 0 1 13.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H2.75A1.75 1.75 0 0 1 1 11.25Z"/></svg>
+									@pwu.pr.comments_count
+								</a>
+							@end
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>
