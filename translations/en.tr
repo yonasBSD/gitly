@@ -407,4 +407,280 @@ opened
 pr_comments_title
 Comments
 -----
+webhooks
+Webhooks
+-----
+webhook_new
+New webhook
+-----
+webhook_none
+No webhooks configured.
+-----
+webhook_url
+Payload URL
+-----
+webhook_secret
+Secret
+-----
+webhook_secret_hint
+Used to compute the X-Gitly-Signature header (HMAC-SHA256). Optional but recommended.
+-----
+webhook_events
+Events to deliver
+-----
+webhook_event_push
+Push
+-----
+webhook_event_issue
+Issues
+-----
+webhook_event_pr
+Pull requests
+-----
+webhook_event_comment
+Comments
+-----
+webhook_event_release
+Releases
+-----
+webhook_create
+Create webhook
+-----
+webhook_delete
+Delete
+-----
+webhook_active
+Active
+-----
+webhook_inactive
+Inactive
+-----
+webhook_last_status
+Last response
+-----
+webhook_never_delivered
+Never delivered
+-----
+webhook_deliveries
+Recent deliveries
+-----
+webhook_back
+Back to webhooks
+-----
+manage_webhooks
+Manage webhooks
+-----
+discussions
+Discussions
+-----
+discussion_new
+New discussion
+-----
+discussion_none
+No discussions yet.
+-----
+discussion_create
+Create discussion
+-----
+discussion_title_placeholder
+Discussion title
+-----
+discussion_body_placeholder
+Start the conversation...
+-----
+discussion_category
+Category
+-----
+discussion_category_general
+General
+-----
+discussion_category_qa
+Q&A
+-----
+discussion_category_announcement
+Announcement
+-----
+discussion_category_idea
+Ideas
+-----
+discussion_locked
+Locked
+-----
+discussion_reply_placeholder
+Reply to this discussion
+-----
+discussion_reply_button
+Post reply
+-----
+discussion_lock
+Lock discussion
+-----
+discussion_unlock
+Unlock discussion
+-----
+discussion_delete
+Delete discussion
+-----
+discussion_answer
+Mark as answer
+-----
+discussion_answered
+Answered
+-----
+discussion_opened
+opened
+-----
+projects
+Projects
+-----
+project_new
+New project
+-----
+project_none
+No projects yet.
+-----
+project_create
+Create project
+-----
+project_name_placeholder
+Project name
+-----
+project_description_placeholder
+Project description (optional)
+-----
+project_delete
+Delete project
+-----
+project_add_column
+Add column
+-----
+project_column_name_placeholder
+Column name (e.g. Todo, In progress, Done)
+-----
+project_add_card
+Add card
+-----
+project_card_title_placeholder
+Card title
+-----
+project_card_note_placeholder
+Notes (optional)
+-----
+project_card_save
+Save card
+-----
+project_card_delete
+Delete
+-----
+project_column_delete
+Delete column
+-----
+project_column_empty
+No cards.
+-----
+milestones
+Milestones
+-----
+milestone_new
+New milestone
+-----
+milestone_none
+No milestones yet.
+-----
+milestone_create
+Create milestone
+-----
+milestone_title_placeholder
+Milestone title
+-----
+milestone_description_placeholder
+Description (optional)
+-----
+milestone_due_date
+Due date
+-----
+milestone_status_open
+Open
+-----
+milestone_status_closed
+Closed
+-----
+milestone_close
+Close milestone
+-----
+milestone_reopen
+Reopen milestone
+-----
+milestone_delete
+Delete milestone
+-----
+milestone_progress
+Progress
+-----
+milestone_issues
+Linked issues
+-----
+milestone_no_issues
+No issues linked yet.
+-----
+twofa_title
+Two-factor authentication
+-----
+twofa_status_enabled
+Two-factor authentication is enabled.
+-----
+twofa_status_disabled
+Two-factor authentication is disabled.
+-----
+twofa_enable
+Enable two-factor authentication
+-----
+twofa_disable
+Disable two-factor authentication
+-----
+twofa_setup_intro
+Scan the QR code with an authenticator app (Aegis, Google Authenticator, 1Password, ...), or enter the secret manually. Then enter the 6-digit code below to confirm.
+-----
+twofa_secret
+Secret
+-----
+twofa_code
+6-digit code
+-----
+twofa_verify
+Verify and enable
+-----
+twofa_login_prompt
+Enter the 6-digit code from your authenticator app to continue.
+-----
+twofa_login_button
+Verify
+-----
+twofa_invalid
+Invalid code, try again.
+-----
+api_tokens
+API tokens
+-----
+api_token_new
+New API token
+-----
+api_token_none
+No API tokens yet.
+-----
+api_token_name
+Token name
+-----
+api_token_create
+Create token
+-----
+api_token_revoke
+Revoke
+-----
+api_token_show_once
+This token is shown only once. Copy it now:
+-----
+api_docs
+API documentation
+-----
 

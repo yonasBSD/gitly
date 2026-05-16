@@ -407,4 +407,280 @@ pr_opened
 pr_comments_title
 Комментарии
 -----
+webhooks
+Веб-хуки
+-----
+webhook_new
+Новый веб-хук
+-----
+webhook_none
+Веб-хуки не настроены.
+-----
+webhook_url
+URL для доставки
+-----
+webhook_secret
+Секрет
+-----
+webhook_secret_hint
+Используется для вычисления заголовка X-Gitly-Signature (HMAC-SHA256). Необязательно, но рекомендуется.
+-----
+webhook_events
+События для доставки
+-----
+webhook_event_push
+Push
+-----
+webhook_event_issue
+Задачи
+-----
+webhook_event_pr
+Пулреквесты
+-----
+webhook_event_comment
+Комментарии
+-----
+webhook_event_release
+Релизы
+-----
+webhook_create
+Создать веб-хук
+-----
+webhook_delete
+Удалить
+-----
+webhook_active
+Активен
+-----
+webhook_inactive
+Отключён
+-----
+webhook_last_status
+Последний ответ
+-----
+webhook_never_delivered
+Доставок ещё не было
+-----
+webhook_deliveries
+Последние доставки
+-----
+webhook_back
+К веб-хукам
+-----
+manage_webhooks
+Управление веб-хуками
+-----
+discussions
+Обсуждения
+-----
+discussion_new
+Новое обсуждение
+-----
+discussion_none
+Обсуждений пока нет.
+-----
+discussion_create
+Создать обсуждение
+-----
+discussion_title_placeholder
+Заголовок обсуждения
+-----
+discussion_body_placeholder
+Начните обсуждение...
+-----
+discussion_category
+Категория
+-----
+discussion_category_general
+Общее
+-----
+discussion_category_qa
+Q&A
+-----
+discussion_category_announcement
+Объявление
+-----
+discussion_category_idea
+Идеи
+-----
+discussion_locked
+Закрыто
+-----
+discussion_reply_placeholder
+Ответить
+-----
+discussion_reply_button
+Отправить ответ
+-----
+discussion_lock
+Закрыть обсуждение
+-----
+discussion_unlock
+Открыть обсуждение
+-----
+discussion_delete
+Удалить обсуждение
+-----
+discussion_answer
+Отметить как ответ
+-----
+discussion_answered
+Есть ответ
+-----
+discussion_opened
+открыто
+-----
+projects
+Проекты
+-----
+project_new
+Новый проект
+-----
+project_none
+Проектов пока нет.
+-----
+project_create
+Создать проект
+-----
+project_name_placeholder
+Название проекта
+-----
+project_description_placeholder
+Описание (необязательно)
+-----
+project_delete
+Удалить проект
+-----
+project_add_column
+Добавить колонку
+-----
+project_column_name_placeholder
+Название колонки (например, Todo, В работе, Готово)
+-----
+project_add_card
+Добавить карточку
+-----
+project_card_title_placeholder
+Заголовок карточки
+-----
+project_card_note_placeholder
+Заметки (необязательно)
+-----
+project_card_save
+Сохранить карточку
+-----
+project_card_delete
+Удалить
+-----
+project_column_delete
+Удалить колонку
+-----
+project_column_empty
+Нет карточек.
+-----
+milestones
+Этапы
+-----
+milestone_new
+Новый этап
+-----
+milestone_none
+Этапов пока нет.
+-----
+milestone_create
+Создать этап
+-----
+milestone_title_placeholder
+Название этапа
+-----
+milestone_description_placeholder
+Описание (необязательно)
+-----
+milestone_due_date
+Срок
+-----
+milestone_status_open
+Открыт
+-----
+milestone_status_closed
+Закрыт
+-----
+milestone_close
+Закрыть этап
+-----
+milestone_reopen
+Снова открыть этап
+-----
+milestone_delete
+Удалить этап
+-----
+milestone_progress
+Прогресс
+-----
+milestone_issues
+Связанные задачи
+-----
+milestone_no_issues
+Связанных задач пока нет.
+-----
+twofa_title
+Двухфакторная аутентификация
+-----
+twofa_status_enabled
+Двухфакторная аутентификация включена.
+-----
+twofa_status_disabled
+Двухфакторная аутентификация отключена.
+-----
+twofa_enable
+Включить двухфакторную аутентификацию
+-----
+twofa_disable
+Отключить двухфакторную аутентификацию
+-----
+twofa_setup_intro
+Отсканируйте QR-код приложением-аутентификатором (Aegis, Google Authenticator, 1Password, ...) или введите секрет вручную. Затем введите 6-значный код ниже для подтверждения.
+-----
+twofa_secret
+Секрет
+-----
+twofa_code
+6-значный код
+-----
+twofa_verify
+Подтвердить и включить
+-----
+twofa_login_prompt
+Введите 6-значный код из приложения-аутентификатора, чтобы продолжить.
+-----
+twofa_login_button
+Подтвердить
+-----
+twofa_invalid
+Неверный код, попробуйте ещё раз.
+-----
+api_tokens
+API-токены
+-----
+api_token_new
+Новый API-токен
+-----
+api_token_none
+API-токенов пока нет.
+-----
+api_token_name
+Имя токена
+-----
+api_token_create
+Создать токен
+-----
+api_token_revoke
+Отозвать
+-----
+api_token_show_once
+Этот токен показывается только один раз. Скопируйте его сейчас:
+-----
+api_docs
+Документация API
+-----
 

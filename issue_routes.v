@@ -59,6 +59,12 @@ pub fn (mut app App) handle_add_repo_issue(mut ctx Context, username string, rep
 	app.increment_user_post(mut ctx.user) or { app.info(err.str()) }
 	app.add_issue(repo.id, ctx.user.id, title, text) or { app.info(err.str()) }
 	app.increment_repo_issues(repo.id) or { app.info(err.str()) }
+	app.dispatch_webhook(repo.id, 'issue', WebhookIssuePayload{
+		action: 'opened'
+		repo:   '${username}/${repo_name}'
+		title:  title
+		author: ctx.user.username
+	})
 	has_first_issue_activity := app.has_activity(ctx.user.id, 'first_issue')
 	if !has_first_issue_activity {
 		app.add_activity(ctx.user.id, 'first_issue') or { app.info(err.str()) }

@@ -16,12 +16,9 @@
 			@end
 
 			<section class="settings-section">
-				<h2 class="settings-section__title">Webhook</h2>
-				<p class="settings-section__desc">Set a secret to verify deliveries from your git provider.</p>
-				<form class="settings-form" action="/@ctx.user.username/@repo.name/settings" method="post">
-					<input type="password" name="webhook_secret" value="@repo.webhook_secret" placeholder="Webhook secret">
-					<input type="submit" class="settings-form__submit" value="Update repo">
-				</form>
+				<h2 class="settings-section__title">%webhooks</h2>
+				<p class="settings-section__desc">%webhook_secret_hint</p>
+				<a class="settings-form__submit settings-form__submit--link" href="/@ctx.user.username/@repo.name/settings/webhooks">%manage_webhooks</a>
 			</section>
 
 			<section class="settings-section settings-section--danger">

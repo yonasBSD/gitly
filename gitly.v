@@ -286,6 +286,36 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table PrReviewComment
 	}!
+	sql app.db {
+		create table Webhook
+	}!
+	sql app.db {
+		create table WebhookDelivery
+	}!
+	sql app.db {
+		create table Discussion
+	}!
+	sql app.db {
+		create table DiscussionComment
+	}!
+	sql app.db {
+		create table Project
+	}!
+	sql app.db {
+		create table ProjectColumn
+	}!
+	sql app.db {
+		create table ProjectCard
+	}!
+	sql app.db {
+		create table Milestone
+	}!
+	sql app.db {
+		create table TwoFactor
+	}!
+	sql app.db {
+		create table ApiToken
+	}!
 }
 
 fn (mut app App) migrate_tables() ! {

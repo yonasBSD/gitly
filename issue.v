@@ -59,11 +59,7 @@ fn (mut app App) add_issue_returning_id(repo_id int, author_id int, title string
 	sql app.db {
 		insert issue into Issue
 	}!
-	rows := app.db.exec_no_null('select last_insert_rowid()') or { return 0 }
-	if rows.len > 0 && rows[0].vals.len > 0 {
-		return rows[0].vals[0].int()
-	}
-	return 0
+	return db_last_insert_id(app.db)
 }
 
 fn (mut app App) find_or_create_label(repo_id int, name string, color string) !int {
@@ -81,11 +77,7 @@ fn (mut app App) find_or_create_label(repo_id int, name string, color string) !i
 	sql app.db {
 		insert label into Label
 	}!
-	rows := app.db.exec_no_null('select last_insert_rowid()') or { return 0 }
-	if rows.len > 0 && rows[0].vals.len > 0 {
-		return rows[0].vals[0].int()
-	}
-	return 0
+	return db_last_insert_id(app.db)
 }
 
 fn (mut app App) add_issue_label(issue_id int, label_id int) ! {
