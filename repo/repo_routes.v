@@ -80,6 +80,28 @@ pub fn (mut app App) handle_update_repo_settings(username string, repo_name stri
 	return ctx.redirect_to_repository(username, repo_name)
 }
 
+@['/:username/:repo_name/settings/features'; post]
+pub fn (mut app App) handle_update_repo_features(username string, repo_name string) veb.Result {
+	repo := app.find_repo_by_name_and_username(repo_name, username) or {
+		return ctx.redirect_to_repository(username, repo_name)
+	}
+	is_owner := app.check_repo_owner(ctx.user.username, repo_name)
+
+	if !is_owner {
+		return ctx.redirect_to_repository(username, repo_name)
+	}
+
+	disable_discussions := 'discussions_enabled' !in ctx.form
+	disable_projects := 'projects_enabled' !in ctx.form
+	disable_milestones := 'milestones_enabled' !in ctx.form
+	disable_wiki := 'wiki_enabled' !in ctx.form
+
+	app.update_repo_features(repo.id, disable_discussions, disable_projects, disable_milestones,
+		disable_wiki) or { app.info(err.str()) }
+
+	return ctx.redirect('/${username}/${repo_name}/settings')
+}
+
 @['/:user/:repo_name/delete'; post]
 pub fn (mut app App) handle_repo_delete(username string, repo_name string) veb.Result {
 	repo := app.find_repo_by_name_and_username(repo_name, username) or {

@@ -731,6 +731,18 @@ Once deleted, the repository is gone. Type the full path to confirm.
 delete_repo
 Delete repo
 -----
+features_section_title
+Features
+-----
+features_section_desc
+Enable or disable features for this repository.
+-----
+save_features
+Save features
+-----
+wiki
+Wiki
+-----
 header_search_placeholder
 Search...
 -----

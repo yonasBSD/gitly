@@ -43,18 +43,24 @@
 		<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"></path></svg>
 		@repo.format_nr_releases(ctx.lang)
 	</a>
-	<a class='repo-stat-item' href='/@repo.user_name/@repo.name/discussions'>
-		<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M1.5 2.75A.75.75 0 0 1 2.25 2h11.5a.75.75 0 0 1 .75.75v8.5a.75.75 0 0 1-.75.75H5.06l-2.573 2.573A.75.75 0 0 1 1.5 13.94Z"/></svg>
-		%discussions
-	</a>
-	<a class='repo-stat-item' href='/@repo.user_name/@repo.name/projects'>
-		<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M1.75 0A1.75 1.75 0 0 0 0 1.75v12.5C0 15.216.784 16 1.75 16h12.5A1.75 1.75 0 0 0 16 14.25V1.75A1.75 1.75 0 0 0 14.25 0Zm12.5 1.5a.25.25 0 0 1 .25.25v12.5a.25.25 0 0 1-.25.25H1.75a.25.25 0 0 1-.25-.25V1.75a.25.25 0 0 1 .25-.25ZM5 3.75v8.5a.75.75 0 0 1-1.5 0v-8.5a.75.75 0 0 1 1.5 0Zm3.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5a.75.75 0 0 1 1.5 0Zm3.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 1.5 0Z"/></svg>
-		%projects
-	</a>
-	<a class='repo-stat-item' href='/@repo.user_name/@repo.name/milestones'>
-		<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M7.75 0a.75.75 0 0 1 .75.75V3h3.634c.414 0 .814.147 1.13.414l2.07 1.75a1.75 1.75 0 0 1 0 2.672l-2.07 1.75a1.75 1.75 0 0 1-1.13.414H8.5v5.25a.75.75 0 0 1-1.5 0V10H2.75A1.75 1.75 0 0 1 1 8.25v-3.5C1 3.784 1.784 3 2.75 3H7V.75A.75.75 0 0 1 7.75 0Z"/></svg>
-		%milestones
-	</a>
+	@if repo.discussions_enabled()
+		<a class='repo-stat-item' href='/@repo.user_name/@repo.name/discussions'>
+			<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M1.5 2.75A.75.75 0 0 1 2.25 2h11.5a.75.75 0 0 1 .75.75v8.5a.75.75 0 0 1-.75.75H5.06l-2.573 2.573A.75.75 0 0 1 1.5 13.94Z"/></svg>
+			%discussions
+		</a>
+	@end
+	@if repo.projects_enabled()
+		<a class='repo-stat-item' href='/@repo.user_name/@repo.name/projects'>
+			<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M1.75 0A1.75 1.75 0 0 0 0 1.75v12.5C0 15.216.784 16 1.75 16h12.5A1.75 1.75 0 0 0 16 14.25V1.75A1.75 1.75 0 0 0 14.25 0Zm12.5 1.5a.25.25 0 0 1 .25.25v12.5a.25.25 0 0 1-.25.25H1.75a.25.25 0 0 1-.25-.25V1.75a.25.25 0 0 1 .25-.25ZM5 3.75v8.5a.75.75 0 0 1-1.5 0v-8.5a.75.75 0 0 1 1.5 0Zm3.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5a.75.75 0 0 1 1.5 0Zm3.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 1.5 0Z"/></svg>
+			%projects
+		</a>
+	@end
+	@if repo.milestones_enabled()
+		<a class='repo-stat-item' href='/@repo.user_name/@repo.name/milestones'>
+			<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M7.75 0a.75.75 0 0 1 .75.75V3h3.634c.414 0 .814.147 1.13.414l2.07 1.75a1.75 1.75 0 0 1 0 2.672l-2.07 1.75a1.75 1.75 0 0 1-1.13.414H8.5v5.25a.75.75 0 0 1-1.5 0V10H2.75A1.75 1.75 0 0 1 1 8.25v-3.5C1 3.784 1.784 3 2.75 3H7V.75A.75.75 0 0 1 7.75 0Z"/></svg>
+			%milestones
+		</a>
+	@end
 	<a class='repo-stat-item' href='/@repo.user_name/@repo.name/ci'>
 		<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M488.2 383.8l-64.4-64.4c-12-12-28.3-18.7-45.3-18.7h-21.4l-64-128h37.7c13.3 0 24-10.7 24-24V88c0-13.3-10.7-24-24-24H181.2c-13.3 0-24 10.7-24 24v60.7c0 13.3 10.7 24 24 24h37.7l-64 128h-21.4c-17 0-33.3 6.7-45.3 18.7l-64.4 64.4c-12 12-18.7 28.3-18.7 45.3V488c0 13.3 10.7 24 24 24h453.8c13.3 0 24-10.7 24-24v-58.9c0-17-6.7-33.3-18.7-45.3zM209.2 116h93.6v8.7h-93.6V116zm65.1 56.7l64 128H173.7l64-128h36.6z"></path></svg>
 		%ci_label

@@ -731,6 +731,18 @@ delete_repo_desc
 delete_repo
 Удалить репозиторий
 -----
+features_section_title
+Возможности
+-----
+features_section_desc
+Включите или отключите возможности этого репозитория.
+-----
+save_features
+Сохранить настройки
+-----
+wiki
+Вики
+-----
 header_search_placeholder
 Поиск...
 -----

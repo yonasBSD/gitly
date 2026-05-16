@@ -16,6 +16,46 @@
 			@end
 
 			<section class="settings-section">
+				<h2 class="settings-section__title">%features_section_title</h2>
+				<p class="settings-section__desc">%features_section_desc</p>
+				<form class="settings-form features-form" action="/@ctx.user.username/@repo.name/settings/features" method="post">
+					<label class="features-form__option">
+						<input type="checkbox" name="discussions_enabled"
+						@if repo.discussions_enabled()
+							checked
+						@end
+						>
+						<span>%discussions</span>
+					</label>
+					<label class="features-form__option">
+						<input type="checkbox" name="projects_enabled"
+						@if repo.projects_enabled()
+							checked
+						@end
+						>
+						<span>%projects</span>
+					</label>
+					<label class="features-form__option">
+						<input type="checkbox" name="milestones_enabled"
+						@if repo.milestones_enabled()
+							checked
+						@end
+						>
+						<span>%milestones</span>
+					</label>
+					<label class="features-form__option">
+						<input type="checkbox" name="wiki_enabled"
+						@if repo.wiki_enabled()
+							checked
+						@end
+						>
+						<span>%wiki</span>
+					</label>
+					<input type="submit" class="settings-form__submit" value="%save_features">
+				</form>
+			</section>
+
+			<section class="settings-section">
 				<h2 class="settings-section__title">%webhooks</h2>
 				<p class="settings-section__desc">%webhook_secret_hint</p>
 				<a class="settings-form__submit settings-form__submit--link" href="/@ctx.user.username/@repo.name/settings/webhooks">%manage_webhooks</a>

@@ -26,22 +26,42 @@ struct Repo {
 	latest_update_hash string    @[skip]
 	latest_activity    time.Time @[skip]
 mut:
-	webhook_secret   string
-	tags_count       int
-	nr_open_issues   int @[orm: 'open_issues_count']
-	nr_open_prs      int @[orm: 'open_prs_count']
-	nr_releases      int @[orm: 'releases_count']
-	nr_branches      int @[orm: 'branches_count']
-	nr_tags          int
-	nr_stars         int        @[orm: 'stars_count']
-	lang_stats       []LangStat @[skip]
-	created_at       int
-	nr_contributors  int
-	labels           []Label @[skip]
-	status           RepoStatus
-	msg_cache        map[string]string @[skip]
-	latest_commit_at int               @[skip]
-	activity_buckets []int             @[skip]
+	webhook_secret      string
+	tags_count          int
+	nr_open_issues      int @[orm: 'open_issues_count']
+	nr_open_prs         int @[orm: 'open_prs_count']
+	nr_releases         int @[orm: 'releases_count']
+	nr_branches         int @[orm: 'branches_count']
+	nr_tags             int
+	nr_stars            int        @[orm: 'stars_count']
+	lang_stats          []LangStat @[skip]
+	created_at          int
+	nr_contributors     int
+	labels              []Label @[skip]
+	status              RepoStatus
+	msg_cache           map[string]string @[skip]
+	latest_commit_at    int               @[skip]
+	activity_buckets    []int             @[skip]
+	disable_discussions bool
+	disable_projects    bool
+	disable_milestones  bool
+	disable_wiki        bool
+}
+
+fn (r &Repo) discussions_enabled() bool {
+	return !r.disable_discussions
+}
+
+fn (r &Repo) projects_enabled() bool {
+	return !r.disable_projects
+}
+
+fn (r &Repo) milestones_enabled() bool {
+	return !r.disable_milestones
+}
+
+fn (r &Repo) wiki_enabled() bool {
+	return !r.disable_wiki
 }
 
 // log_field_separator is declared as constant in case we need to change it later
@@ -199,6 +219,13 @@ fn (mut app App) increment_file_views(file_id int) ! {
 fn (mut app App) set_repo_webhook_secret(repo_id int, secret string) ! {
 	sql app.db {
 		update Repo set webhook_secret = secret where id == repo_id
+	}!
+}
+
+fn (mut app App) update_repo_features(repo_id int, disable_discussions bool, disable_projects bool, disable_milestones bool, disable_wiki bool) ! {
+	sql app.db {
+		update Repo set disable_discussions = disable_discussions, disable_projects = disable_projects,
+		disable_milestones = disable_milestones, disable_wiki = disable_wiki where id == repo_id
 	}!
 }
 
