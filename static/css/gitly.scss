@@ -101,6 +101,22 @@ pre > code {
 	}
 }
 
+.clone-status-log {
+	margin: 20px auto 0;
+	max-width: 720px;
+	padding: 12px 16px;
+	background: #f6f8fa;
+	border: 1px solid #e1e4e8;
+	border-radius: $small-radius;
+	color: $gray-dark;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.5;
+	text-align: left;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 #top_right_div {
 	float:right;
 	display: flex;

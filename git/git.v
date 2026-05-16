@@ -1,6 +1,7 @@
 module git
 
 import os
+import time
 
 pub struct Git {}
 
@@ -27,6 +28,57 @@ pub fn Git.exec_shell(command string) os.Result {
 pub fn Git.clone(url string, path string) os.Result {
 	println('new clone url="${url}" path="${path}"')
 	return os.exec(['git', 'clone', '--bare', url, path])
+}
+
+// Git.clone_with_progress runs `git clone --bare --progress` and streams
+// every byte of git's progress output (which goes to stderr) into
+// `progress_path` while the clone is running, so a separate process can
+// poll the file and show live progress to the user.
+pub fn Git.clone_with_progress(url string, path string, progress_path string) os.Result {
+	println('new clone (progress) url="${url}" path="${path}" progress="${progress_path}"')
+	os.rm(progress_path) or {}
+	mut p := os.new_process('git')
+	p.set_args(['clone', '--bare', '--progress', url, path])
+	p.set_redirect_stdio()
+	p.run()
+	mut log := os.open_append(progress_path) or {
+		eprintln('clone_with_progress: cannot open progress file "${progress_path}": ${err}')
+		// fall back to non-streaming behaviour
+		p.wait()
+		out := p.stdout_slurp() + p.stderr_slurp()
+		code := p.code
+		p.close()
+		return os.Result{
+			exit_code: code
+			output:    out
+		}
+	}
+	mut collected := ''
+	for p.is_alive() {
+		chunk := p.stderr_read()
+		if chunk.len > 0 {
+			log.write_string(chunk) or {}
+			log.flush()
+			collected += chunk
+		}
+		// drain stdout so the pipe buffer never blocks the child
+		_ := p.stdout_read()
+		time.sleep(100 * time.millisecond)
+	}
+	final := p.stderr_slurp()
+	if final.len > 0 {
+		log.write_string(final) or {}
+		log.flush()
+		collected += final
+	}
+	log.close()
+	p.wait()
+	exit_code := p.code
+	p.close()
+	return os.Result{
+		exit_code: exit_code
+		output:    collected
+	}
 }
 
 pub fn Git.show_file_blob(repo_dir string, branch string, file_path string) !string {
