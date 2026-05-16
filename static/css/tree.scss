@@ -22,6 +22,7 @@
 .repo-settings-link {
 	font-size: 14px;
 	line-height: 1;
+	margin-left: auto;
 }
 
 /* 1. The repo stats panel */
@@ -305,7 +306,7 @@ a.repo-mode-link:hover {
 /* Two-column layout for the top of the repo (files + sidebar) */
 .repo-layout {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) 296px;
+	grid-template-columns: minmax(0, 1fr) 160px;
 	gap: 24px;
 	align-items: start;
 }
@@ -492,6 +493,10 @@ a.repo-mode-link:hover {
 		object-fit: cover;
 		display: block;
 	}
+}
+
+.sidebar-contributor--shadow {
+	cursor: default;
 }
 
 @media (max-width: 960px) {

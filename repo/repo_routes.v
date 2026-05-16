@@ -368,11 +368,15 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_
 	// The tree page will fetch files from git on demand.
 	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
 	eprintln('clone done, repo available — indexing in background')
-	// Kick off the GitHub issue import in its own thread with its own DB
-	// connection so it runs in parallel with indexing and the user can watch
-	// the issue count grow as imports complete.
-	if import_issues && cloned_repo.clone_url.contains('github.com') {
-		spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id, conf)
+	// For GitHub clones, also pull the repo description and contributors list
+	// (the issue import is gated on a separate user opt-in).
+	if cloned_repo.clone_url.contains('github.com') {
+		spawn bg_import_github_repo_info(cloned_repo.id, cloned_repo.clone_url,
+			cloned_repo.description, conf)
+		if import_issues {
+			spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id,
+				conf)
+		}
 	}
 	// Index branches, commits, and language stats in the background.
 	app.update_repo_from_fs(mut cloned_repo, true) or {
@@ -380,6 +384,31 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_
 	}
 	eprintln('background indexing complete')
 	app.db.close() or {}
+}
+
+fn bg_import_github_repo_info(repo_id int, clone_url string, existing_description string, conf config.Config) {
+	eprintln('[github-info] spawned thread for repo_id=${repo_id}')
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('[github-info] cannot open db connection: ${err}')
+			return
+		}
+		config: conf
+	}
+	defer {
+		app.db.close() or {}
+	}
+	if existing_description.trim_space() == '' {
+		description := fetch_github_repo_description(clone_url)
+		if description != '' {
+			app.set_repo_description(repo_id, description) or {
+				eprintln('[github-info] cannot save description: ${err}')
+			}
+		}
+	}
+	app.import_github_contributors(repo_id, clone_url) or {
+		eprintln('[github-contrib] FAILED: ${err}')
+	}
 }
 
 fn bg_import_github_issues(repo_id int, clone_url string, owner_user_id int, conf config.Config) {
@@ -399,7 +428,43 @@ fn bg_import_github_issues(repo_id int, clone_url string, owner_user_id int, con
 
 pub fn (mut app App) kekw(mut ctx Context) veb.Result {
 	clone_url := ''
+	clone_progress := ''
 	return $veb.html('templates/cloning_in_process.html')
+}
+
+// read_clone_progress parses a git `--progress` log file and returns
+// the latest output as a single newline-separated string, ready to be
+// shown inside a <pre> block. Git emits live progress with `\r` and
+// stage transitions with `\n`; we collapse repeated progress lines for
+// the same phase ("Counting objects", "Receiving objects", …) so only
+// the most recent value for each phase remains.
+fn read_clone_progress(progress_path string) string {
+	raw := os.read_file(progress_path) or { return '' }
+	if raw.len == 0 {
+		return ''
+	}
+	lines := raw.replace('\r', '\n').split('\n')
+	mut stages := []string{}
+	mut phase_index := map[string]int{}
+	for raw_line in lines {
+		line := raw_line.trim_space()
+		if line == '' {
+			continue
+		}
+		mut body := line
+		if body.starts_with('remote: ') {
+			body = body[8..]
+		}
+		colon := body.index(':') or { -1 }
+		key := if colon == -1 { body } else { body[..colon].trim_space() }
+		if key in phase_index {
+			stages[phase_index[key]] = line
+		} else {
+			phase_index[key] = stages.len
+			stages << line
+		}
+	}
+	return stages.join('\n')
 }
 
 @['/:username/:repo_name/tree/:branch_name/:path...']
@@ -409,7 +474,10 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		return ctx.not_found()
 	}
 	mut clone_url := ''
+	mut clone_progress := ''
 	if repo.status == .cloning {
+		clone_url = repo.clone_url
+		clone_progress = read_clone_progress(repo.clone_progress_path())
 		return $veb.html('templates/cloning_in_process.html')
 	}
 

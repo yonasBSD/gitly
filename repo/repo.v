@@ -236,6 +236,19 @@ fn (mut app App) set_repo_status(repo_id int, status RepoStatus) ! {
 	}!
 }
 
+fn (mut app App) set_repo_description(repo_id int, description string) ! {
+	sql app.db {
+		update Repo set description = description where id == repo_id
+	}!
+}
+
+fn (mut app App) update_repo_contributor_count(repo_id int) ! {
+	count := app.get_count_repo_contributors(repo_id)!
+	sql app.db {
+		update Repo set nr_contributors = count where id == repo_id
+	}!
+}
+
 fn (mut app App) increment_repo_issues(repo_id int) ! {
 	sql app.db {
 		update Repo set nr_open_issues = nr_open_issues + 1 where id == repo_id
@@ -1056,9 +1069,14 @@ fn (mut app App) update_repo_primary_branch(repo_id int, branch string) ! {
 	}!
 }
 
+fn (r &Repo) clone_progress_path() string {
+	return r.git_dir + '.progress'
+}
+
 fn (mut r Repo) clone() {
 	eprintln('R CLONE')
-	clone_result := git.Git.clone(r.clone_url, r.git_dir)
+	progress_path := r.clone_progress_path()
+	clone_result := git.Git.clone_with_progress(r.clone_url, r.git_dir, progress_path)
 	clone_exit_code := clone_result.exit_code
 
 	if clone_exit_code != 0 {
@@ -1068,6 +1086,8 @@ fn (mut r Repo) clone() {
 	}
 
 	r.status = .done
+	// progress file is no longer needed after a successful clone
+	os.rm(progress_path) or {}
 	eprintln('clone done')
 }
 

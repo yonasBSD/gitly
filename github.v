@@ -30,6 +30,18 @@ struct GitHubLabel {
 	description string
 }
 
+struct GitHubRepoInfo {
+	description string
+}
+
+struct GitHubContributor {
+	login      string
+	avatar_url string
+	type_      string @[json: 'type']
+	html_url   string
+	id         int
+}
+
 struct GitHubIssue {
 	number       int
 	title        string
@@ -72,6 +84,103 @@ fn (mut app App) find_or_create_github_shadow_user(github_login string) !int {
 		is_github:       true
 		is_registered:   false
 		avatar:          'https://github.com/${github_login}.png'
+		created_at:      time.now()
+	}
+	app.add_user(user)!
+	created := app.get_user_by_username(github_login) or {
+		return error('shadow user not found after insert: ${github_login}')
+	}
+	return created.id
+}
+
+// fetch_github_repo_description returns the GitHub description for a repo, or
+// an empty string if it cannot be retrieved.
+fn fetch_github_repo_description(clone_url string) string {
+	owner, name := parse_github_owner_repo(clone_url) or {
+		eprintln('[github-info] cannot parse github url: ${clone_url}')
+		return ''
+	}
+	url := 'https://api.github.com/repos/${owner}/${name}'
+	eprintln('[github-info] GET ${url}')
+	mut req := http.new_request(.get, url, '')
+	req.add_header(.user_agent, 'gitly')
+	req.add_header(.accept, 'application/vnd.github+json')
+	resp := req.do() or {
+		eprintln('[github-info] request failed: ${err}')
+		return ''
+	}
+	if resp.status_code != 200 {
+		eprintln('[github-info] non-200 status ${resp.status_code}: ${resp.body#[..200]}')
+		return ''
+	}
+	info := json.decode(GitHubRepoInfo, resp.body) or {
+		eprintln('[github-info] cannot decode response: ${err}')
+		return ''
+	}
+	return info.description
+}
+
+fn (mut app App) import_github_contributors(repo_id int, clone_url string) ! {
+	eprintln('[github-contrib] starting for repo_id=${repo_id} clone_url=${clone_url}')
+	owner, name := parse_github_owner_repo(clone_url) or {
+		return error('cannot parse github url: ${clone_url}')
+	}
+	mut page := 1
+	mut total := 0
+	for page <= 10 {
+		url := 'https://api.github.com/repos/${owner}/${name}/contributors?per_page=100&page=${page}'
+		eprintln('[github-contrib] GET ${url}')
+		mut req := http.new_request(.get, url, '')
+		req.add_header(.user_agent, 'gitly')
+		req.add_header(.accept, 'application/vnd.github+json')
+		resp := req.do() or { return error('github api request failed: ${err}') }
+		if resp.status_code != 200 {
+			return error('github api ${resp.status_code}: ${resp.body}')
+		}
+		contributors := json.decode([]GitHubContributor, resp.body) or {
+			return error('cannot decode github contributors: ${err}')
+		}
+		if contributors.len == 0 {
+			break
+		}
+		for c in contributors {
+			if c.login == '' || c.type_ == 'Bot' {
+				continue
+			}
+			user_id := app.find_or_create_github_shadow_contributor(c.login, c.avatar_url) or {
+				eprintln('[github-contrib] cannot resolve @${c.login}: ${err}')
+				continue
+			}
+			app.add_contributor(user_id, repo_id) or {
+				eprintln('[github-contrib] cannot link @${c.login}: ${err}')
+				continue
+			}
+			total++
+		}
+		if contributors.len < 100 {
+			break
+		}
+		page++
+	}
+	app.update_repo_contributor_count(repo_id) or {
+		eprintln('[github-contrib] cannot update contributor count: ${err}')
+	}
+	eprintln('[github-contrib] done: imported ${total} contributors into repo ${repo_id}')
+}
+
+// find_or_create_github_shadow_contributor is like find_or_create_github_shadow_user
+// but also stores the GitHub avatar URL when given.
+fn (mut app App) find_or_create_github_shadow_contributor(github_login string, avatar_url string) !int {
+	if u := app.get_user_by_username(github_login) {
+		return u.id
+	}
+	avatar := if avatar_url != '' { avatar_url } else { 'https://github.com/${github_login}.png' }
+	user := User{
+		username:        github_login
+		github_username: github_login
+		is_github:       true
+		is_registered:   false
+		avatar:          avatar
 		created_at:      time.now()
 	}
 	app.add_user(user)!
