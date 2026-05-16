@@ -682,8 +682,6 @@ form {
 }
 
 .new-repo__header {
-	border-bottom: 1px solid $gray;
-	padding-bottom: 16px;
 	margin: 24px 0 24px;
 
 	h1 {
@@ -835,10 +833,9 @@ form {
 }
 
 .new-repo__actions {
-	border-top: 1px solid $gray;
 	padding-top: 18px;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: flex-start;
 }
 
 .new-repo__submit {
@@ -1052,8 +1049,43 @@ form {
 	color: $gray-dark;
 }
 
+.lang_select {
+	margin-right: 16px;
+	display: inline-flex;
+}
+
 #select_lang {
-	margin-right:20px;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background-color: transparent;
+	color: $white;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: $small-radius;
+	padding: 5px 26px 5px 10px;
+	font-size: 13px;
+	line-height: 1.4;
+	cursor: pointer;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23ffffff' d='M0 0l5 6 5-6z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 9px 6px;
+	transition: border-color 120ms ease, background-color 120ms ease;
+
+	&:hover {
+		border-color: rgba(255, 255, 255, 0.4);
+		background-color: rgba(255, 255, 255, 0.06);
+	}
+
+	&:focus {
+		outline: none;
+		border-color: rgba(255, 255, 255, 0.6);
+	}
+
+	option {
+		color: $black;
+		background-color: $white;
+	}
 }
 
 /* Pull request UI */

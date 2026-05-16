@@ -42,6 +42,12 @@ pub fn (mut app App) handle_login(mut ctx Context, username string, password str
 	if !user.is_registered {
 		return ctx.redirect_to_login()
 	}
+	if app.user_has_two_factor(user.id) {
+		expires := time.now().unix() + two_factor_pending_ttl
+		token := app.sign_pending_2fa(user, expires)
+		ctx.set_cookie(name: two_factor_pending_cookie, value: token, path: '/')
+		return ctx.redirect('/login/2fa')
+	}
 	app.auth_user(mut ctx, user, ctx.ip()) or {
 		ctx.error('There was an error while logging in')
 		return app.login(mut ctx)
