@@ -660,6 +660,13 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 		}
 	}
 
+	excluded_extensions := ['.png', '.jpg', '.jpeg', '.obj', '.json', '.pdf']
+	for ext in excluded_extensions {
+		if lower_path.ends_with(ext) {
+			return none
+		}
+	}
+
 	item_name := item_path.after('/')
 	if item_name == '' {
 		return none
@@ -677,6 +684,20 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 		size:               meta_parts[3].int()
 		is_size_calculated: true
 	}
+}
+
+fn (r &Repo) lookup_file_via_git(branch string, path string) ?File {
+	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '--full-name', '--long', branch, '--',
+		path])
+	if git_result.exit_code != 0 {
+		return none
+	}
+	for line in git_result.output.split_into_lines() {
+		if file := r.parse_top_file_line(line, branch) {
+			return file
+		}
+	}
+	return none
 }
 
 fn (r &Repo) top_files(branch string, limit int) []File {
