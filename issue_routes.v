@@ -39,7 +39,7 @@ pub fn (mut app App) new_issue(username string, repo_name string) veb.Result {
 
 @['/:username/issues']
 pub fn (mut app App) handle_get_user_issues(mut ctx Context, username string) veb.Result {
-	return app.user_issues(mut ctx, username, '0')
+	return app.user_issues(mut ctx, username, 'created')
 }
 
 @['/:username/:repo_name/issues'; post]
@@ -90,11 +90,14 @@ pub fn (mut app App) issues(mut ctx Context, username string, repo_name string, 
 		issue = repo_issues[i]
 		user = app.get_user_by_id(issue.author_id) or { continue }
 		issue.labels = app.get_issue_labels(issue.id)
+		issue.repo_author = repo.user_name
+		issue.repo_name = repo.name
 		issues_with_users << IssueWithUser{
 			item: issue
 			user: user
 		}
 	}
+	show_repo_link := false
 	mut first := false
 	mut last := false
 	if repo.nr_open_issues > commits_per_page {
@@ -137,8 +140,8 @@ pub fn (mut app App) issue(mut ctx Context, username string, repo_name string, i
 	return $veb.html()
 }
 
-@['/:username/issues/:page']
-pub fn (mut app App) user_issues(mut ctx Context, username string, page string) veb.Result {
+@['/:username/issues/:tab']
+pub fn (mut app App) user_issues(mut ctx Context, username string, tab string) veb.Result {
 	if !ctx.logged_in {
 		return ctx.not_found()
 	}
@@ -149,47 +152,53 @@ pub fn (mut app App) user_issues(mut ctx Context, username string, page string) 
 	if !exists {
 		return ctx.not_found()
 	}
-	page_i := page.int()
-	mut issues := app.find_user_issues(user.id)
-	mut first := false
-	mut last := false
-	mut issue := Issue{}
-	mut issue_repo := Repo{}
-	mut i := 0
-	for i = 0; i < issues.len; i++ {
-		issue = issues[i]
-		issue_repo = app.find_repo_by_id(issue.repo_id) or { continue }
-		issues[i].repo_author = issue_repo.user_name
-		issues[i].repo_name = issue_repo.name
-	}
-	if issues.len > commits_per_page {
-		offset := page_i * commits_per_page
-		delta := issues.len - offset
-		if delta > 0 {
-			if delta == issues.len && page_i == 0 {
-				first = true
-			} else {
-				last = true
-			}
-		}
+	current_tab := if tab in ['assigned', 'created', 'mentioned', 'activity'] {
+		tab
 	} else {
-		last = true
-		first = true
+		'created'
+	}
+	mut issues := match current_tab {
+		'assigned' { []Issue{} }
+		'mentioned' { app.find_user_mentioned_issues(user.username) }
+		'activity' { app.find_user_recent_issues(user.id) }
+		else { app.find_user_issues(user.id) }
+	}
+
+	mut issue_repo := Repo{}
+	for mut issue in issues {
+		issue_repo = app.find_repo_by_id(issue.repo_id) or { continue }
+		issue.repo_author = issue_repo.user_name
+		issue.repo_name = issue_repo.name
+		issue.labels = app.get_issue_labels(issue.id)
 	}
 	mut issues_with_users := []IssueWithUser{}
-	mut issue_author := User{}
-	for i = 0; i < issues.len; i++ {
-		issue = issues[i]
-		issue_author = app.get_user_by_id(issue.author_id) or { continue }
+	for issue in issues {
+		issue_author := app.get_user_by_id(issue.author_id) or { continue }
 		issues_with_users << IssueWithUser{
 			item: issue
 			user: issue_author
 		}
 	}
-	mut last_site := 0
-	if page_i > 0 {
-		last_site = page_i - 1
+	tab_assigned_class := if current_tab == 'assigned' {
+		'user-issues-sidebar__item user-issues-sidebar__item--active'
+	} else {
+		'user-issues-sidebar__item'
 	}
-	next_site := page_i + 1
+	tab_created_class := if current_tab == 'created' {
+		'user-issues-sidebar__item user-issues-sidebar__item--active'
+	} else {
+		'user-issues-sidebar__item'
+	}
+	tab_mentioned_class := if current_tab == 'mentioned' {
+		'user-issues-sidebar__item user-issues-sidebar__item--active'
+	} else {
+		'user-issues-sidebar__item'
+	}
+	tab_activity_class := if current_tab == 'activity' {
+		'user-issues-sidebar__item user-issues-sidebar__item--active'
+	} else {
+		'user-issues-sidebar__item'
+	}
+	show_repo_link := true
 	return $veb.html()
 }

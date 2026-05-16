@@ -237,7 +237,7 @@ commits_count
 commit|commits|commits
 -----
 issues_count
-issue|issues|issues
+incidencia|incidencias|incidencias
 -----
 prs_count
 pull request|pull requests|pull requests
@@ -747,7 +747,7 @@ header_repositories
 Repositorios
 -----
 header_issues
-Issues
+Incidencias
 -----
 header_stars
 Estrellas
@@ -766,6 +766,51 @@ Sesión iniciada como
 -----
 header_sign_out
 Cerrar sesión
+-----
+issue_issues
+Incidencias
+-----
+issue_new
+Nueva incidencia
+-----
+issue_none
+Aún no hay incidencias.
+-----
+issue_your_issues
+Incidencias
+-----
+issue_assigned_to_me
+Asignadas a mí
+-----
+issue_created_by_me
+Creadas por mí
+-----
+issue_mentioned
+Mencionado
+-----
+issue_recent_activity
+Actividad reciente
+-----
+issue_none_assigned
+No tienes incidencias asignadas.
+-----
+issue_none_created
+Aún no has abierto ninguna incidencia.
+-----
+issue_none_mentioned
+Aún no te han mencionado en incidencias.
+-----
+issue_none_activity
+Sin actividad reciente.
+-----
+issue_opened
+abierta
+-----
+issue_by
+por
+-----
+issue_comments_title
+Comentarios
 -----
 admin_stats_running_since
 Gitly funciona desde hace

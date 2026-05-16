@@ -1152,6 +1152,84 @@ form {
 	color: $gray-dark;
 }
 
+.issue-row__repo {
+	color: $link-color !important;
+	font-size: 12px !important;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.user-issues-layout {
+	display: grid;
+	grid-template-columns: 240px 1fr;
+	gap: 24px;
+	margin-top: 16px;
+
+	@include mobile {
+		grid-template-columns: 1fr;
+		gap: 12px;
+	}
+}
+
+.user-issues-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.user-issues-sidebar__heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 10px 12px;
+	font-size: 16px;
+	font-weight: 600;
+	color: $black;
+	border-bottom: 1px solid $gray;
+	margin-bottom: 8px;
+}
+
+.user-issues-sidebar__heading-icon {
+	width: 20px;
+	height: 20px;
+	color: $black;
+}
+
+.user-issues-sidebar__item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 7px 10px;
+	border-radius: $small-radius;
+	color: $black !important;
+	font-size: 14px;
+	transition: background-color 0.07s;
+
+	&:hover {
+		background-color: $gray-light;
+		text-decoration: none;
+	}
+}
+
+.user-issues-sidebar__item--active {
+	background-color: $gray-light;
+	font-weight: 600;
+	box-shadow: inset 2px 0 0 $link-color;
+}
+
+.user-issues-sidebar__icon {
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+	color: $gray-dark;
+}
+
+.user-issues-main {
+	min-width: 0;
+}
+
 .lang_select {
 	margin-right: 16px;
 	display: inline-flex;

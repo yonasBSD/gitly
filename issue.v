@@ -138,8 +138,76 @@ fn (mut app App) get_repo_issue_count(repo_id int) int {
 
 fn (mut app App) find_user_issues(user_id int) []Issue {
 	return sql app.db {
-		select from Issue where author_id == user_id && is_pr == false
+		select from Issue where author_id == user_id && is_pr == false order by created_at desc
 	} or { []Issue{} }
+}
+
+fn (mut app App) find_user_mentioned_issues(username string) []Issue {
+	needle := '@' + username
+	mut seen := map[int]bool{}
+	mut result := []Issue{}
+	direct_rows := db_exec_values(app.db,
+		'select id from ${sql_table('Issue')} where is_pr = 0 and text like ${sql_like_pattern(needle)} order by created_at desc') or {
+		[][]string{}
+	}
+	for row in direct_rows {
+		id := row[0].int()
+		if id in seen {
+			continue
+		}
+		issue := app.find_issue_by_id(id) or { continue }
+		seen[id] = true
+		result << issue
+	}
+	comment_rows := db_exec_values(app.db,
+		'select distinct issue_id from ${sql_table('Comment')} where text like ${sql_like_pattern(needle)}') or {
+		[][]string{}
+	}
+	for row in comment_rows {
+		id := row[0].int()
+		if id in seen {
+			continue
+		}
+		issue := app.find_issue_by_id(id) or { continue }
+		if issue.is_pr {
+			continue
+		}
+		seen[id] = true
+		result << issue
+	}
+	result.sort(a.created_at > b.created_at)
+	return result
+}
+
+fn (mut app App) find_user_recent_issues(user_id int) []Issue {
+	mut seen := map[int]bool{}
+	mut result := []Issue{}
+	authored := app.find_user_issues(user_id)
+	for issue in authored {
+		if issue.id in seen {
+			continue
+		}
+		seen[issue.id] = true
+		result << issue
+	}
+	comment_rows := db_exec_values(app.db,
+		'select distinct issue_id from ${sql_table('Comment')} where author_id = ${user_id}') or {
+		[][]string{}
+	}
+	for row in comment_rows {
+		id := row[0].int()
+		if id in seen {
+			continue
+		}
+		issue := app.find_issue_by_id(id) or { continue }
+		if issue.is_pr {
+			continue
+		}
+		seen[id] = true
+		result << issue
+	}
+	result.sort(a.created_at > b.created_at)
+	return result
 }
 
 fn (mut app App) delete_repo_issues(repo_id int) ! {

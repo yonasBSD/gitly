@@ -237,7 +237,7 @@ commits_count
 commit|commits|commits
 -----
 issues_count
-issue|issues|issues
+problema|problemas|problemas
 -----
 prs_count
 pull request|pull requests|pull requests
@@ -747,7 +747,7 @@ header_repositories
 Repositórios
 -----
 header_issues
-Issues
+Problemas
 -----
 header_stars
 Estrelas
@@ -766,6 +766,51 @@ Conectado como
 -----
 header_sign_out
 Sair
+-----
+issue_issues
+Problemas
+-----
+issue_new
+Novo problema
+-----
+issue_none
+Ainda não há problemas.
+-----
+issue_your_issues
+Problemas
+-----
+issue_assigned_to_me
+Atribuídos a mim
+-----
+issue_created_by_me
+Criados por mim
+-----
+issue_mentioned
+Menções
+-----
+issue_recent_activity
+Atividade recente
+-----
+issue_none_assigned
+Você não tem problemas atribuídos.
+-----
+issue_none_created
+Você ainda não abriu nenhum problema.
+-----
+issue_none_mentioned
+Você ainda não foi mencionado em nenhum problema.
+-----
+issue_none_activity
+Sem atividade recente.
+-----
+issue_opened
+aberto
+-----
+issue_by
+por
+-----
+issue_comments_title
+Comentários
 -----
 admin_stats_running_since
 Gitly em execução há

@@ -767,6 +767,51 @@ header_signed_in_as
 header_sign_out
 Выйти
 -----
+issue_issues
+Задачи
+-----
+issue_new
+Новая задача
+-----
+issue_none
+Задач пока нет.
+-----
+issue_your_issues
+Задачи
+-----
+issue_assigned_to_me
+Назначены мне
+-----
+issue_created_by_me
+Созданы мной
+-----
+issue_mentioned
+Упоминания
+-----
+issue_recent_activity
+Последняя активность
+-----
+issue_none_assigned
+Вам не назначено ни одной задачи.
+-----
+issue_none_created
+Вы ещё не открыли ни одной задачи.
+-----
+issue_none_mentioned
+Вас ещё не упоминали в задачах.
+-----
+issue_none_activity
+Нет недавней активности по задачам.
+-----
+issue_opened
+открыта
+-----
+issue_by
+автор
+-----
+issue_comments_title
+Комментарии
+-----
 admin_stats_running_since
 Gitly работает с
 -----

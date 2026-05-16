@@ -767,6 +767,51 @@ Signed in as
 header_sign_out
 Sign out
 -----
+issue_issues
+Issues
+-----
+issue_new
+New issue
+-----
+issue_none
+No issues yet.
+-----
+issue_your_issues
+Issues
+-----
+issue_assigned_to_me
+Assigned to me
+-----
+issue_created_by_me
+Created by me
+-----
+issue_mentioned
+Mentioned
+-----
+issue_recent_activity
+Recent activity
+-----
+issue_none_assigned
+No issues are assigned to you.
+-----
+issue_none_created
+You haven't opened any issues yet.
+-----
+issue_none_mentioned
+You haven't been mentioned in any issues.
+-----
+issue_none_activity
+No recent issue activity.
+-----
+issue_opened
+opened
+-----
+issue_by
+by
+-----
+issue_comments_title
+Comments
+-----
 admin_stats_running_since
 Gitly runs since
 -----
