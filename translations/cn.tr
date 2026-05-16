@@ -1,769 +1,769 @@
 welcome_to_gitly
-Welcome to Gitly! Looks like you've just set it up, you'll need to register
-the main administrator account for this server.
+欢迎使用 Gitly！看起来您刚刚完成了设置，
+您需要为此服务器注册主管理员账户。
 -----
 register
-Register
+注册
 -----
 register_admin_account
-Register an admin account
+注册管理员账户
 -----
 new_repository
-New repo
+新建仓库
 -----
 repo_being_cloned_plz_wait
-Your repo is being cloned. Please wait a bit...
+正在克隆您的仓库，请稍候...
 -----
 repo_being_cloned_clone_url
-Clone URL:
+克隆地址：
 -----
 username
-Username
+用户名
 -----
 password
-Password
+密码
 -----
 email
-Email
+邮箱
 -----
 index_intro
-Gitly is an open-source development platform that has the following features
+Gitly 是一个开源开发平台，具有以下功能
 -----
 index_source_hosting
-Source code hosting
+源代码托管
 -----
 index_project_management
-Project management
+项目管理
 -----
 index_ci_cd
-CI & CD
+CI 和 CD
 -----
 index_main_features
-Main features:
+主要功能：
 -----
 index_feature_light_fast
-Light and fast
+轻量快速
 -----
 index_feature_minimal_ram
-Minimal amount of RAM usage (works great on the cheapest $3.5 AWS Lightsail instance)
+最低 RAM 占用（在最便宜的 $3.5 AWS Lightsail 实例上也能流畅运行）
 -----
 index_feature_easy_deploy
-Easy to deploy (a single <1 MB binary that includes compiled templates)
+易于部署（单个 <1 MB 的二进制文件，包含已编译的模板）
 -----
 index_feature_no_js
-Works without JavaScript
+无需 JavaScript 即可运行
 -----
 index_feature_lang_stats
-Detailed language stats for each directory
+每个目录的详细语言统计
 -----
 index_feature_top_files
-"Top files" feature to give an overview of the project
+"热门文件"功能提供项目概览
 -----
 index_feature_fast_ci
-Very fast CI with pre-cached dependencies
+带预缓存依赖的超快 CI
 -----
 index_feature_pr_no_fork
-Submitting a pull request without forking the repository
+无需 fork 仓库即可提交拉取请求
 -----
 index_open_source
-Open source
+开源
 -----
 index_all_open_source
-All features are open source
+所有功能均为开源
 -----
 index_min_ram
-Minimum RAM
+最小内存
 -----
 index_cheapest_server
-Cheapest server
+最便宜的服务器
 -----
 index_works_no_js
-Works without JS
+无需 JS 即可运行
 -----
 index_detailed_lang_stats
-Detailed language stats
+详细的语言统计
 -----
 index_install_size
-Installation size
+安装大小
 -----
 index_load_time
-Time to load vlang/v repo main page
+加载 vlang/v 仓库主页的时间
 -----
 index_ci_features_header
-CI features
+CI 功能
 -----
 index_cpu_cores
-# CPU cores
+CPU 核心数
 -----
 index_dep_cache
-Built-in dependency cache
+内置依赖缓存
 -----
 index_separate_instance
-A separate instance with an option to SSH to
+独立实例，支持 SSH 连接
 -----
 index_instant_start
-Instant start on commit/PR
+提交/PR 时即时启动
 -----
 index_stop_ci
-An easy way to stop entire CI run (manually or on new commit/PR/force push)
+轻松停止整个 CI 运行（手动或在新提交/PR/强制推送时）
 -----
 index_logs_storage_time
-CI logs storage time
+CI 日志存储时间
 -----
 index_basic_ci_minutes
-CI minutes in a basic package
+基础套餐 CI 分钟数
 -----
 index_price_per_user
-Price per user per month
+每用户每月价格
 -----
 index_yes
-Yes
+是
 -----
 index_no
-No
+否
 -----
 index_partially
-Partially
+部分支持
 -----
 index_three_months
-3 months
+3 个月
 -----
 index_six_months
-6 months
+6 个月
 -----
 index_check_action
-Check out Gitly in action by browsing the V language repo:
+浏览 V 语言仓库以查看 Gitly 的实际效果：
 -----
 open_source_title
-What GitLab features are not open source
+GitLab 哪些功能不是开源的
 -----
 open_source_intro
-GitLab is often presented as the open-source alternative to GitHub. In reality, only the Community Edition (CE) is open source under the MIT license. Most of the features GitLab actually advertises and sells live in the proprietary Enterprise Edition (EE), which is released under a non-free source-available license. If you self-host the free CE, you do not get them.
+GitLab 经常被宣传为 GitHub 的开源替代品。实际上，只有 Community Edition (CE) 是基于 MIT 许可证的开源版本。GitLab 实际宣传和销售的大多数功能都在专有的 Enterprise Edition (EE) 中，该版本采用非自由的源代码可见许可证发布。如果您自托管免费的 CE，则无法使用这些功能。
 -----
 open_source_ee_only_title
-A non-exhaustive list of EE-only (proprietary) features:
+EE 专属（专有）功能的非完整列表：
 -----
 open_source_feat_advanced_search
-Advanced search (Elasticsearch-powered code search across projects)
+高级搜索（基于 Elasticsearch 的跨项目代码搜索）
 -----
 open_source_feat_mr_approvals
-Multiple merge request approval rules and required approvers
+多个合并请求审批规则和必需审批者
 -----
 open_source_feat_security_scanning
-SAST, DAST, container scanning and secret detection
+SAST、DAST、容器扫描和密钥检测
 -----
 open_source_feat_dependency_scanning
-Dependency scanning and license compliance
+依赖扫描和许可证合规性
 -----
 open_source_feat_compliance
-Compliance frameworks and compliance dashboards
+合规框架和合规仪表板
 -----
 open_source_feat_audit_events
-Full audit events and audit reports
+完整审计事件和审计报告
 -----
 open_source_feat_epics
-Epics and multi-level epics
+史诗和多级史诗
 -----
 open_source_feat_roadmaps
-Roadmaps and milestone planning views
+路线图和里程碑规划视图
 -----
 open_source_feat_portfolio
-Portfolio and value stream analytics
+投资组合和价值流分析
 -----
 open_source_feat_protected_envs
-Protected environments and deployment approvals
+受保护的环境和部署审批
 -----
 open_source_feat_geo
-Geo replication across multiple regions
+跨多个地区的地理复制
 -----
 open_source_feat_dr
-Disaster recovery
+灾难恢复
 -----
 open_source_feat_group_saml
-Group-level SAML SSO and SCIM provisioning
+组级 SAML SSO 和 SCIM 配置
 -----
 open_source_feat_ldap_sync
-LDAP group sync and Kerberos integration
+LDAP 组同步和 Kerberos 集成
 -----
 open_source_feat_push_rules
-Push rules and required pipeline configurations
+推送规则和必需的流水线配置
 -----
 open_source_feat_insights
-Insights, value stream dashboards and DORA metrics
+洞察、价值流仪表板和 DORA 指标
 -----
 open_source_outro
-Gitly takes a different approach: every feature is part of the same open-source codebase. There is no Enterprise Edition, no paywalled module, and no separate "premium" repository.
+Gitly 采取了不同的方法：每个功能都是同一开源代码库的一部分。没有 Enterprise Edition，没有付费墙模块，也没有单独的"高级"仓库。
 -----
 new_repo_title
-Create a new repository
+创建新仓库
 -----
 new_repo_name
-Name
+名称
 -----
 new_repo_description
-Description
+描述
 -----
 new_repo_optional
-(optional)
+（可选）
 -----
 new_repo_clone_url
-Clone URL
+克隆地址
 -----
 new_repo_clone_hint
-(only if you want to clone an existing repository)
+（仅当您想克隆现有仓库时）
 -----
 new_repo_import_issues
-Import issues from GitHub
+从 GitHub 导入 issue
 -----
 new_repo_visibility
-Repository visibility
+仓库可见性
 -----
 new_repo_public
-Public
+公开
 -----
 new_repo_public_desc
-Anyone on the internet can see this repository.
+互联网上的任何人都可以查看此仓库。
 -----
 new_repo_private
-Private
+私有
 -----
 new_repo_private_desc
-You choose who can see and commit to this repository.
+您选择谁可以查看和提交到此仓库。
 -----
 new_repo_create
-Create repository
+创建仓库
 -----
 commits_count
-commit|commits|commits
+提交|提交|提交
 -----
 issues_count
 issue|issues|issues
 -----
 prs_count
-pull request|pull requests|pull requests
+拉取请求|拉取请求|拉取请求
 -----
 contributors_count
-contributor|contributors|contributors
+贡献者|贡献者|贡献者
 -----
 branches_count
-branch|branches|branches
+分支|分支|分支
 -----
 releases_count
-release|releases|releases
+发布|发布|发布
 -----
 tags_count
-tag|tags|tags
+标签|标签|标签
 -----
 topics_count
-discussion|discussions|discussions
+讨论|讨论|讨论
 -----
 stars_count
-star|stars|stars
+星标|星标|星标
 -----
 watchers_count
-watcher|watchers|watchers
+关注者|关注者|关注者
 -----
 ci_label
 CI
 -----
 pr_pull_requests
-Pull requests
+拉取请求
 -----
 pr_new
-New pull request
+新建拉取请求
 -----
 pr_tab_open
-Open
+开放
 -----
 pr_tab_merged
-Merged
+已合并
 -----
 pr_tab_closed
-Closed
+已关闭
 -----
 pr_none
-No pull requests.
+暂无拉取请求。
 -----
 pr_status_open
-Open
+开放
 -----
 pr_status_merged
-Merged
+已合并
 -----
 pr_status_closed
-Closed
+已关闭
 -----
 pr_wants_to_merge
-wants to merge
+希望合并
 -----
 pr_into
-into
+到
 -----
 pr_conversation
-Conversation
+讨论
 -----
 pr_files_changed
-Files changed
+变更的文件
 -----
 pr_files_changed_label
-files changed
+个文件已变更
 -----
 pr_commits_label
-commits
+提交
 -----
 pr_review_approved
-approved
+已批准
 -----
 pr_review_changes_requested
-requested changes
+请求变更
 -----
 pr_review_commented
-commented
+已评论
 -----
 pr_commented
-commented
+已评论
 -----
 pr_leave_comment
-Leave a comment
+发表评论
 -----
 pr_comment_button
-Comment
+评论
 -----
 pr_merge
-Merge pull request
+合并拉取请求
 -----
 pr_close
-Close pull request
+关闭拉取请求
 -----
 pr_reopen
-Reopen pull request
+重新打开拉取请求
 -----
 pr_open_title
-Open a pull request
+打开拉取请求
 -----
 pr_compare_desc
-Compare two branches in this repository and propose a merge. Forks are not required.
+比较此仓库中的两个分支并提议合并。无需 fork。
 -----
 pr_base
-base
+基础
 -----
 pr_compare
-compare
+对比
 -----
 pr_choose_branch
-(choose a branch)
+（选择一个分支）
 -----
 pr_compare_button
-Compare
+比较
 -----
 pr_no_commits_between
-No commits between these branches.
+这两个分支之间没有提交。
 -----
 pr_title_placeholder
-Title
+标题
 -----
 pr_description_placeholder
-Describe the changes (optional)
+描述变更内容（可选）
 -----
 pr_create
-Create pull request
+创建拉取请求
 -----
 pr_commits_heading
-Commits
+提交
 -----
 pr_by
-by
+作者：
 -----
 pr_no_file_changes
-No file changes detected.
+未检测到文件变更。
 -----
 pr_binary_file
-Binary file not shown.
+二进制文件不显示。
 -----
 pr_line_comment_placeholder
-Add a review comment on this line (optional)
+在此行添加审查评论（可选）
 -----
 pr_overall_review_placeholder
-Overall review comment (optional)
+总体审查评论（可选）
 -----
 pr_review_action_comment
-Comment
+评论
 -----
 pr_review_action_approve
-Approve
+批准
 -----
 pr_review_action_request_changes
-Request changes
+请求变更
 -----
 pr_submit_review
-Submit review
+提交审查
 -----
 pr_your_pulls
-Your pull requests
+您的拉取请求
 -----
 pr_none_user
-You haven't opened any pull requests yet.
+您尚未打开任何拉取请求。
 -----
 pr_opened
-opened
+已打开
 -----
 pr_comments_title
-Comments
+评论
 -----
 webhooks
-Webhooks
+Webhook
 -----
 webhook_new
-New webhook
+新建 Webhook
 -----
 webhook_none
-No webhooks configured.
+未配置 Webhook。
 -----
 webhook_url
 Payload URL
 -----
 webhook_secret
-Secret
+密钥
 -----
 webhook_secret_hint
-Used to compute the X-Gitly-Signature header (HMAC-SHA256). Optional but recommended.
+用于计算 X-Gitly-Signature 头（HMAC-SHA256）。可选但推荐使用。
 -----
 webhook_events
-Events to deliver
+要传递的事件
 -----
 webhook_event_push
-Push
+推送
 -----
 webhook_event_issue
 Issues
 -----
 webhook_event_pr
-Pull requests
+拉取请求
 -----
 webhook_event_comment
-Comments
+评论
 -----
 webhook_event_release
-Releases
+发布
 -----
 webhook_create
-Create webhook
+创建 Webhook
 -----
 webhook_delete
-Delete
+删除
 -----
 webhook_active
-Active
+启用
 -----
 webhook_inactive
-Inactive
+禁用
 -----
 webhook_last_status
-Last response
+最近响应
 -----
 webhook_never_delivered
-Never delivered
+从未传递
 -----
 webhook_deliveries
-Recent deliveries
+最近传递
 -----
 webhook_back
-Back to webhooks
+返回 Webhook
 -----
 manage_webhooks
-Manage webhooks
+管理 Webhook
 -----
 discussions
-Discussions
+讨论
 -----
 discussion_new
-New discussion
+新建讨论
 -----
 discussion_none
-No discussions yet.
+暂无讨论。
 -----
 discussion_create
-Create discussion
+创建讨论
 -----
 discussion_title_placeholder
-Discussion title
+讨论标题
 -----
 discussion_body_placeholder
-Start the conversation...
+开始对话...
 -----
 discussion_category
-Category
+分类
 -----
 discussion_category_general
-General
+通用
 -----
 discussion_category_qa
-Q&A
+问答
 -----
 discussion_category_announcement
-Announcement
+公告
 -----
 discussion_category_idea
-Ideas
+想法
 -----
 discussion_locked
-Locked
+已锁定
 -----
 discussion_reply_placeholder
-Reply to this discussion
+回复此讨论
 -----
 discussion_reply_button
-Post reply
+发布回复
 -----
 discussion_lock
-Lock discussion
+锁定讨论
 -----
 discussion_unlock
-Unlock discussion
+解锁讨论
 -----
 discussion_delete
-Delete discussion
+删除讨论
 -----
 discussion_answer
-Mark as answer
+标记为答案
 -----
 discussion_answered
-Answered
+已回答
 -----
 discussion_opened
-opened
+已打开
 -----
 projects
-Projects
+项目
 -----
 project_new
-New project
+新建项目
 -----
 project_none
-No projects yet.
+暂无项目。
 -----
 project_create
-Create project
+创建项目
 -----
 project_name_placeholder
-Project name
+项目名称
 -----
 project_description_placeholder
-Project description (optional)
+项目描述（可选）
 -----
 project_delete
-Delete project
+删除项目
 -----
 project_add_column
-Add column
+添加列
 -----
 project_column_name_placeholder
-Column name (e.g. Todo, In progress, Done)
+列名称（例如：待办、进行中、完成）
 -----
 project_add_card
-Add card
+添加卡片
 -----
 project_card_title_placeholder
-Card title
+卡片标题
 -----
 project_card_note_placeholder
-Notes (optional)
+备注（可选）
 -----
 project_card_save
-Save card
+保存卡片
 -----
 project_card_delete
-Delete
+删除
 -----
 project_column_delete
-Delete column
+删除列
 -----
 project_column_empty
-No cards.
+无卡片。
 -----
 milestones
-Milestones
+里程碑
 -----
 milestone_new
-New milestone
+新建里程碑
 -----
 milestone_none
-No milestones yet.
+暂无里程碑。
 -----
 milestone_create
-Create milestone
+创建里程碑
 -----
 milestone_title_placeholder
-Milestone title
+里程碑标题
 -----
 milestone_description_placeholder
-Description (optional)
+描述（可选）
 -----
 milestone_due_date
-Due date
+截止日期
 -----
 milestone_status_open
-Open
+开放
 -----
 milestone_status_closed
-Closed
+已关闭
 -----
 milestone_close
-Close milestone
+关闭里程碑
 -----
 milestone_reopen
-Reopen milestone
+重新打开里程碑
 -----
 milestone_delete
-Delete milestone
+删除里程碑
 -----
 milestone_progress
-Progress
+进度
 -----
 milestone_issues
-Linked issues
+关联的 issue
 -----
 milestone_no_issues
-No issues linked yet.
+尚未关联任何 issue。
 -----
 twofa_title
-Two-factor authentication
+双因素认证
 -----
 twofa_status_enabled
-Two-factor authentication is enabled.
+双因素认证已启用。
 -----
 twofa_status_disabled
-Two-factor authentication is disabled.
+双因素认证已禁用。
 -----
 twofa_enable
-Enable two-factor authentication
+启用双因素认证
 -----
 twofa_disable
-Disable two-factor authentication
+禁用双因素认证
 -----
 twofa_setup_intro
-Scan the QR code with an authenticator app (Aegis, Google Authenticator, 1Password, ...), or enter the secret manually. Then enter the 6-digit code below to confirm.
+使用身份验证应用（Aegis、Google Authenticator、1Password 等）扫描二维码，或手动输入密钥。然后输入下方的 6 位数代码进行确认。
 -----
 twofa_secret
-Secret
+密钥
 -----
 twofa_code
-6-digit code
+6 位数代码
 -----
 twofa_verify
-Verify and enable
+验证并启用
 -----
 twofa_login_prompt
-Enter the 6-digit code from your authenticator app to continue.
+请输入身份验证应用中的 6 位数代码以继续。
 -----
 twofa_login_button
-Verify
+验证
 -----
 twofa_invalid
-Invalid code, try again.
+代码无效，请重试。
 -----
 api_tokens
-API tokens
+API 令牌
 -----
 api_token_new
-New API token
+新建 API 令牌
 -----
 api_token_none
-No API tokens yet.
+暂无 API 令牌。
 -----
 api_token_name
-Token name
+令牌名称
 -----
 api_token_create
-Create token
+创建令牌
 -----
 api_token_revoke
-Revoke
+撤销
 -----
 api_token_show_once
-This token is shown only once. Copy it now:
+此令牌仅显示一次。请立即复制：
 -----
 api_docs
-API documentation
+API 文档
 -----
 repo_delete_warning
-This repo will be permanently removed with no way to revert this action.
+此仓库将被永久删除，无法撤销此操作。
 -----
 repo_delete_public_intro
-It's a public repository with:
+这是一个公开仓库，包含以下统计信息：
 -----
 repo_delete_public_outro
-All of them will be lost.
+所有这些都将丢失。
 -----
 repo_delete_confirm_question
-Are you sure you want to continue?
+您确定要继续吗？
 -----
 repo_delete_confirm_yes
-Yes, delete repository
+是的，删除仓库
 -----
 repo_delete_cancel
-Cancel
+取消
 -----
 settings_title
-Settings
+设置
 -----
 danger_zone
-Danger zone
+危险区域
 -----
 transfer_ownership
-Transfer ownership
+转移所有权
 -----
 transfer_ownership_desc
-Move this repository to another user. Type the full path to confirm.
+将此仓库转移给另一个用户。输入完整路径以确认。
 -----
 new_owner_username
-New owner username
+新所有者用户名
 -----
 move_repo
-Move repo
+转移仓库
 -----
 delete_repo_title
-Delete this repository
+删除此仓库
 -----
 delete_repo_desc
-Once deleted, the repository is gone. Type the full path to confirm.
+删除后，仓库将不可恢复。输入完整路径以确认。
 -----
 delete_repo
-Delete repo
+删除仓库
 -----
 header_search_placeholder
-Search...
+搜索...
 -----
 header_login
-Log in
+登录
 -----
 header_register
-Register
+注册
 -----
 header_profile
-Profile
+个人资料
 -----
 header_repositories
-Repositories
+仓库
 -----
 header_issues
 Issues
 -----
 header_stars
-Stars
+星标
 -----
 header_feed
-Feed
+动态
 -----
 header_settings
-Settings
+设置
 -----
 header_admin_panel
-Admin Panel
+管理面板
 -----
 header_signed_in_as
-Signed in as
+已登录为
 -----
 header_sign_out
-Sign out
+退出登录
 -----
