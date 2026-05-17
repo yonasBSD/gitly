@@ -7,6 +7,7 @@ import time
 import git
 import highlight
 import validation
+import config
 
 struct Repo {
 	id                 int @[primary; sql: serial]
@@ -26,22 +27,43 @@ struct Repo {
 	latest_update_hash string    @[skip]
 	latest_activity    time.Time @[skip]
 mut:
-	webhook_secret   string
-	tags_count       int
-	nr_open_issues   int @[orm: 'open_issues_count']
-	nr_open_prs      int @[orm: 'open_prs_count']
-	nr_releases      int @[orm: 'releases_count']
-	nr_branches      int @[orm: 'branches_count']
-	nr_tags          int
-	nr_stars         int        @[orm: 'stars_count']
-	lang_stats       []LangStat @[skip]
-	created_at       int
-	nr_contributors  int
-	labels           []Label @[skip]
-	status           RepoStatus
-	msg_cache        map[string]string @[skip]
-	latest_commit_at int               @[skip]
-	activity_buckets []int             @[skip]
+	webhook_secret      string
+	tags_count          int
+	nr_open_issues      int @[orm: 'open_issues_count']
+	nr_open_prs         int @[orm: 'open_prs_count']
+	nr_releases         int @[orm: 'releases_count']
+	nr_branches         int @[orm: 'branches_count']
+	nr_tags             int
+	nr_stars            int        @[orm: 'stars_count']
+	lang_stats          []LangStat @[skip]
+	created_at          int
+	nr_contributors     int
+	labels              []Label @[skip]
+	status              RepoStatus
+	msg_cache           map[string]string @[skip]
+	latest_commit_at    int               @[skip]
+	activity_buckets    []int             @[skip]
+	disable_discussions bool
+	disable_projects    bool
+	disable_milestones  bool
+	disable_wiki        bool
+	is_pinned           bool
+}
+
+fn (r &Repo) discussions_enabled() bool {
+	return !r.disable_discussions
+}
+
+fn (r &Repo) projects_enabled() bool {
+	return !r.disable_projects
+}
+
+fn (r &Repo) milestones_enabled() bool {
+	return !r.disable_milestones
+}
+
+fn (r &Repo) wiki_enabled() bool {
+	return !r.disable_wiki
 }
 
 // log_field_separator is declared as constant in case we need to change it later
@@ -133,6 +155,40 @@ fn (mut app App) find_user_public_repos(user_id int) []Repo {
 	} or { []Repo{} }
 }
 
+const profile_repos_limit = 6
+
+fn (mut app App) find_user_pinned_repos(user_id int, include_private bool) []Repo {
+	limit := profile_repos_limit
+	if include_private {
+		return sql app.db {
+			select from Repo where user_id == user_id && is_pinned == true && is_deleted == false limit limit
+		} or { []Repo{} }
+	}
+	return sql app.db {
+		select from Repo where user_id == user_id && is_pinned == true && is_public == true
+		&& is_deleted == false limit limit
+	} or { []Repo{} }
+}
+
+fn (mut app App) find_user_top_repos_by_stars(user_id int, include_private bool, l int) []Repo {
+	if include_private {
+		return sql app.db {
+			select from Repo where user_id == user_id && is_deleted == false order by nr_stars desc limit l
+		} or { []Repo{} }
+	}
+	return sql app.db {
+		select from Repo where user_id == user_id && is_public == true && is_deleted == false order by nr_stars desc limit l
+	} or { []Repo{} }
+}
+
+fn (mut app App) find_user_profile_repos(user_id int, include_private bool) []Repo {
+	pinned := app.find_user_pinned_repos(user_id, include_private)
+	if pinned.len > 0 {
+		return pinned
+	}
+	return app.find_user_top_repos_by_stars(user_id, include_private, profile_repos_limit)
+}
+
 fn (app &App) search_public_repos(query string) []Repo {
 	repo_rows := db_exec_values(app.db,
 		'select id, name, user_id, description, stars_count from ${sql_table('Repo')} where is_public is true and is_deleted is false and name like ${sql_like_pattern(query)}') or {
@@ -202,9 +258,29 @@ fn (mut app App) set_repo_webhook_secret(repo_id int, secret string) ! {
 	}!
 }
 
+fn (mut app App) update_repo_features(repo_id int, disable_discussions bool, disable_projects bool, disable_milestones bool, disable_wiki bool) ! {
+	sql app.db {
+		update Repo set disable_discussions = disable_discussions, disable_projects = disable_projects,
+		disable_milestones = disable_milestones, disable_wiki = disable_wiki where id == repo_id
+	}!
+}
+
 fn (mut app App) set_repo_status(repo_id int, status RepoStatus) ! {
 	sql app.db {
 		update Repo set status = status where id == repo_id
+	}!
+}
+
+fn (mut app App) set_repo_description(repo_id int, description string) ! {
+	sql app.db {
+		update Repo set description = description where id == repo_id
+	}!
+}
+
+fn (mut app App) update_repo_contributor_count(repo_id int) ! {
+	count := app.get_count_repo_contributors(repo_id)!
+	sql app.db {
+		update Repo set nr_contributors = count where id == repo_id
 	}!
 }
 
@@ -218,6 +294,16 @@ fn (mut app App) get_count_repo() int {
 	return sql app.db {
 		select count from Repo where is_deleted == false
 	} or { 0 }
+}
+
+fn (mut app App) get_max_repo_id() int {
+	rows := sql app.db {
+		select from Repo order by id desc limit 1
+	} or { return 0 }
+	if rows.len == 0 {
+		return 0
+	}
+	return rows[0].id
 }
 
 fn (mut app App) add_repo(repo Repo) ! {
@@ -282,13 +368,18 @@ fn (mut app App) user_has_repo(user_id int, repo_name string) bool {
 	return count >= 0
 }
 
-fn (mut app App) update_repo_from_fs(mut repo Repo) ! {
+fn (mut app App) update_repo_from_fs(mut repo Repo, recompute_lang_stats bool) ! {
 	println('UPDATE REPO FROM FS')
 	repo_id := repo.id
 
 	app.db.exec('BEGIN TRANSACTION')!
 
-	repo.analyze_lang(app)!
+	// Language analysis reads every file in the repo and is slow on large
+	// repos; callers on the git push hot path pass `false` and run it in a
+	// background thread instead, so the git client is not blocked.
+	if recompute_lang_stats {
+		repo.analyze_lang(app)!
+	}
 
 	app.info(repo.nr_contributors.str())
 	app.fetch_branches(repo)!
@@ -444,11 +535,40 @@ fn (mut app App) update_repo_branch_data(mut repo Repo, branch_name string) ! {
 }
 
 // TODO: tags and other stuff
+// update_repo_after_push runs on the request thread after a git push so that
+// new commits appear in the UI immediately. It skips language analysis,
+// which is slow and runs in bg_recompute_lang_stats instead.
 fn (mut app App) update_repo_after_push(repo_id int, branch_name string) ! {
 	mut repo := app.find_repo_by_id(repo_id) or { return }
 
-	app.update_repo_from_fs(mut repo)!
+	app.update_repo_from_fs(mut repo, false)!
 	app.delete_repository_files_in_branch(repo_id, branch_name)!
+}
+
+// bg_recompute_lang_stats recomputes language statistics for a repo in a
+// background thread. It opens its own sqlite connection (matching the
+// clone_repo / bg_fetch_files_info pattern) because the shared App.db
+// handle is not safe for concurrent use across threads.
+fn bg_recompute_lang_stats(repo_id int, conf config.Config) {
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('bg_recompute_lang_stats: cannot open ${db_backend_name()} db: ${err}')
+			return
+		}
+		config: conf
+	}
+	app.load_settings()
+	defer {
+		app.db.close() or {}
+	}
+
+	repo := app.find_repo_by_id(repo_id) or {
+		eprintln('bg_recompute_lang_stats: repo ${repo_id} not found')
+		return
+	}
+	repo.analyze_lang(app) or {
+		eprintln('bg_recompute_lang_stats: analyze_lang failed for repo ${repo_id}: ${err}')
+	}
 }
 
 fn (r &Repo) analyze_lang(app &App) ! {
@@ -642,6 +762,21 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 		return none
 	}
 
+	lower_path := item_path.to_lower()
+	for segment in lower_path.split('/') {
+		if segment == 'thirdparty' || segment == '3rdparty' || segment == 'third_party'
+			|| segment == 'third-party' {
+			return none
+		}
+	}
+
+	excluded_extensions := ['.png', '.jpg', '.jpeg', '.obj', '.json', '.pdf']
+	for ext in excluded_extensions {
+		if lower_path.ends_with(ext) {
+			return none
+		}
+	}
+
 	item_name := item_path.after('/')
 	if item_name == '' {
 		return none
@@ -659,6 +794,39 @@ fn (r &Repo) parse_top_file_line(line string, branch string) ?File {
 		size:               meta_parts[3].int()
 		is_size_calculated: true
 	}
+}
+
+fn (r &Repo) lookup_file_via_git(branch string, path string) ?File {
+	git_result := git.Git.exec_in_dir(r.git_dir, ['ls-tree', '--full-name', '--long', branch, '--',
+		path])
+	if git_result.exit_code != 0 {
+		return none
+	}
+	for line in git_result.output.split_into_lines() {
+		tab_pos := line.index('\t') or { continue }
+		meta := line[..tab_pos]
+		item_path := line[tab_pos + 1..]
+		meta_parts := meta.fields()
+		if meta_parts.len < 4 || meta_parts[1] != 'blob' {
+			continue
+		}
+		item_name := item_path.after('/')
+		if item_name == '' {
+			continue
+		}
+		parent_path_raw := os.dir(item_path)
+		parent_path := if parent_path_raw == '.' { '' } else { parent_path_raw }
+		return File{
+			name:               item_name
+			parent_path:        parent_path
+			repo_id:            r.id
+			branch:             branch
+			is_dir:             false
+			size:               meta_parts[3].int()
+			is_size_calculated: true
+		}
+	}
+	return none
 }
 
 fn (r &Repo) top_files(branch string, limit int) []File {
@@ -936,9 +1104,14 @@ fn (mut app App) update_repo_primary_branch(repo_id int, branch string) ! {
 	}!
 }
 
+fn (r &Repo) clone_progress_path() string {
+	return r.git_dir + '.progress'
+}
+
 fn (mut r Repo) clone() {
 	eprintln('R CLONE')
-	clone_result := git.Git.clone(r.clone_url, r.git_dir)
+	progress_path := r.clone_progress_path()
+	clone_result := git.Git.clone_with_progress(r.clone_url, r.git_dir, progress_path)
 	clone_exit_code := clone_result.exit_code
 
 	if clone_exit_code != 0 {
@@ -948,6 +1121,8 @@ fn (mut r Repo) clone() {
 	}
 
 	r.status = .done
+	// progress file is no longer needed after a successful clone
+	os.rm(progress_path) or {}
 	eprintln('clone done')
 }
 

@@ -194,4 +194,798 @@ Insights, дашборды value stream и метрики DORA
 open_source_outro
 В Gitly другой подход: каждая функция — часть общей кодовой базы с открытым исходным кодом. Нет Enterprise Edition, нет платных модулей и нет отдельного «premium»-репозитория.
 -----
-
+new_repo_title
+Создать новый репозиторий KEKW
+-----
+new_repo_name
+Название
+-----
+new_repo_description
+Описание
+-----
+new_repo_optional
+(необязательно)
+-----
+new_repo_clone_url
+URL для клонирования
+-----
+new_repo_clone_hint
+(только если вы хотите клонировать существующий репозиторий)
+-----
+new_repo_import_issues
+Импортировать issues с GitHub
+-----
+new_repo_visibility
+Видимость репозитория
+-----
+new_repo_public
+Публичный
+-----
+new_repo_public_desc
+Любой пользователь в интернете может видеть этот репозиторий.
+-----
+new_repo_private
+Приватный
+-----
+new_repo_private_desc
+Вы выбираете, кто может видеть этот репозиторий и коммитить в него.
+-----
+new_repo_create
+Создать репозиторий
+-----
+commits_count
+коммит|коммита|коммитов
+-----
+issues_count
+задача|задачи|задач
+-----
+prs_count
+пулреквест|пулреквеста|пулреквестов
+-----
+contributors_count
+участник|участника|участников
+-----
+branches_count
+ветка|ветки|веток
+-----
+releases_count
+релиз|релиза|релизов
+-----
+tags_count
+тег|тега|тегов
+-----
+topics_count
+обсуждение|обсуждения|обсуждений
+-----
+stars_count
+звезда|звезды|звёзд
+-----
+watchers_count
+наблюдатель|наблюдателя|наблюдателей
+-----
+ci_label
+CI
+-----
+pr_pull_requests
+Пулреквесты
+-----
+pr_new
+Новый пулреквест
+-----
+pr_tab_open
+Открытые
+-----
+pr_tab_merged
+Слитые
+-----
+pr_tab_closed
+Закрытые
+-----
+pr_none
+Нет пулреквестов.
+-----
+pr_status_open
+Открыт
+-----
+pr_status_merged
+Слит
+-----
+pr_status_closed
+Закрыт
+-----
+pr_wants_to_merge
+хочет слить
+-----
+pr_into
+в
+-----
+pr_conversation
+Обсуждение
+-----
+pr_files_changed
+Изменённые файлы
+-----
+pr_files_changed_label
+файлов изменено
+-----
+pr_commits_label
+коммитов
+-----
+pr_review_approved
+одобрил
+-----
+pr_review_changes_requested
+запросил изменения
+-----
+pr_review_commented
+прокомментировал
+-----
+pr_commented
+прокомментировал
+-----
+pr_leave_comment
+Оставьте комментарий
+-----
+pr_comment_button
+Комментировать
+-----
+pr_merge
+Слить пулреквест
+-----
+pr_close
+Закрыть пулреквест
+-----
+pr_reopen
+Снова открыть пулреквест
+-----
+pr_open_title
+Открыть пулреквест
+-----
+pr_compare_desc
+Сравните две ветки в этом репозитории и предложите слияние. Форк не требуется.
+-----
+pr_base
+база
+-----
+pr_compare
+сравнить
+-----
+pr_choose_branch
+(выберите ветку)
+-----
+pr_compare_button
+Сравнить
+-----
+pr_no_commits_between
+Между этими ветками нет коммитов.
+-----
+pr_title_placeholder
+Заголовок
+-----
+pr_description_placeholder
+Описание изменений (необязательно)
+-----
+pr_create
+Создать пулреквест
+-----
+pr_commits_heading
+Коммиты
+-----
+pr_by
+от
+-----
+pr_no_file_changes
+Изменения файлов не обнаружены.
+-----
+pr_binary_file
+Бинарный файл не отображается.
+-----
+pr_line_comment_placeholder
+Добавить комментарий к строке (необязательно)
+-----
+pr_overall_review_placeholder
+Общий комментарий к ревью (необязательно)
+-----
+pr_review_action_comment
+Комментарий
+-----
+pr_review_action_approve
+Одобрить
+-----
+pr_review_action_request_changes
+Запросить изменения
+-----
+pr_submit_review
+Отправить ревью
+-----
+pr_your_pulls
+Ваши пулреквесты
+-----
+pr_none_user
+Вы пока не создавали пулреквестов.
+-----
+pr_opened
+открыт
+-----
+pr_comments_title
+Комментарии
+-----
+webhooks
+Веб-хуки
+-----
+webhook_new
+Новый веб-хук
+-----
+webhook_none
+Веб-хуки не настроены.
+-----
+webhook_url
+URL для доставки
+-----
+webhook_secret
+Секрет
+-----
+webhook_secret_hint
+Используется для вычисления заголовка X-Gitly-Signature (HMAC-SHA256). Необязательно, но рекомендуется.
+-----
+webhook_events
+События для доставки
+-----
+webhook_event_push
+Push
+-----
+webhook_event_issue
+Задачи
+-----
+webhook_event_pr
+Пулреквесты
+-----
+webhook_event_comment
+Комментарии
+-----
+webhook_event_release
+Релизы
+-----
+webhook_create
+Создать веб-хук
+-----
+webhook_delete
+Удалить
+-----
+webhook_active
+Активен
+-----
+webhook_inactive
+Отключён
+-----
+webhook_last_status
+Последний ответ
+-----
+webhook_never_delivered
+Доставок ещё не было
+-----
+webhook_deliveries
+Последние доставки
+-----
+webhook_back
+К веб-хукам
+-----
+manage_webhooks
+Управление веб-хуками
+-----
+discussions
+Обсуждения
+-----
+discussion_new
+Новое обсуждение
+-----
+discussion_none
+Обсуждений пока нет.
+-----
+discussion_create
+Создать обсуждение
+-----
+discussion_title_placeholder
+Заголовок обсуждения
+-----
+discussion_body_placeholder
+Начните обсуждение...
+-----
+discussion_category
+Категория
+-----
+discussion_category_general
+Общее
+-----
+discussion_category_qa
+Q&A
+-----
+discussion_category_announcement
+Объявление
+-----
+discussion_category_idea
+Идеи
+-----
+discussion_locked
+Закрыто
+-----
+discussion_reply_placeholder
+Ответить
+-----
+discussion_reply_button
+Отправить ответ
+-----
+discussion_lock
+Закрыть обсуждение
+-----
+discussion_unlock
+Открыть обсуждение
+-----
+discussion_delete
+Удалить обсуждение
+-----
+discussion_answer
+Отметить как ответ
+-----
+discussion_answered
+Есть ответ
+-----
+discussion_opened
+открыто
+-----
+projects
+Проекты
+-----
+project_new
+Новый проект
+-----
+project_none
+Проектов пока нет.
+-----
+project_create
+Создать проект
+-----
+project_name_placeholder
+Название проекта
+-----
+project_description_placeholder
+Описание (необязательно)
+-----
+project_delete
+Удалить проект
+-----
+project_add_column
+Добавить колонку
+-----
+project_column_name_placeholder
+Название колонки (например, Todo, В работе, Готово)
+-----
+project_add_card
+Добавить карточку
+-----
+project_card_title_placeholder
+Заголовок карточки
+-----
+project_card_note_placeholder
+Заметки (необязательно)
+-----
+project_card_save
+Сохранить карточку
+-----
+project_card_delete
+Удалить
+-----
+project_column_delete
+Удалить колонку
+-----
+project_column_empty
+Нет карточек.
+-----
+milestones
+Этапы
+-----
+milestone_new
+Новый этап
+-----
+milestone_none
+Этапов пока нет.
+-----
+milestone_create
+Создать этап
+-----
+milestone_title_placeholder
+Название этапа
+-----
+milestone_description_placeholder
+Описание (необязательно)
+-----
+milestone_due_date
+Срок
+-----
+milestone_status_open
+Открыт
+-----
+milestone_status_closed
+Закрыт
+-----
+milestone_close
+Закрыть этап
+-----
+milestone_reopen
+Снова открыть этап
+-----
+milestone_delete
+Удалить этап
+-----
+milestone_progress
+Прогресс
+-----
+milestone_issues
+Связанные задачи
+-----
+milestone_no_issues
+Связанных задач пока нет.
+-----
+twofa_title
+Двухфакторная аутентификация
+-----
+twofa_status_enabled
+Двухфакторная аутентификация включена.
+-----
+twofa_status_disabled
+Двухфакторная аутентификация отключена.
+-----
+twofa_enable
+Включить двухфакторную аутентификацию
+-----
+twofa_disable
+Отключить двухфакторную аутентификацию
+-----
+twofa_setup_intro
+Отсканируйте QR-код приложением-аутентификатором (Aegis, Google Authenticator, 1Password, ...) или введите секрет вручную. Затем введите 6-значный код ниже для подтверждения.
+-----
+twofa_secret
+Секрет
+-----
+twofa_code
+6-значный код
+-----
+twofa_verify
+Подтвердить и включить
+-----
+twofa_login_prompt
+Введите 6-значный код из приложения-аутентификатора, чтобы продолжить.
+-----
+twofa_login_button
+Подтвердить
+-----
+twofa_invalid
+Неверный код, попробуйте ещё раз.
+-----
+api_tokens
+API-токены
+-----
+api_token_new
+Новый API-токен
+-----
+api_token_none
+API-токенов пока нет.
+-----
+api_token_name
+Имя токена
+-----
+api_token_create
+Создать токен
+-----
+api_token_revoke
+Отозвать
+-----
+api_token_show_once
+Этот токен показывается только один раз. Скопируйте его сейчас:
+-----
+api_docs
+Документация API
+-----
+repo_delete_warning
+Этот репозиторий будет удалён навсегда без возможности восстановления.
+-----
+repo_delete_public_intro
+Это публичный репозиторий со следующей статистикой:
+-----
+repo_delete_public_outro
+Всё это будет потеряно.
+-----
+repo_delete_confirm_question
+Вы уверены, что хотите продолжить?
+-----
+repo_delete_confirm_yes
+Да, удалить репозиторий
+-----
+repo_delete_cancel
+Отмена
+-----
+settings_title
+Настройки
+-----
+danger_zone
+Опасная зона
+-----
+transfer_ownership
+Передать владение
+-----
+transfer_ownership_desc
+Перенести этот репозиторий другому пользователю. Введите полный путь для подтверждения.
+-----
+new_owner_username
+Имя нового владельца
+-----
+move_repo
+Передать репозиторий
+-----
+delete_repo_title
+Удалить этот репозиторий
+-----
+delete_repo_desc
+После удаления репозиторий пропадёт. Введите полный путь для подтверждения.
+-----
+delete_repo
+Удалить репозиторий
+-----
+features_section_title
+Возможности
+-----
+features_section_desc
+Включите или отключите возможности этого репозитория.
+-----
+save_features
+Сохранить настройки
+-----
+wiki
+Вики
+-----
+header_search_placeholder
+Поиск...
+-----
+header_login
+Войти
+-----
+header_register
+Регистрация
+-----
+header_profile
+Профиль
+-----
+header_repositories
+Репозитории
+-----
+header_issues
+Задачи
+-----
+header_stars
+Звёзды
+-----
+header_feed
+Лента
+-----
+header_settings
+Настройки
+-----
+header_admin_panel
+Панель администратора
+-----
+header_signed_in_as
+Вы вошли как
+-----
+header_sign_out
+Выйти
+-----
+issue_issues
+Задачи
+-----
+issue_new
+Новая задача
+-----
+issue_none
+Задач пока нет.
+-----
+issue_your_issues
+Задачи
+-----
+issue_assigned_to_me
+Назначены мне
+-----
+issue_created_by_me
+Созданы мной
+-----
+issue_mentioned
+Упоминания
+-----
+issue_recent_activity
+Последняя активность
+-----
+issue_none_assigned
+Вам не назначено ни одной задачи.
+-----
+issue_none_created
+Вы ещё не открыли ни одной задачи.
+-----
+issue_none_mentioned
+Вас ещё не упоминали в задачах.
+-----
+issue_none_activity
+Нет недавней активности по задачам.
+-----
+issue_opened
+открыта
+-----
+issue_by
+автор
+-----
+issue_comments_title
+Комментарии
+-----
+admin_stats_running_since
+Gitly работает с
+-----
+admin_stats_total_users
+Зарегистрированные пользователи
+-----
+admin_stats_total_repos
+Репозитории
+-----
+admin_stats_total_commits
+Коммиты
+-----
+admin_stats_total_issues
+Задачи
+-----
+admin_stats_new_users
+Новые пользователи
+-----
+admin_stats_new_repos
+Новые репозитории
+-----
+admin_stats_commits
+Коммиты
+-----
+admin_stats_new_issues
+Новые задачи
+-----
+admin_stats_last_n_days
+За 30 дней
+-----
+commit_committed
+закоммитил
+-----
+commit_view_patch
+Посмотреть патч
+-----
+commit_files_changed
+файлов изменено
+-----
+commit_additions
+добавлений
+-----
+commit_deletions
+удалений
+-----
+commit_no_changes
+В этом коммите нет изменений файлов.
+-----
+commit_binary_file
+Бинарный файл не отображается.
+-----
+commit_file_new
+новый файл
+-----
+commit_file_deleted
+удалён
+-----
+commit_file_renamed
+переименован
+-----
+commits_on
+Коммиты от
+-----
+browse_repo_at_point
+Посмотреть репозиторий на этот момент
+-----
+about_section
+О проекте
+-----
+no_description
+Описание не предоставлено.
+-----
+readme_link
+Readme
+-----
+license_link
+Лицензия
+-----
+stars_label
+звёзд
+-----
+watching_label
+наблюдают
+-----
+sponsor_section
+Поддержать проект
+-----
+sponsor_action
+Поддержать
+-----
+releases_section
+Релизы
+-----
+contributors_section
+Контрибьюторы
+-----
+latest_label
+Последний
+-----
+releases_more
+других релизов
+-----
+no_releases
+Релизов пока нет
+-----
+no_contributors
+Контрибьюторов пока нет
+-----
+star_action
+В избранное
+-----
+starred
+В избранном
+-----
+watch_action
+Наблюдать
+-----
+unwatch_action
+Не наблюдать
+-----
+user_edit_profile
+Изменить профиль
+-----
+user_pinned_repos
+Закреплённые репозитории
+-----
+user_view_all_repos
+Все
+-----
+user_no_repos
+Репозиториев пока нет.
+-----
+user_repo_public
+Публичный
+-----
+user_repo_private
+Приватный
+-----
+user_contributions_in_year
+коммитов за последний год
+-----
+user_commits_label
+коммитов
+-----
+user_heatmap_less
+Меньше
+-----
+user_heatmap_more
+Больше
+-----
+user_contribution_activity
+Активность
+-----
+user_activity_joined
+Регистрация в Gitly
+-----
+user_activity_first_repo
+Первый репозиторий
+-----
+user_activity_first_issue
+Первый ишью
+-----
+user_activity_on
+от
+-----

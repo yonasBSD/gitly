@@ -20,68 +20,108 @@
 
 					@if is_page_owner
 						<a href="/@user.username/settings">
-							<button class="edit-profile-button">Edit profile</button>
+							<button class="edit-profile-button">%user_edit_profile</button>
 						</a>
 					@end
 				</div>
 
 				<div class="profile-block__right">
-					<h1>Repositories</h1>
+					<div class="profile-repos-header">
+						<h2>%user_pinned_repos</h2>
+						<a class="profile-repos-all" href="/@user.username/repos">%user_view_all_repos</a>
+					</div>
 
 					@if repos.len > 0
-						@for repo in repos
-							<div class="list-item">
-								<a href="/@user.username/@repo.name">
-									<h3>@repo.name</h3>
-								</a>
-								@if repo.description.len > 0
-									<p><i>@repo.description</i></p>
-								@end
-								@if is_page_owner
-									@if repo.is_public
-										<p><b>Public</b></p>
-									@else
-										<p><b>Private</b></p>
+						<div class="profile-repo-grid">
+							@for repo in repos
+								<div class="profile-repo-card">
+									<div class="profile-repo-card__header">
+										<a class="profile-repo-card__title" href="/@user.username/@repo.name">@repo.name</a>
+										@if is_page_owner
+											@if repo.is_public
+												<span class="profile-repo-card__badge">%user_repo_public</span>
+											@else
+												<span class="profile-repo-card__badge profile-repo-card__badge--private">%user_repo_private</span>
+											@end
+										@end
+									</div>
+									@if repo.description.len > 0
+										<p class="profile-repo-card__desc">@repo.description</p>
 									@end
-								@end
-							</div>
-						@end
-						@else
-							<h2>No repositories</h2>
-						@end
+									<div class="profile-repo-card__footer">
+										@if repo.lang_stats.len > 0
+											<span class="profile-repo-card__lang">
+												<span class="profile-repo-card__lang-dot" style="background-color:@{repo.lang_stats[0].color}"></span>
+												@repo.lang_stats[0].name
+											</span>
+										@end
+										@if repo.nr_stars > 0
+											<span class="profile-repo-card__meta">★ @repo.nr_stars</span>
+										@end
+									</div>
+								</div>
+							@end
+						</div>
+					@else
+						<p class="profile-repos-empty">%user_no_repos</p>
+					@end
+				</div>
+			</div>
+
+			<div class="profile-activity-heatmap">
+				<div class="profile-activity-heatmap__header">
+					<h2>@activity_total %user_contributions_in_year</h2>
+					<span class="profile-activity-heatmap__range">@activity_start_label — @activity_end_label</span>
+				</div>
+				<div class="profile-activity-heatmap__grid" role="img" aria-label="Contribution activity">
+					@for _ in 0 .. activity_leading
+						<div class="profile-activity-heatmap__cell profile-activity-heatmap__cell--empty"></div>
+					@end
+					@for count in activity_buckets
+						<div class="profile-activity-heatmap__cell" data-level="@{activity_level(count, activity_max)}" title="@count %user_commits_label"></div>
+					@end
+				</div>
+				<div class="profile-activity-heatmap__legend">
+					<span>%user_heatmap_less</span>
+					<div class="profile-activity-heatmap__cell" data-level="0"></div>
+					<div class="profile-activity-heatmap__cell" data-level="1"></div>
+					<div class="profile-activity-heatmap__cell" data-level="2"></div>
+					<div class="profile-activity-heatmap__cell" data-level="3"></div>
+					<div class="profile-activity-heatmap__cell" data-level="4"></div>
+					<span>%user_heatmap_more</span>
 				</div>
 			</div>
 
 			<div class="profile-activities">
-				<h2>Contribution activity</h2>
+				<h2>%user_contribution_activity</h2>
 
 				@for activity in activities
 					@if activity.name == 'joined'
 						<div class="activity">
-							<h4>Joined Gitly</h4>
+							<h4>%user_activity_joined</h4>
 							<div class="activity-joined">
-								<p>Joined Gitly</p>
-								<p>on @user.created_at.ddmmy()</p>
+								<p>%user_activity_joined</p>
+								<p>%user_activity_on @user.created_at.ddmmy()</p>
 							</div>
 						</div>
 					@end
 
 					@if activity.name == 'first_repo'
 						<div class="activity">
-							<h4>First repository</h4>
+							<h4>%user_activity_first_repo</h4>
 							<div class="activity-first_repo">
-								<p>First repository</p>
-								<p>on @activity.created_at.ddmmy()</p>
+								<p>%user_activity_first_repo</p>
+								<p>%user_activity_on @activity.created_at.ddmmy()</p>
 							</div>
 						</div>
 					@end
 
 					@if activity.name == 'first_issue'
 						<div class="activity">
-							<h4>First issue</h4>
+							<h4>%user_activity_first_issue</h4>
 							<div class="activity-first_issue">
-								<p>First issue</p>
-								<p>on @activity.created_at.ddmmy()</p>
+								<p>%user_activity_first_issue</p>
+								<p>%user_activity_on @activity.created_at.ddmmy()</p>
 							</div>
 						</div>
 					@end

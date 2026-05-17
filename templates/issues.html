@@ -9,56 +9,34 @@
 		<div class="content">
 			@include 'layout/repo_menu.html'
 
-			<h1>Issues</h1>
-
-			<div>
-				@if ctx.logged_in
-					<a href='/@repo.user_name/@repo.name/issues/new'>New issue</a>
-				@end
+			<div class="issues-header">
+				<h1 class="issues-header__title">%issue_issues</h1>
+				<div class="issues-header__actions">
+					@if repo.milestones_enabled()
+						<a class="issues-header__milestones" href="/@repo.user_name/@repo.name/milestones">%milestones</a>
+					@end
+					@if ctx.logged_in
+						<a class="issues-header__new" href='/@repo.user_name/@repo.name/issues/new'>%issue_new</a>
+					@end
+				</div>
 			</div>
 
-			</br>
+			@if issues_with_users.len == 0
+				<div class="issues-empty">%issue_none</div>
+			@else
+				@include '_issue_list.html'
 
-			.commit-day {
-			}
-
-			.clog-block {
-				@for issue_with_user in issues_with_users
-					.clog {
-						.clog-msg {
-							<a href="/@repo.user_name/@repo.name/issue/@issue_with_user.item.id">@issue_with_user.item.title</a>
-						}
-
-						<b>#@issue_with_user.item.id</b> opened @issue_with_user.item.relative_time()
-						by <a href="/@issue_with_user.user.username">@issue_with_user.user.username</a>
-
-						@if issue_with_user.item.comments_count > 0
-							.comments {
-								@if issue_with_user.item.comments_count == 1
-									@issue_with_user.item.comments_count comment
-								@else
-									@issue_with_user.item.comments_count comments
-								@end
-							}
-						@end
-					}
-				@end
-			}
-
-			@if issues_with_users.len > 0
-				<div class="buttons">
+				<div class="issue-pager">
 					@if first
-						<a href="/@repo.user_name/@repo.name/issues/@prev_page" class="button disabled">Prev</a>
+						<span class="issue-pager__btn issue-pager__btn--disabled">Prev</span>
 					@else
-						<a href="/@repo.user_name/@repo.name/issues/@prev_page" class="button">Prev</a>/
+						<a class="issue-pager__btn" href="/@repo.user_name/@repo.name/issues/@prev_page">Prev</a>
 					@end
-
-					<span>@page of @page_count</span>
-
+					<span class="issue-pager__info">@page of @page_count</span>
 					@if last
-						<a href="/@repo.user_name/@repo.name/issues/@next_page" class="button disabled">Next</a>
+						<span class="issue-pager__btn issue-pager__btn--disabled">Next</span>
 					@else
-						<a href="/@repo.user_name/@repo.name/issues/@next_page" class="button">Next</a>
+						<a class="issue-pager__btn" href="/@repo.user_name/@repo.name/issues/@next_page">Next</a>
 					@end
 				</div>
 			@end

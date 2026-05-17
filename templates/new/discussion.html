@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include '../layout/head.html'
+	</head>
+	<body>
+		@include '../layout/header.html'
+
+		<div class="content">
+			@include '../layout/repo_menu.html'
+
+			<div class="new-discussion">
+				<div class="new-discussion__header">
+					<h1>%discussion_new</h1>
+				</div>
+
+				<form method="post" action="/@repo.user_name/@repo.name/discussions" class="new-discussion__form">
+					<div class="new-discussion__field">
+						<label class="new-discussion__label" for="title">%discussion_title_placeholder <span class="new-discussion__req">*</span></label>
+						<input id="title" class="new-discussion__title-input" type="text" name="title" placeholder="%discussion_title_placeholder" required autofocus>
+					</div>
+
+					<div class="new-discussion__field">
+						<p class="new-discussion__label">%discussion_category</p>
+						<label class="new-discussion__option">
+							<input type="radio" name="category" value="general" checked>
+							<span class="new-discussion__option-body">
+								<span class="new-discussion__option-title">%discussion_category_general</span>
+							</span>
+						</label>
+						<label class="new-discussion__option">
+							<input type="radio" name="category" value="qa">
+							<span class="new-discussion__option-body">
+								<span class="new-discussion__option-title">%discussion_category_qa</span>
+							</span>
+						</label>
+						<label class="new-discussion__option">
+							<input type="radio" name="category" value="announcement">
+							<span class="new-discussion__option-body">
+								<span class="new-discussion__option-title">%discussion_category_announcement</span>
+							</span>
+						</label>
+						<label class="new-discussion__option">
+							<input type="radio" name="category" value="idea">
+							<span class="new-discussion__option-body">
+								<span class="new-discussion__option-title">%discussion_category_idea</span>
+							</span>
+						</label>
+					</div>
+
+					<div class="new-discussion__field">
+						<label class="new-discussion__label" for="body">%discussion_body_placeholder</label>
+						<textarea id="body" class="new-discussion__textarea" name="body" placeholder="%discussion_body_placeholder" rows="10"></textarea>
+					</div>
+
+					<div class="new-discussion__actions">
+						<button type="submit" class="new-discussion__submit">%discussion_create</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		@include '../layout/footer.html'
+	</body>
+</html>

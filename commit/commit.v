@@ -16,69 +16,15 @@ mut:
 	message    string
 }
 
-struct Change {
-mut:
-	file      string
-	additions int
-	deletions int
-	diff      string
-	message   string
-}
-
 fn (commit Commit) relative() string {
 	return time.unix(commit.created_at).relative()
 }
 
-fn (commit Commit) get_changes(repo Repo) []Change {
-	git_changes := repo.git('show ${commit.hash}')
-
-	mut change := Change{}
-	mut changes := []Change{}
-	mut started := false
-	for line in git_changes.split_into_lines() {
-		args := line.split(' ')
-		if args.len <= 0 {
-			continue
-		}
-
-		match args[0] {
-			'diff' {
-				started = true
-				if change.file.len > 0 {
-					changes << change
-					change = Change{}
-				}
-				change.file = args[2][2..]
-			}
-			'index' {
-				continue
-			}
-			'---' {
-				continue
-			}
-			'+++' {
-				continue
-			}
-			'@@' {
-				change.diff = line
-			}
-			else {
-				if started {
-					if line.bytes()[0] == `+` {
-						change.additions++
-					}
-					if line.bytes()[0] == `-` {
-						change.deletions++
-					}
-					change.message += '${line}\n'
-				}
-			}
-		}
+fn (commit Commit) short_hash() string {
+	if commit.hash.len <= 7 {
+		return commit.hash
 	}
-
-	changes << change
-
-	return changes
+	return commit.hash[..7]
 }
 
 fn (mut app App) commit_exists(repo_id int, branch_id int, hash string) bool {
@@ -161,6 +107,27 @@ fn (app App) get_repo_activity_buckets(repo_id int) []int {
 	for c in commits {
 		idx := (c.created_at - cutoff) / week_seconds
 		if idx >= 0 && idx < activity_weeks {
+			buckets[idx]++
+		}
+	}
+	return buckets
+}
+
+// get_user_daily_activity returns commit counts per day for the given user
+// over the past `days` days. Index 0 is the oldest day, index `days-1` is today.
+fn (app App) get_user_daily_activity(user_id int, days int) []int {
+	day_seconds := 24 * 3600
+	now := time.now()
+	// Anchor to the start of today (local), so today is always the last bucket.
+	today_start := i64(time.new(year: now.year, month: now.month, day: now.day).unix())
+	cutoff := int(today_start) - (days - 1) * day_seconds
+	commits := sql app.db {
+		select from Commit where author_id == user_id && created_at >= cutoff
+	} or { []Commit{} }
+	mut buckets := []int{len: days}
+	for c in commits {
+		idx := (c.created_at - cutoff) / day_seconds
+		if idx >= 0 && idx < days {
 			buckets[idx]++
 		}
 	}

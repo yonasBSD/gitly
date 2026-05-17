@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="issues-header">
+				<h1 class="issues-header__title">%projects</h1>
+				@if ctx.logged_in && repo.user_id == ctx.user.id
+					<a class="issues-header__new" href="/@repo.user_name/@repo.name/projects/new">%project_new</a>
+				@end
+			</div>
+
+			@if projects.len == 0
+				<div class="issues-empty">%project_none</div>
+			@else
+				<ul class="project-list">
+					@for p in projects
+						<li class="project-row">
+							<a class="project-row__title" href="/@repo.user_name/@repo.name/projects/@p.id">@{p.formatted_name()}</a>
+							<p class="project-row__desc">@p.description</p>
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

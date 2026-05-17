@@ -67,12 +67,30 @@ pub fn (mut app App) register_user(username string, password string, salt string
 
 	if user.id != 0 && user.is_registered {
 		app.info('User ${username} already exists')
-		return false
+		return error('username `${username}` is already taken')
+	}
+
+	// A non-registered row with this username exists (e.g. a GitHub shadow user).
+	// Block normal registration; the GitHub flow handles upgrading shadow users itself.
+	if user.id != 0 && !github {
+		app.info('Username ${username} is reserved by an unregistered/shadow user')
+		return error('username `${username}` is already taken')
 	}
 
 	user = app.get_user_by_email(emails[0]) or { User{} }
 
+	if user.id != 0 && user.is_registered {
+		app.info('Email ${emails[0]} is already in use')
+		return error('email `${emails[0]}` is already in use')
+	}
+
 	if user.id == 0 {
+		// Final guard: make sure no Email row points at this address even if
+		// the parent user lookup didn't surface (orphaned/duplicate rows).
+		if app.email_exists(emails[0]) {
+			return error('email `${emails[0]}` is already in use')
+		}
+
 		user = User{
 			username:        username
 			password:        password
@@ -85,22 +103,36 @@ pub fn (mut app App) register_user(username string, password string, salt string
 			is_admin:        is_admin
 		}
 
-		app.add_user(user)!
+		app.add_user(user) or {
+			if is_unique_constraint_error(err) {
+				return error('username `${username}` or email `${emails[0]}` is already in use')
+			}
+			return err
+		}
 
 		mut u := app.get_user_by_username(user.username) or {
 			app.info('User was not inserted')
-			return false
+			return error('user `${username}` was not inserted (lookup after insert failed: ${err})')
 		}
 
-		if u.password != user.password || u.username != user.username {
-			app.info('User was not inserted')
-			return false
+		if u.password != user.password {
+			app.info('User was not inserted (password mismatch after insert)')
+			return error('user `${username}` was not inserted (password mismatch after insert)')
+		}
+		if u.username != user.username {
+			app.info('User was not inserted (username mismatch after insert)')
+			return error('user `${username}` was not inserted (username mismatch after insert: got `${u.username}`)')
 		}
 
 		app.add_activity(u.id, 'joined')!
 
 		for email in emails {
-			app.add_email(u.id, email)!
+			app.add_email(u.id, email) or {
+				if is_unique_constraint_error(err) {
+					return error('email `${email}` is already in use')
+				}
+				return err
+			}
 		}
 
 		u.emails = app.find_user_emails(u.id)
@@ -122,6 +154,17 @@ pub fn (mut app App) register_user(username string, password string, salt string
 	app.create_user_dir(username)
 
 	return true
+}
+
+fn is_unique_constraint_error(err IError) bool {
+	return err.msg().to_lower().contains('unique constraint')
+}
+
+pub fn (app App) email_exists(value string) bool {
+	rows := sql app.db {
+		select from Email where email == value limit 1
+	} or { [] }
+	return rows.len > 0
 }
 
 fn (mut app App) create_user_dir(username string) {
@@ -408,4 +451,23 @@ pub fn (mut app App) get_user_from_cookies(ctx &Context) ?User {
 	token := app.get_token(token_cookie) or { return none }
 	mut user := app.get_user_by_id(token.user_id) or { return none }
 	return user
+}
+
+// activity_level maps a per-day commit count to a heatmap intensity level 0..4,
+// scaled by the user's busiest day across the window.
+fn activity_level(count int, max int) int {
+	if count <= 0 || max <= 0 {
+		return 0
+	}
+	ratio := f64(count) / f64(max)
+	if ratio > 0.75 {
+		return 4
+	}
+	if ratio > 0.5 {
+		return 3
+	}
+	if ratio > 0.25 {
+		return 2
+	}
+	return 1
 }

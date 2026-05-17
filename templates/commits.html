@@ -10,26 +10,45 @@
 			@include 'layout/repo_menu.html'
 
 			@for day, commits2 in d_commits
-				.commit-day {
-					.commit-day-title {
-						Commits @msg @day
-					}
-					.clog-block {
+				<div class="commit-day">
+					<div class="commit-day-title">
+						%commits_on @day
+					</div>
+					<div class="clog-block">
 						@for commit in commits2
-							.clog {
-								.clog-msg {
-									<a href='/@repo.user_name/@repo.name/commit/@commit.hash'>@commit.message</a>
-								}
-
-								<span>@commit.author</span>
-
-								span.clog-time {
-									commited @commit.relative()
-								}
-							}
+							<div class="clog">
+								@if commit.author_id in author_usernames
+									<a class="clog-avatar-link" href="/@author_usernames[commit.author_id]">
+										<img class="clog-avatar" src="@author_avatars[commit.author_id]" alt="@commit.author">
+									</a>
+								@else
+									<span class="clog-avatar-link">
+										<img class="clog-avatar" src="/assets/default_avatar.png" alt="@commit.author">
+									</span>
+								@end
+								<div class="clog-body">
+									<div class="clog-msg">
+										<a href="/@repo.user_name/@repo.name/commit/@commit.hash">@commit.message</a>
+									</div>
+									<div class="clog-meta">
+										@if commit.author_id in author_usernames
+											<a class="clog-author" href="/@author_usernames[commit.author_id]">@commit.author</a>
+										@else
+											<span class="clog-author">@commit.author</span>
+										@end
+										<span class="clog-time">%commit_committed @commit.relative()</span>
+									</div>
+								</div>
+								<div class="clog-actions">
+									<a class="clog-hash" href="/@repo.user_name/@repo.name/commit/@commit.hash" title="@commit.hash">@commit.short_hash()</a>
+									<a class="clog-browse" href="/@repo.user_name/@repo.name/tree/@commit.hash" title="%browse_repo_at_point" aria-label="%browse_repo_at_point">
+										<svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path fill="currentColor" d="M4.72 3.22a.75.75 0 0 1 1.06 1.06L2.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L.47 8.53a.75.75 0 0 1 0-1.06Zm6.56 0a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06L13.94 8l-3.72-3.72a.75.75 0 0 1 0-1.06Z"/></svg>
+									</a>
+								</div>
+							</div>
 						@end
-					}
-				}
+					</div>
+				</div>
 			@end
 
 			@if d_commits.len > 0

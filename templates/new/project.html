@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include '../layout/head.html'
+	</head>
+	<body>
+		@include '../layout/header.html'
+
+		<div class="content">
+			@include '../layout/repo_menu.html'
+
+			<h1>%project_new</h1>
+
+			<form method="post" action="/@repo.user_name/@repo.name/projects" class="project-form">
+				<div class="field">
+					<input type="text" name="name" placeholder="%project_name_placeholder" required>
+				</div>
+				<div class="field">
+					<textarea name="description" placeholder="%project_description_placeholder" rows="4"></textarea>
+				</div>
+				<button type="submit" class="settings-form__submit">%project_create</button>
+			</form>
+		</div>
+
+		@include '../layout/footer.html'
+	</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="issues-header">
+				<h1 class="issues-header__title">@{project.formatted_name()}</h1>
+				@if can_edit
+					<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/delete" class="inline-form">
+						<button type="submit" class="link-button link-button--danger">%project_delete</button>
+					</form>
+				@end
+			</div>
+
+			@if project.description != ''
+				<p class="project-desc">@project.description</p>
+			@end
+
+			<div class="kanban-board">
+				@for cv in views
+					<div class="kanban-column">
+						<div class="kanban-column__header">
+							<h3>@cv.column.name</h3>
+							@if can_edit
+								<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/columns/@cv.column.id/delete" class="inline-form">
+									<button type="submit" class="link-button link-button--danger" title="%project_column_delete">&times;</button>
+								</form>
+							@end
+						</div>
+						<ul class="kanban-cards">
+							@if cv.cards.len == 0
+								<li class="kanban-cards__empty">%project_column_empty</li>
+							@end
+							@for card in cv.cards
+								<li class="kanban-card">
+									<div class="kanban-card__title">@card.title</div>
+									@if card.note != ''
+										<p class="kanban-card__note">@card.note</p>
+									@end
+									@if can_edit
+										<div class="kanban-card__actions">
+											<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/cards/@card.id/move" class="inline-form">
+												<select name="column_id">
+													@for c2 in views
+														@if c2.column.id == cv.column.id
+															<option value="@c2.column.id" selected>@c2.column.name</option>
+														@else
+															<option value="@c2.column.id">@c2.column.name</option>
+														@end
+													@end
+												</select>
+												<button type="submit" class="link-button" title="Move">&rarr;</button>
+											</form>
+											<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/cards/@card.id/delete" class="inline-form">
+												<button type="submit" class="link-button link-button--danger" title="%project_card_delete">&times;</button>
+											</form>
+										</div>
+									@end
+								</li>
+							@end
+						</ul>
+						@if can_edit
+							<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/columns/@cv.column.id/cards" class="kanban-card-form">
+								<input type="text" name="title" placeholder="%project_card_title_placeholder" required>
+								<textarea name="note" placeholder="%project_card_note_placeholder" rows="2"></textarea>
+								<button type="submit" class="link-button">%project_card_save</button>
+							</form>
+						@end
+					</div>
+				@end
+
+				@if can_edit
+					<div class="kanban-column kanban-column--add">
+						<form method="post" action="/@repo.user_name/@repo.name/projects/@project.id/columns" class="kanban-card-form">
+							<input type="text" name="name" placeholder="%project_column_name_placeholder" required>
+							<button type="submit" class="link-button">%project_add_column</button>
+						</form>
+					</div>
+				@end
+			</div>
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

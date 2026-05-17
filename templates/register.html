@@ -14,9 +14,7 @@
 		@include 'layout/header.html'
 
 		<div class="content">
-			.form-error {
-				@ctx.form_error
-			}
+			<div id='register-error' class='form-error'>@ctx.form_error</div>
 
 			<h1>
 				@if no_users
@@ -33,7 +31,7 @@
 			@end
 
 			<div class="form">
-				<form method='post' action='/register'>
+				<form id='register-form' method='post' action='/register'>
 					<div class="field">
 						<input type='text' name='username' placeholder='%username' required autofocus>
 					</div>
@@ -50,7 +48,7 @@
 			</div>
 		</div>
 
-		@js '/js/block-form.js'
+		@js '/js/register.js'
 		@include 'layout/footer.html'
 	</body>
 </html>

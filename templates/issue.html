@@ -13,32 +13,45 @@
 		<div class="content">
 			@include 'layout/repo_menu.html'
 
-			<div class="issue-main-post">
-				<h1>@issue.title #@issue.id</h1>
-				<div class="avatar-with-user-info">
+			<div class="issue-header">
+				<h1 class="issue-header__title">@{issue.formatted_title()} <span class="issue-header__id">#@issue.id</span></h1>
+			</div>
+
+			<div class="issue-post">
+				<a href="/@issue_author.username" class="issue-post__avatar">
 					<img src="@{app.prepare_user_avatar_url(issue_author.avatar)}">
-					<span>
-						<i>by</i> <a href="/@issue_author.username"><i>@issue_author.username</i></a>
-						<p>@issue.text</p>
-					</span>
+				</a>
+				<div class="issue-post__body">
+					<div class="issue-post__meta">
+						<a href="/@issue_author.username" class="issue-post__author">@issue_author.username</a>
+						<span class="issue-post__time">%issue_opened @{issue.relative_time()}</span>
+					</div>
+					<div class="markdown-body issue-post__content">@{issue.formatted_body()}</div>
 				</div>
 			</div>
 
 			@for comment_with_user in comments_with_users
-				<div class="avatar-with-user-info issue-comment-post">
-					<img src="@{app.prepare_user_avatar_url(comment_with_user.user.avatar)}">
-					<span>
-						<a href="/@comment_with_user.user.username"><i>@comment_with_user.user.username</i></a> </i>commented @comment_with_user.item.relative()</i>
-						<p>@comment_with_user.item.text</p>
-					</span>
+				<div class="issue-post issue-post--comment">
+					<a href="/@comment_with_user.user.username" class="issue-post__avatar">
+						<img src="@{app.prepare_user_avatar_url(comment_with_user.user.avatar)}">
+					</a>
+					<div class="issue-post__body">
+						<div class="issue-post__meta">
+							<a href="/@comment_with_user.user.username" class="issue-post__author">@comment_with_user.user.username</a>
+							<span class="issue-post__time">%pr_commented @comment_with_user.item.relative()</span>
+						</div>
+						<div class="issue-post__content">@comment_with_user.item.text</div>
+					</div>
 				</div>
 			@end
 
 			@if ctx.logged_in
-				<form method='post' class='form vertical-form comment-post-form' action='/@repo.user_name/@repo.name/comments'>
-					<textarea type='text' class='input-comment' name='text' placeholder='Leave a comment' required></textarea>
+				<form method='post' class='comment-form' action='/@repo.user_name/@repo.name/comments'>
+					<textarea class='comment-form__input' name='text' placeholder='%pr_leave_comment' required></textarea>
 					<input type='hidden' name='issue_id' value='@issue.id'>
-					<input type='submit' class="comment-post-submit" name='submit' value='Comment'>
+					<div class="comment-form__actions">
+						<input type='submit' class="comment-form__submit" name='submit' value='%pr_comment_button'>
+					</div>
 				</form>
 			@end
 		</div>

@@ -1,0 +1,844 @@
+welcome_to_gitly
+¡Bienvenido a Gitly! Parece que acabas de configurarlo, deberás registrar
+la cuenta de administrador principal para este servidor.
+-----
+register
+Registrarse
+-----
+register_admin_account
+Registrar una cuenta de administrador
+-----
+new_repository
+Nuevo repositorio
+-----
+repo_being_cloned_plz_wait
+Tu repositorio se está clonando. Por favor, espera un momento...
+-----
+repo_being_cloned_clone_url
+URL de clonación:
+-----
+username
+Nombre de usuario
+-----
+password
+Contraseña
+-----
+email
+Correo electrónico
+-----
+index_intro
+Gitly es una plataforma de desarrollo de código abierto que cuenta con las siguientes características
+-----
+index_source_hosting
+Alojamiento de código fuente
+-----
+index_project_management
+Gestión de proyectos
+-----
+index_ci_cd
+CI y CD
+-----
+index_main_features
+Características principales:
+-----
+index_feature_light_fast
+Ligero y rápido
+-----
+index_feature_minimal_ram
+Uso mínimo de RAM (funciona perfectamente en la instancia más barata de AWS Lightsail por $3.5)
+-----
+index_feature_easy_deploy
+Fácil de implementar (un único binario de <1 MB que incluye plantillas compiladas)
+-----
+index_feature_no_js
+Funciona sin JavaScript
+-----
+index_feature_lang_stats
+Estadísticas detalladas de lenguajes para cada directorio
+-----
+index_feature_top_files
+Funcionalidad de "Archivos principales" para dar una visión general del proyecto
+-----
+index_feature_fast_ci
+CI muy rápido con dependencias precacheadas
+-----
+index_feature_pr_no_fork
+Envío de pull requests sin necesidad de hacer fork del repositorio
+-----
+index_open_source
+Código abierto
+-----
+index_all_open_source
+Todas las funcionalidades son de código abierto
+-----
+index_min_ram
+RAM mínima
+-----
+index_cheapest_server
+Servidor más económico
+-----
+index_works_no_js
+Funciona sin JS
+-----
+index_detailed_lang_stats
+Estadísticas detalladas de lenguajes
+-----
+index_install_size
+Tamaño de instalación
+-----
+index_load_time
+Tiempo de carga de la página principal del repositorio vlang/v
+-----
+index_ci_features_header
+Características de CI
+-----
+index_cpu_cores
+# Núcleos de CPU
+-----
+index_dep_cache
+Caché de dependencias integrada
+-----
+index_separate_instance
+Una instancia separada con opción de conexión SSH
+-----
+index_instant_start
+Inicio instantáneo al hacer commit/PR
+-----
+index_stop_ci
+Una forma sencilla de detener la ejecución completa de CI (manualmente o al hacer un nuevo commit/PR/force push)
+-----
+index_logs_storage_time
+Tiempo de almacenamiento de logs de CI
+-----
+index_basic_ci_minutes
+Minutos de CI en el paquete básico
+-----
+index_price_per_user
+Precio por usuario al mes
+-----
+index_yes
+Sí
+-----
+index_no
+No
+-----
+index_partially
+Parcialmente
+-----
+index_three_months
+3 meses
+-----
+index_six_months
+6 meses
+-----
+index_check_action
+Echa un vistazo a Gitly en acción explorando el repositorio del lenguaje V:
+-----
+open_source_title
+Qué características de GitLab no son de código abierto
+-----
+open_source_intro
+GitLab a menudo se presenta como la alternativa de código abierto a GitHub. En realidad, solo la Community Edition (CE) es de código abierto bajo la licencia MIT. La mayoría de las características que GitLab realmente promociona y vende se encuentran en la Enterprise Edition (EE) propietaria, que se publica bajo una licencia no libre de código fuente disponible. Si autoalojas la CE gratuita, no las obtienes.
+-----
+open_source_ee_only_title
+Una lista no exhaustiva de características exclusivas de EE (propietarias):
+-----
+open_source_feat_advanced_search
+Búsqueda avanzada (búsqueda de código basada en Elasticsearch en varios proyectos)
+-----
+open_source_feat_mr_approvals
+Múltiples reglas de aprobación de merge request y aprobadores obligatorios
+-----
+open_source_feat_security_scanning
+SAST, DAST, escaneo de contenedores y detección de secretos
+-----
+open_source_feat_dependency_scanning
+Escaneo de dependencias y cumplimiento de licencias
+-----
+open_source_feat_compliance
+Marcos de cumplimiento y paneles de cumplimiento
+-----
+open_source_feat_audit_events
+Eventos de auditoría completos e informes de auditoría
+-----
+open_source_feat_epics
+Épicas y épicas multinivel
+-----
+open_source_feat_roadmaps
+Hojas de ruta y vistas de planificación de hitos
+-----
+open_source_feat_portfolio
+Análisis de portafolio y flujo de valor
+-----
+open_source_feat_protected_envs
+Entornos protegidos y aprobaciones de despliegue
+-----
+open_source_feat_geo
+Replicación geográfica en varias regiones
+-----
+open_source_feat_dr
+Recuperación ante desastres
+-----
+open_source_feat_group_saml
+SAML SSO a nivel de grupo y aprovisionamiento SCIM
+-----
+open_source_feat_ldap_sync
+Sincronización de grupos LDAP e integración Kerberos
+-----
+open_source_feat_push_rules
+Reglas de push y configuraciones de pipeline obligatorias
+-----
+open_source_feat_insights
+Insights, paneles de flujo de valor y métricas DORA
+-----
+open_source_outro
+Gitly adopta un enfoque diferente: cada característica forma parte del mismo código base de código abierto. No hay Enterprise Edition, ni módulo de pago, ni repositorio "premium" separado.
+-----
+new_repo_title
+Crear un nuevo repositorio
+-----
+new_repo_name
+Nombre
+-----
+new_repo_description
+Descripción
+-----
+new_repo_optional
+(opcional)
+-----
+new_repo_clone_url
+URL de clonación
+-----
+new_repo_clone_hint
+(solo si quieres clonar un repositorio existente)
+-----
+new_repo_import_issues
+Importar issues desde GitHub
+-----
+new_repo_visibility
+Visibilidad del repositorio
+-----
+new_repo_public
+Público
+-----
+new_repo_public_desc
+Cualquier persona en internet puede ver este repositorio.
+-----
+new_repo_private
+Privado
+-----
+new_repo_private_desc
+Tú eliges quién puede ver y hacer commits a este repositorio.
+-----
+new_repo_create
+Crear repositorio
+-----
+commits_count
+commit|commits|commits
+-----
+issues_count
+incidencia|incidencias|incidencias
+-----
+prs_count
+pull request|pull requests|pull requests
+-----
+contributors_count
+colaborador|colaboradores|colaboradores
+-----
+branches_count
+rama|ramas|ramas
+-----
+releases_count
+versión|versiones|versiones
+-----
+tags_count
+etiqueta|etiquetas|etiquetas
+-----
+topics_count
+discusión|discusiones|discusiones
+-----
+stars_count
+estrella|estrellas|estrellas
+-----
+watchers_count
+observador|observadores|observadores
+-----
+ci_label
+CI
+-----
+pr_pull_requests
+Pull requests
+-----
+pr_new
+Nuevo pull request
+-----
+pr_tab_open
+Abiertos
+-----
+pr_tab_merged
+Fusionados
+-----
+pr_tab_closed
+Cerrados
+-----
+pr_none
+No hay pull requests.
+-----
+pr_status_open
+Abierto
+-----
+pr_status_merged
+Fusionado
+-----
+pr_status_closed
+Cerrado
+-----
+pr_wants_to_merge
+quiere fusionar
+-----
+pr_into
+en
+-----
+pr_conversation
+Conversación
+-----
+pr_files_changed
+Archivos modificados
+-----
+pr_files_changed_label
+archivos modificados
+-----
+pr_commits_label
+commits
+-----
+pr_review_approved
+aprobado
+-----
+pr_review_changes_requested
+solicitó cambios
+-----
+pr_review_commented
+comentó
+-----
+pr_commented
+comentó
+-----
+pr_leave_comment
+Deja un comentario
+-----
+pr_comment_button
+Comentar
+-----
+pr_merge
+Fusionar pull request
+-----
+pr_close
+Cerrar pull request
+-----
+pr_reopen
+Reabrir pull request
+-----
+pr_open_title
+Abrir un pull request
+-----
+pr_compare_desc
+Compara dos ramas en este repositorio y propón una fusión. No se requieren forks.
+-----
+pr_base
+base
+-----
+pr_compare
+comparar
+-----
+pr_choose_branch
+(elige una rama)
+-----
+pr_compare_button
+Comparar
+-----
+pr_no_commits_between
+No hay commits entre estas ramas.
+-----
+pr_title_placeholder
+Título
+-----
+pr_description_placeholder
+Describe los cambios (opcional)
+-----
+pr_create
+Crear pull request
+-----
+pr_commits_heading
+Commits
+-----
+pr_by
+por
+-----
+pr_no_file_changes
+No se detectaron cambios en los archivos.
+-----
+pr_binary_file
+Archivo binario no mostrado.
+-----
+pr_line_comment_placeholder
+Añade un comentario de revisión en esta línea (opcional)
+-----
+pr_overall_review_placeholder
+Comentario general de revisión (opcional)
+-----
+pr_review_action_comment
+Comentar
+-----
+pr_review_action_approve
+Aprobar
+-----
+pr_review_action_request_changes
+Solicitar cambios
+-----
+pr_submit_review
+Enviar revisión
+-----
+pr_your_pulls
+Tus pull requests
+-----
+pr_none_user
+Aún no has abierto ningún pull request.
+-----
+pr_opened
+abrió
+-----
+pr_comments_title
+Comentarios
+-----
+webhooks
+Webhooks
+-----
+webhook_new
+Nuevo webhook
+-----
+webhook_none
+No hay webhooks configurados.
+-----
+webhook_url
+URL del payload
+-----
+webhook_secret
+Secreto
+-----
+webhook_secret_hint
+Se usa para calcular la cabecera X-Gitly-Signature (HMAC-SHA256). Opcional pero recomendado.
+-----
+webhook_events
+Eventos a entregar
+-----
+webhook_event_push
+Push
+-----
+webhook_event_issue
+Issues
+-----
+webhook_event_pr
+Pull requests
+-----
+webhook_event_comment
+Comentarios
+-----
+webhook_event_release
+Versiones
+-----
+webhook_create
+Crear webhook
+-----
+webhook_delete
+Eliminar
+-----
+webhook_active
+Activo
+-----
+webhook_inactive
+Inactivo
+-----
+webhook_last_status
+Última respuesta
+-----
+webhook_never_delivered
+Nunca entregado
+-----
+webhook_deliveries
+Entregas recientes
+-----
+webhook_back
+Volver a webhooks
+-----
+manage_webhooks
+Gestionar webhooks
+-----
+discussions
+Discusiones
+-----
+discussion_new
+Nueva discusión
+-----
+discussion_none
+Aún no hay discusiones.
+-----
+discussion_create
+Crear discusión
+-----
+discussion_title_placeholder
+Título de la discusión
+-----
+discussion_body_placeholder
+Inicia la conversación...
+-----
+discussion_category
+Categoría
+-----
+discussion_category_general
+General
+-----
+discussion_category_qa
+Preguntas y respuestas
+-----
+discussion_category_announcement
+Anuncio
+-----
+discussion_category_idea
+Ideas
+-----
+discussion_locked
+Bloqueada
+-----
+discussion_reply_placeholder
+Responder a esta discusión
+-----
+discussion_reply_button
+Publicar respuesta
+-----
+discussion_lock
+Bloquear discusión
+-----
+discussion_unlock
+Desbloquear discusión
+-----
+discussion_delete
+Eliminar discusión
+-----
+discussion_answer
+Marcar como respuesta
+-----
+discussion_answered
+Respondida
+-----
+discussion_opened
+abrió
+-----
+projects
+Proyectos
+-----
+project_new
+Nuevo proyecto
+-----
+project_none
+Aún no hay proyectos.
+-----
+project_create
+Crear proyecto
+-----
+project_name_placeholder
+Nombre del proyecto
+-----
+project_description_placeholder
+Descripción del proyecto (opcional)
+-----
+project_delete
+Eliminar proyecto
+-----
+project_add_column
+Añadir columna
+-----
+project_column_name_placeholder
+Nombre de la columna (ej. Por hacer, En progreso, Hecho)
+-----
+project_add_card
+Añadir tarjeta
+-----
+project_card_title_placeholder
+Título de la tarjeta
+-----
+project_card_note_placeholder
+Notas (opcional)
+-----
+project_card_save
+Guardar tarjeta
+-----
+project_card_delete
+Eliminar
+-----
+project_column_delete
+Eliminar columna
+-----
+project_column_empty
+No hay tarjetas.
+-----
+milestones
+Hitos
+-----
+milestone_new
+Nuevo hito
+-----
+milestone_none
+Aún no hay hitos.
+-----
+milestone_create
+Crear hito
+-----
+milestone_title_placeholder
+Título del hito
+-----
+milestone_description_placeholder
+Descripción (opcional)
+-----
+milestone_due_date
+Fecha límite
+-----
+milestone_status_open
+Abierto
+-----
+milestone_status_closed
+Cerrado
+-----
+milestone_close
+Cerrar hito
+-----
+milestone_reopen
+Reabrir hito
+-----
+milestone_delete
+Eliminar hito
+-----
+milestone_progress
+Progreso
+-----
+milestone_issues
+Issues vinculados
+-----
+milestone_no_issues
+No hay issues vinculados aún.
+-----
+twofa_title
+Autenticación de dos factores
+-----
+twofa_status_enabled
+La autenticación de dos factores está activada.
+-----
+twofa_status_disabled
+La autenticación de dos factores está desactivada.
+-----
+twofa_enable
+Activar autenticación de dos factores
+-----
+twofa_disable
+Desactivar autenticación de dos factores
+-----
+twofa_setup_intro
+Escanea el código QR con una aplicación de autenticación (Aegis, Google Authenticator, 1Password, ...), o introduce el secreto manualmente. Luego ingresa el código de 6 dígitos para confirmar.
+-----
+twofa_secret
+Secreto
+-----
+twofa_code
+Código de 6 dígitos
+-----
+twofa_verify
+Verificar y activar
+-----
+twofa_login_prompt
+Introduce el código de 6 dígitos de tu aplicación de autenticación para continuar.
+-----
+twofa_login_button
+Verificar
+-----
+twofa_invalid
+Código no válido, inténtalo de nuevo.
+-----
+api_tokens
+Tokens de API
+-----
+api_token_new
+Nuevo token de API
+-----
+api_token_none
+Aún no hay tokens de API.
+-----
+api_token_name
+Nombre del token
+-----
+api_token_create
+Crear token
+-----
+api_token_revoke
+Revocar
+-----
+api_token_show_once
+Este token se muestra solo una vez. Cópialo ahora:
+-----
+api_docs
+Documentación de la API
+-----
+repo_delete_warning
+Este repositorio se eliminará permanentemente sin posibilidad de revertir esta acción.
+-----
+repo_delete_public_intro
+Es un repositorio público con:
+-----
+repo_delete_public_outro
+Todo se perderá.
+-----
+repo_delete_confirm_question
+¿Estás seguro de que quieres continuar?
+-----
+repo_delete_confirm_yes
+Sí, eliminar repositorio
+-----
+repo_delete_cancel
+Cancelar
+-----
+settings_title
+Configuración
+-----
+danger_zone
+Zona de peligro
+-----
+transfer_ownership
+Transferir propiedad
+-----
+transfer_ownership_desc
+Mueve este repositorio a otro usuario. Escribe la ruta completa para confirmar.
+-----
+new_owner_username
+Nombre del nuevo propietario
+-----
+move_repo
+Mover repo
+-----
+delete_repo_title
+Eliminar este repositorio
+-----
+delete_repo_desc
+Una vez eliminado, el repositorio se pierde. Escribe la ruta completa para confirmar.
+-----
+delete_repo
+Eliminar repo
+-----
+header_search_placeholder
+Buscar...
+-----
+header_login
+Iniciar sesión
+-----
+header_register
+Registrarse
+-----
+header_profile
+Perfil
+-----
+header_repositories
+Repositorios
+-----
+header_issues
+Incidencias
+-----
+header_stars
+Estrellas
+-----
+header_feed
+Feed
+-----
+header_settings
+Configuración
+-----
+header_admin_panel
+Panel de administración
+-----
+header_signed_in_as
+Sesión iniciada como
+-----
+header_sign_out
+Cerrar sesión
+-----
+issue_issues
+Incidencias
+-----
+issue_new
+Nueva incidencia
+-----
+issue_none
+Aún no hay incidencias.
+-----
+issue_your_issues
+Incidencias
+-----
+issue_assigned_to_me
+Asignadas a mí
+-----
+issue_created_by_me
+Creadas por mí
+-----
+issue_mentioned
+Mencionado
+-----
+issue_recent_activity
+Actividad reciente
+-----
+issue_none_assigned
+No tienes incidencias asignadas.
+-----
+issue_none_created
+Aún no has abierto ninguna incidencia.
+-----
+issue_none_mentioned
+Aún no te han mencionado en incidencias.
+-----
+issue_none_activity
+Sin actividad reciente.
+-----
+issue_opened
+abierta
+-----
+issue_by
+por
+-----
+issue_comments_title
+Comentarios
+-----
+admin_stats_running_since
+Gitly funciona desde hace
+-----
+admin_stats_total_users
+Usuarios registrados
+-----
+admin_stats_total_repos
+Repositorios
+-----
+admin_stats_total_commits
+Commits
+-----
+admin_stats_total_issues
+Incidencias
+-----
+admin_stats_new_users
+Nuevos usuarios
+-----
+admin_stats_new_repos
+Nuevos repositorios
+-----
+admin_stats_commits
+Commits
+-----
+admin_stats_new_issues
+Nuevas incidencias
+-----
+admin_stats_last_n_days
+Últimos 30 días
+-----

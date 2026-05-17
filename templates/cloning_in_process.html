@@ -15,7 +15,11 @@
 				%repo_being_cloned_clone_url <code>@clone_url</code>
 			</p>
 		@end
-		<img width=200 src='/assets/circular_progress_bar.gif'>
+		@if clone_progress != ''
+			<pre class="clone-status-log">@clone_progress</pre>
+		@else
+			<img width=200 src='/assets/circular_progress_bar.gif'>
+		@end
 	</div>
 </div>
 

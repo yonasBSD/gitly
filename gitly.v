@@ -158,7 +158,14 @@ pub fn (mut app App) before_request(mut ctx Context) bool {
 		unsafe { prealloc_scope_checkpoint(c'gitly loaded user') }
 	}
 	lang_cookie := ctx.get_cookie('lang') or { '' }
-	ctx.lang = if lang_cookie == 'ru' { .ru } else { .en }
+	ctx.lang = match lang_cookie {
+		'ru' { Lang.ru }
+		'es' { Lang.es }
+		'jp' { Lang.jp }
+		'cn' { Lang.cn }
+		'pt' { Lang.pt }
+		else { Lang.en }
+	}
 
 	$if trace_prealloc ? {
 		unsafe { prealloc_scope_checkpoint(c'gitly loaded lang') }
@@ -215,6 +222,12 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table Issue
 	}!
+	sql app.db {
+		create table Label
+	}!
+	sql app.db {
+		create table IssueLabel
+	}!
 	//"created_at int default (strftime('%s', 'now'))"
 	sql app.db {
 		create table Commit
@@ -268,12 +281,59 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table CiStatus
 	}!
+	sql app.db {
+		create table PullRequest
+	}!
+	sql app.db {
+		create table PrComment
+	}!
+	sql app.db {
+		create table PrReview
+	}!
+	sql app.db {
+		create table PrReviewComment
+	}!
+	sql app.db {
+		create table Webhook
+	}!
+	sql app.db {
+		create table WebhookDelivery
+	}!
+	sql app.db {
+		create table Discussion
+	}!
+	sql app.db {
+		create table DiscussionComment
+	}!
+	sql app.db {
+		create table Project
+	}!
+	sql app.db {
+		create table ProjectColumn
+	}!
+	sql app.db {
+		create table ProjectCard
+	}!
+	sql app.db {
+		create table Milestone
+	}!
+	sql app.db {
+		create table TwoFactor
+	}!
+	sql app.db {
+		create table ApiToken
+	}!
 }
 
 fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('File', 'is_size_calculated', db_bool_column_type())!
 	app.add_missing_column('Settings', 'disable_tree_folder_size', db_bool_column_type())!
 	app.add_missing_column('Repo', 'is_deleted', db_bool_column_type())!
+	app.add_missing_column('Repo', 'disable_discussions', db_bool_column_type())!
+	app.add_missing_column('Repo', 'disable_projects', db_bool_column_type())!
+	app.add_missing_column('Repo', 'disable_milestones', db_bool_column_type())!
+	app.add_missing_column('Repo', 'disable_wiki', db_bool_column_type())!
+	app.add_missing_column('Repo', 'is_pinned', db_bool_column_type())!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {

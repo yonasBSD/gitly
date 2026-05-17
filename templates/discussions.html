@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include 'layout/head.html'
+	</head>
+	<body>
+		@include 'layout/header.html'
+
+		<div class="content">
+			@include 'layout/repo_menu.html'
+
+			<div class="issues-header">
+				<h1 class="issues-header__title">%discussions</h1>
+				@if ctx.logged_in
+					<a class="issues-header__new" href="/@repo.user_name/@repo.name/discussions/new">%discussion_new</a>
+				@end
+			</div>
+
+			@if rows.len == 0
+				<div class="issues-empty">%discussion_none</div>
+			@else
+				<ul class="issue-list">
+					@for r in rows
+						<li class="issue-row">
+							<svg class="issue-row__icon" viewBox="0 0 16 16" aria-hidden="true">
+								<path fill="#0969da" d="M1.5 2.75A.75.75 0 0 1 2.25 2h11.5a.75.75 0 0 1 .75.75v8.5a.75.75 0 0 1-.75.75H5.06l-2.573 2.573A.75.75 0 0 1 1.5 13.94Z"/>
+							</svg>
+							<div class="issue-row__body">
+								<div class="issue-row__heading">
+									<a class="issue-row__title" href="/@repo.user_name/@repo.name/discussions/@r.item.id">@{r.item.formatted_title()}</a>
+									<span class="issue-label">@{r.item.category_label()}</span>
+									@if r.item.is_answered
+										<span class="issue-label issue-label--answered">%discussion_answered</span>
+									@end
+									@if r.item.is_locked
+										<span class="issue-label">%discussion_locked</span>
+									@end
+								</div>
+								<div class="issue-row__meta">
+									<span>#@r.item.id</span>
+									<span>%discussion_opened @{r.item.relative_time()} %pr_by</span>
+									<a class="issue-row__author" href="/@r.user.username">@r.user.username</a>
+								</div>
+							</div>
+							@if r.item.comments_count > 0
+								<a class="issue-row__comments" href="/@repo.user_name/@repo.name/discussions/@r.item.id" title="%pr_comments_title">
+									<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 2.75A1.75 1.75 0 0 1 2.75 1h10.5A1.75 1.75 0 0 1 15 2.75v8.5A1.75 1.75 0 0 1 13.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H2.75A1.75 1.75 0 0 1 1 11.25Z"/></svg>
+									@r.item.comments_count
+								</a>
+							@end
+						</li>
+					@end
+				</ul>
+			@end
+		</div>
+
+		@include 'layout/footer.html'
+	</body>
+</html>

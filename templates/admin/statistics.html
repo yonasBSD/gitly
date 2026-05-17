@@ -17,8 +17,61 @@
 				<span>Statistics</span>
 			</div>
 
-			<div>
-				<p>Gitly runs since <b>@app.running_since()</b></p>
+			<div class="stat-uptime">
+				<p>%admin_stats_running_since <b>@app.running_since()</b></p>
+			</div>
+
+			<div class="stat-summary">
+				<div class="stat-summary-item">
+					<span class="stat-summary-value">@stats.total_users</span>
+					<span class="stat-summary-label">%admin_stats_total_users</span>
+				</div>
+				<div class="stat-summary-item">
+					<span class="stat-summary-value">@stats.total_repos</span>
+					<span class="stat-summary-label">%admin_stats_total_repos</span>
+				</div>
+				<div class="stat-summary-item">
+					<span class="stat-summary-value">@stats.total_commits</span>
+					<span class="stat-summary-label">%admin_stats_total_commits</span>
+				</div>
+				<div class="stat-summary-item">
+					<span class="stat-summary-value">@stats.total_issues</span>
+					<span class="stat-summary-label">%admin_stats_total_issues</span>
+				</div>
+			</div>
+
+			<div class="stat-cards">
+				<div class="stat-card">
+					<div class="stat-card-head">
+						<h3>%admin_stats_new_users</h3>
+						<span class="stat-card-range">%admin_stats_last_n_days</span>
+					</div>
+					@{render_stat_chart(stats.users, stats.max_users, '#3b82f6')}
+				</div>
+
+				<div class="stat-card">
+					<div class="stat-card-head">
+						<h3>%admin_stats_commits</h3>
+						<span class="stat-card-range">%admin_stats_last_n_days</span>
+					</div>
+					@{render_stat_chart(stats.commits, stats.max_commits, '#22c55e')}
+				</div>
+
+				<div class="stat-card">
+					<div class="stat-card-head">
+						<h3>%admin_stats_new_repos</h3>
+						<span class="stat-card-range">%admin_stats_last_n_days</span>
+					</div>
+					@{render_stat_chart(stats.repos, stats.max_repos, '#a855f7')}
+				</div>
+
+				<div class="stat-card">
+					<div class="stat-card-head">
+						<h3>%admin_stats_new_issues</h3>
+						<span class="stat-card-range">%admin_stats_last_n_days</span>
+					</div>
+					@{render_stat_chart(stats.issues, stats.max_issues, '#f97316')}
+				</div>
 			</div>
 		</div>
 

@@ -194,4 +194,798 @@ Insights, value stream dashboards and DORA metrics
 open_source_outro
 Gitly takes a different approach: every feature is part of the same open-source codebase. There is no Enterprise Edition, no paywalled module, and no separate "premium" repository.
 -----
-
+new_repo_title
+Create a new repository
+-----
+new_repo_name
+Name
+-----
+new_repo_description
+Description
+-----
+new_repo_optional
+(optional)
+-----
+new_repo_clone_url
+Clone URL
+-----
+new_repo_clone_hint
+(only if you want to clone an existing repository)
+-----
+new_repo_import_issues
+Import issues from GitHub
+-----
+new_repo_visibility
+Repository visibility
+-----
+new_repo_public
+Public
+-----
+new_repo_public_desc
+Anyone on the internet can see this repository.
+-----
+new_repo_private
+Private
+-----
+new_repo_private_desc
+You choose who can see and commit to this repository.
+-----
+new_repo_create
+Create repository
+-----
+commits_count
+commit|commits|commits
+-----
+issues_count
+issue|issues|issues
+-----
+prs_count
+pull request|pull requests|pull requests
+-----
+contributors_count
+contributor|contributors|contributors
+-----
+branches_count
+branch|branches|branches
+-----
+releases_count
+release|releases|releases
+-----
+tags_count
+tag|tags|tags
+-----
+topics_count
+discussion|discussions|discussions
+-----
+stars_count
+star|stars|stars
+-----
+watchers_count
+watcher|watchers|watchers
+-----
+ci_label
+CI
+-----
+pr_pull_requests
+Pull requests
+-----
+pr_new
+New pull request
+-----
+pr_tab_open
+Open
+-----
+pr_tab_merged
+Merged
+-----
+pr_tab_closed
+Closed
+-----
+pr_none
+No pull requests.
+-----
+pr_status_open
+Open
+-----
+pr_status_merged
+Merged
+-----
+pr_status_closed
+Closed
+-----
+pr_wants_to_merge
+wants to merge
+-----
+pr_into
+into
+-----
+pr_conversation
+Conversation
+-----
+pr_files_changed
+Files changed
+-----
+pr_files_changed_label
+files changed
+-----
+pr_commits_label
+commits
+-----
+pr_review_approved
+approved
+-----
+pr_review_changes_requested
+requested changes
+-----
+pr_review_commented
+commented
+-----
+pr_commented
+commented
+-----
+pr_leave_comment
+Leave a comment
+-----
+pr_comment_button
+Comment
+-----
+pr_merge
+Merge pull request
+-----
+pr_close
+Close pull request
+-----
+pr_reopen
+Reopen pull request
+-----
+pr_open_title
+Open a pull request
+-----
+pr_compare_desc
+Compare two branches in this repository and propose a merge. Forks are not required.
+-----
+pr_base
+base
+-----
+pr_compare
+compare
+-----
+pr_choose_branch
+(choose a branch)
+-----
+pr_compare_button
+Compare
+-----
+pr_no_commits_between
+No commits between these branches.
+-----
+pr_title_placeholder
+Title
+-----
+pr_description_placeholder
+Describe the changes (optional)
+-----
+pr_create
+Create pull request
+-----
+pr_commits_heading
+Commits
+-----
+pr_by
+by
+-----
+pr_no_file_changes
+No file changes detected.
+-----
+pr_binary_file
+Binary file not shown.
+-----
+pr_line_comment_placeholder
+Add a review comment on this line (optional)
+-----
+pr_overall_review_placeholder
+Overall review comment (optional)
+-----
+pr_review_action_comment
+Comment
+-----
+pr_review_action_approve
+Approve
+-----
+pr_review_action_request_changes
+Request changes
+-----
+pr_submit_review
+Submit review
+-----
+pr_your_pulls
+Your pull requests
+-----
+pr_none_user
+You haven't opened any pull requests yet.
+-----
+pr_opened
+opened
+-----
+pr_comments_title
+Comments
+-----
+webhooks
+Webhooks
+-----
+webhook_new
+New webhook
+-----
+webhook_none
+No webhooks configured.
+-----
+webhook_url
+Payload URL
+-----
+webhook_secret
+Secret
+-----
+webhook_secret_hint
+Used to compute the X-Gitly-Signature header (HMAC-SHA256). Optional but recommended.
+-----
+webhook_events
+Events to deliver
+-----
+webhook_event_push
+Push
+-----
+webhook_event_issue
+Issues
+-----
+webhook_event_pr
+Pull requests
+-----
+webhook_event_comment
+Comments
+-----
+webhook_event_release
+Releases
+-----
+webhook_create
+Create webhook
+-----
+webhook_delete
+Delete
+-----
+webhook_active
+Active
+-----
+webhook_inactive
+Inactive
+-----
+webhook_last_status
+Last response
+-----
+webhook_never_delivered
+Never delivered
+-----
+webhook_deliveries
+Recent deliveries
+-----
+webhook_back
+Back to webhooks
+-----
+manage_webhooks
+Manage webhooks
+-----
+discussions
+Discussions
+-----
+discussion_new
+New discussion
+-----
+discussion_none
+No discussions yet.
+-----
+discussion_create
+Create discussion
+-----
+discussion_title_placeholder
+Discussion title
+-----
+discussion_body_placeholder
+Start the conversation...
+-----
+discussion_category
+Category
+-----
+discussion_category_general
+General
+-----
+discussion_category_qa
+Q&A
+-----
+discussion_category_announcement
+Announcement
+-----
+discussion_category_idea
+Ideas
+-----
+discussion_locked
+Locked
+-----
+discussion_reply_placeholder
+Reply to this discussion
+-----
+discussion_reply_button
+Post reply
+-----
+discussion_lock
+Lock discussion
+-----
+discussion_unlock
+Unlock discussion
+-----
+discussion_delete
+Delete discussion
+-----
+discussion_answer
+Mark as answer
+-----
+discussion_answered
+Answered
+-----
+discussion_opened
+opened
+-----
+projects
+Projects
+-----
+project_new
+New project
+-----
+project_none
+No projects yet.
+-----
+project_create
+Create project
+-----
+project_name_placeholder
+Project name
+-----
+project_description_placeholder
+Project description (optional)
+-----
+project_delete
+Delete project
+-----
+project_add_column
+Add column
+-----
+project_column_name_placeholder
+Column name (e.g. Todo, In progress, Done)
+-----
+project_add_card
+Add card
+-----
+project_card_title_placeholder
+Card title
+-----
+project_card_note_placeholder
+Notes (optional)
+-----
+project_card_save
+Save card
+-----
+project_card_delete
+Delete
+-----
+project_column_delete
+Delete column
+-----
+project_column_empty
+No cards.
+-----
+milestones
+Milestones
+-----
+milestone_new
+New milestone
+-----
+milestone_none
+No milestones yet.
+-----
+milestone_create
+Create milestone
+-----
+milestone_title_placeholder
+Milestone title
+-----
+milestone_description_placeholder
+Description (optional)
+-----
+milestone_due_date
+Due date
+-----
+milestone_status_open
+Open
+-----
+milestone_status_closed
+Closed
+-----
+milestone_close
+Close milestone
+-----
+milestone_reopen
+Reopen milestone
+-----
+milestone_delete
+Delete milestone
+-----
+milestone_progress
+Progress
+-----
+milestone_issues
+Linked issues
+-----
+milestone_no_issues
+No issues linked yet.
+-----
+twofa_title
+Two-factor authentication
+-----
+twofa_status_enabled
+Two-factor authentication is enabled.
+-----
+twofa_status_disabled
+Two-factor authentication is disabled.
+-----
+twofa_enable
+Enable two-factor authentication
+-----
+twofa_disable
+Disable two-factor authentication
+-----
+twofa_setup_intro
+Scan the QR code with an authenticator app (Aegis, Google Authenticator, 1Password, ...), or enter the secret manually. Then enter the 6-digit code below to confirm.
+-----
+twofa_secret
+Secret
+-----
+twofa_code
+6-digit code
+-----
+twofa_verify
+Verify and enable
+-----
+twofa_login_prompt
+Enter the 6-digit code from your authenticator app to continue.
+-----
+twofa_login_button
+Verify
+-----
+twofa_invalid
+Invalid code, try again.
+-----
+api_tokens
+API tokens
+-----
+api_token_new
+New API token
+-----
+api_token_none
+No API tokens yet.
+-----
+api_token_name
+Token name
+-----
+api_token_create
+Create token
+-----
+api_token_revoke
+Revoke
+-----
+api_token_show_once
+This token is shown only once. Copy it now:
+-----
+api_docs
+API documentation
+-----
+repo_delete_warning
+This repo will be permanently removed with no way to revert this action.
+-----
+repo_delete_public_intro
+It's a public repository with:
+-----
+repo_delete_public_outro
+All of them will be lost.
+-----
+repo_delete_confirm_question
+Are you sure you want to continue?
+-----
+repo_delete_confirm_yes
+Yes, delete repository
+-----
+repo_delete_cancel
+Cancel
+-----
+settings_title
+Settings
+-----
+danger_zone
+Danger zone
+-----
+transfer_ownership
+Transfer ownership
+-----
+transfer_ownership_desc
+Move this repository to another user. Type the full path to confirm.
+-----
+new_owner_username
+New owner username
+-----
+move_repo
+Move repo
+-----
+delete_repo_title
+Delete this repository
+-----
+delete_repo_desc
+Once deleted, the repository is gone. Type the full path to confirm.
+-----
+delete_repo
+Delete repo
+-----
+features_section_title
+Features
+-----
+features_section_desc
+Enable or disable features for this repository.
+-----
+save_features
+Save features
+-----
+wiki
+Wiki
+-----
+header_search_placeholder
+Search...
+-----
+header_login
+Log in
+-----
+header_register
+Register
+-----
+header_profile
+Profile
+-----
+header_repositories
+Repositories
+-----
+header_issues
+Issues
+-----
+header_stars
+Stars
+-----
+header_feed
+Feed
+-----
+header_settings
+Settings
+-----
+header_admin_panel
+Admin Panel
+-----
+header_signed_in_as
+Signed in as
+-----
+header_sign_out
+Sign out
+-----
+issue_issues
+Issues
+-----
+issue_new
+New issue
+-----
+issue_none
+No issues yet.
+-----
+issue_your_issues
+Issues
+-----
+issue_assigned_to_me
+Assigned to me
+-----
+issue_created_by_me
+Created by me
+-----
+issue_mentioned
+Mentioned
+-----
+issue_recent_activity
+Recent activity
+-----
+issue_none_assigned
+No issues are assigned to you.
+-----
+issue_none_created
+You haven't opened any issues yet.
+-----
+issue_none_mentioned
+You haven't been mentioned in any issues.
+-----
+issue_none_activity
+No recent issue activity.
+-----
+issue_opened
+opened
+-----
+issue_by
+by
+-----
+issue_comments_title
+Comments
+-----
+admin_stats_running_since
+Gitly runs since
+-----
+admin_stats_total_users
+Registered users
+-----
+admin_stats_total_repos
+Repositories
+-----
+admin_stats_total_commits
+Commits
+-----
+admin_stats_total_issues
+Issues
+-----
+admin_stats_new_users
+New users
+-----
+admin_stats_new_repos
+New repositories
+-----
+admin_stats_commits
+Commits
+-----
+admin_stats_new_issues
+New issues
+-----
+admin_stats_last_n_days
+Last 30 days
+-----
+commit_committed
+committed
+-----
+commit_view_patch
+View patch
+-----
+commit_files_changed
+files changed
+-----
+commit_additions
+additions
+-----
+commit_deletions
+deletions
+-----
+commit_no_changes
+No file changes in this commit.
+-----
+commit_binary_file
+Binary file not shown.
+-----
+commit_file_new
+new file
+-----
+commit_file_deleted
+deleted
+-----
+commit_file_renamed
+renamed
+-----
+commits_on
+Commits on
+-----
+browse_repo_at_point
+Browse repository at this point
+-----
+about_section
+About
+-----
+no_description
+No description provided.
+-----
+readme_link
+Readme
+-----
+license_link
+License
+-----
+stars_label
+stars
+-----
+watching_label
+watching
+-----
+sponsor_section
+Sponsor this project
+-----
+sponsor_action
+Sponsor
+-----
+releases_section
+Releases
+-----
+contributors_section
+Contributors
+-----
+latest_label
+Latest
+-----
+releases_more
+more releases
+-----
+no_releases
+No releases published
+-----
+no_contributors
+No contributors yet
+-----
+star_action
+Star
+-----
+starred
+Starred
+-----
+watch_action
+Watch
+-----
+unwatch_action
+Unwatch
+-----
+user_edit_profile
+Edit profile
+-----
+user_pinned_repos
+Pinned repositories
+-----
+user_view_all_repos
+View all
+-----
+user_no_repos
+No repositories yet.
+-----
+user_repo_public
+Public
+-----
+user_repo_private
+Private
+-----
+user_contributions_in_year
+contributions in the last year
+-----
+user_commits_label
+commits
+-----
+user_heatmap_less
+Less
+-----
+user_heatmap_more
+More
+-----
+user_contribution_activity
+Contribution activity
+-----
+user_activity_joined
+Joined Gitly
+-----
+user_activity_first_repo
+First repository
+-----
+user_activity_first_issue
+First issue
+-----
+user_activity_on
+on
+-----

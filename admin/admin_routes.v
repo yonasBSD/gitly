@@ -72,5 +72,6 @@ pub fn (mut app App) admin_statistics() veb.Result {
 	if !ctx.is_admin() {
 		return ctx.redirect_to_index()
 	}
+	stats := app.get_admin_stats(admin_stats_days)
 	return $veb.html('templates/admin/statistics.html')
 }

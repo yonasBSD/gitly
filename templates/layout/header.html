@@ -10,7 +10,7 @@
 
 
 	<form action="/search" method="GET" style='display: inline-block;'>
-		<input class="search-input" name="query" type="text" placeholder="Search..." autocomplete="off">
+		<input class="search-input" name="query" type="text" placeholder="%header_search_placeholder" autocomplete="off">
 	</form>
 
 	@if ctx.logged_in
@@ -25,31 +25,31 @@
 				<img src="@{app.prepare_user_avatar_url(ctx.user.avatar)}">
 			}
 			.header-dropdown {
+				.links {
+					<a href='/@ctx.user.username/repos' class="link">%header_repositories</a>
+					<a href='/@ctx.user.username' class="link">%header_profile</a>
+					<a href='/@ctx.user.username/issues' class="link">%header_issues</a>
+					<a href='/@ctx.user.username/stars' class="link">%header_stars</a>
+					<a href='/@ctx.user.username/feed' class="link">%header_feed</a>
+				}
+				.links {
+					<a href="/@ctx.user.username/settings" class="link">%header_settings</a>
+					@if ctx.user.is_admin
+						<a href='/admin/settings' class="link">%header_admin_panel</a>
+					@end
+				}
 				.username {
-					<span>Signed in as</span>
+					<span>%header_signed_in_as</span>
 					<a href='/@ctx.user.username'>@ctx.user.username</a>
 				}
 				.links {
-					<a href='/@ctx.user.username' class="link">Profile</a>
-					<a href='/@ctx.user.username/repos' class="link">Repositories</a>
-					<a href='/@ctx.user.username/issues' class="link">Issues</a>
-					<a href='/@ctx.user.username/stars' class="link">Stars</a>
-					<a href='/@ctx.user.username/feed' class="link">Feed</a>
-				}
-				.links {
-					<a href="/@ctx.user.username/settings" class="link">Settings</a>
-					@if ctx.user.is_admin
-						<a href='/admin/settings' class="link">Admin Panel</a>
-					@end
-				}
-				.links {
-					<a href='/logout' class="link">Sign out</a>
+					<a href='/logout' class="link">%header_sign_out</a>
 				}
 				<div class="dropdown-hoverzone"></div>
 			}
 		@else
-			<a href='/login' class='login-button'>Log in</a>
-			<a href='/register' class="login-button" style="margin-left: 5px">Register</a>
+			<a href='/login' class='login-button'>%header_login</a>
+			<a href='/register' class="login-button" style="margin-left: 5px">%header_register</a>
 		@end
 		</div>
 	</div>

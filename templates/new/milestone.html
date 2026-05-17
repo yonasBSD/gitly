@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include '../layout/head.html'
+	</head>
+	<body>
+		@include '../layout/header.html'
+
+		<div class="content">
+			@include '../layout/repo_menu.html'
+
+			<h1>%milestone_new</h1>
+
+			<form method="post" action="/@repo.user_name/@repo.name/milestones" class="milestone-form">
+				<div class="field">
+					<input type="text" name="title" placeholder="%milestone_title_placeholder" required>
+				</div>
+				<div class="field">
+					<textarea name="description" placeholder="%milestone_description_placeholder" rows="4"></textarea>
+				</div>
+				<div class="field">
+					<label>%milestone_due_date</label>
+					<input type="date" name="due_date">
+				</div>
+				<button type="submit" class="settings-form__submit">%milestone_create</button>
+			</form>
+		</div>
+
+		@include '../layout/footer.html'
+	</body>
+</html>

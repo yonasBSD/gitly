@@ -6,21 +6,33 @@
 	<body>
 		@include 'layout/header.html'
 
-		<div class="content">
-			@include './layout/tree_path.html'
-
-			<div class="blob-options-block">
-				<a href="@raw_url" target="_blank">Raw file</a>
-				|
-				<span>${loc} loc (${sloc} sloc)</span>
-				|
-				<span>${file.pretty_size()}</span>
-				|
-				<span>Latest commit hash ${file.last_hash}</span>
-				@if repo.user_id == ctx.user.id
-					|
-					<a href="/@username/@repo_name/edit/@branch_name/@path">Edit</a>
+		<div class="content blob-page">
+			<div class="blob-breadcrumb">
+				@for i, p in ctx.path_split
+					<a class="blob-breadcrumb__link" href="/@repo.user_name/@{ctx.make_path(branch_name, i)}">@p</a>
+					<span class="blob-breadcrumb__sep">/</span>
 				@end
+				<strong class="blob-breadcrumb__file">@file.name</strong>
+			</div>
+
+			<div class="blob-toolbar">
+				<div class="blob-toolbar__stats">
+					<span class="blob-stat"><b>${loc}</b> lines</span>
+					<span class="blob-toolbar__dot">·</span>
+					<span class="blob-stat"><b>${sloc}</b> sloc</span>
+					<span class="blob-toolbar__dot">·</span>
+					<span class="blob-stat">${file.pretty_size()}</span>
+					@if file.last_hash != ''
+						<span class="blob-toolbar__dot">·</span>
+						<a class="blob-stat blob-stat--hash" href="/@repo.user_name/@repo.name/commit/@file.last_hash">@file.last_hash</a>
+					@end
+				</div>
+				<div class="blob-toolbar__actions">
+					<a class="blob-action" href="@raw_url" target="_blank">Raw</a>
+					@if repo.user_id == ctx.user.id
+						<a class="blob-action" href="/@username/@repo_name/edit/@branch_name/@path">Edit</a>
+					@end
+				</div>
 			</div>
 
 			@if is_markdown
@@ -28,7 +40,7 @@
 					@source
 				</div>
 			@else
-				<pre class="blob-content">@source</pre>
+				<pre class="blob-content blob-content__code">@source</pre>
 			@end
 		</div>
 

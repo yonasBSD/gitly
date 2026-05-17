@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		@include '../layout/head.html'
+	</head>
+	<body>
+		@include '../layout/header.html'
+
+		<div class="content">
+			@include '../layout/repo_menu.html'
+
+			<a class="back-link" href="/@repo.user_name/@repo.name/settings/webhooks">&larr; %webhook_back</a>
+
+			<h1 class="settings-title">@webhook.url</h1>
+			<div class="webhook-detail__meta">
+				@if webhook.is_active
+					<span class="webhook-badge webhook-badge--active">%webhook_active</span>
+				@else
+					<span class="webhook-badge webhook-badge--inactive">%webhook_inactive</span>
+				@end
+				<span>@webhook.events</span>
+			</div>
+
+			<h2>%webhook_deliveries</h2>
+			@if deliveries.len == 0
+				<div class="issues-empty">%webhook_never_delivered</div>
+			@else
+				<table class="webhook-deliveries">
+					<thead>
+						<tr><th>Event</th><th>Status</th><th>Body</th></tr>
+					</thead>
+					<tbody>
+						@for d in deliveries
+							<tr>
+								<td>@d.event</td>
+								<td>@d.status_code</td>
+								<td><code>@d.response_body</code></td>
+							</tr>
+						@end
+					</tbody>
+				</table>
+			@end
+		</div>
+
+		@include '../layout/footer.html'
+	</body>
+</html>

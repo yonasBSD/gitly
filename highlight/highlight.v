@@ -133,6 +133,106 @@ pub fn highlight_text(st string, file_path string, commit bool) (string, int, in
 	return res.bytestr(), lines, sloc
 }
 
+// highlight_line returns HTML-escaped, syntax-highlighted markup for a
+// single line of source code. It is stateless across calls (does not
+// track multi-line strings or block comments), so it suits diff rendering
+// where each line is colored independently.
+pub fn highlight_line(content string, file_path string) string {
+	if content.len == 0 {
+		return ''
+	}
+	lang := extension_to_lang(file_path) or { return escape_html(content) }
+	lc := lang.line_comments
+	mut mlc := ''
+	if lang.mline_comments.len >= 2 {
+		mlc = lang.mline_comments[0]
+	}
+	runes := content.bytes()
+	mut res := []u8{cap: runes.len + 16}
+	mut in_string := false
+	mut ss := u8(` `)
+	mut in_line_comment := false
+	for pos := 0; pos < runes.len; pos++ {
+		mut c := runes[pos]
+		if in_line_comment {
+			res << write(c)
+			continue
+		}
+		if in_string {
+			res << write(c)
+			if pos > 0 && runes[pos - 1] == `\\` && ss == `"` {
+				continue
+			}
+			if c == ss {
+				in_string = false
+				res << '</u>'.bytes()
+			}
+			continue
+		}
+		if is_letter(c, lang) {
+			word_start := pos
+			for pos < runes.len && is_letter(runes[pos], lang) {
+				pos++
+			}
+			w := runes[word_start..pos].bytestr()
+			pos--
+			if w in lang.keywords {
+				res << '<b>'.bytes()
+				res << w.bytes()
+				res << '</b>'.bytes()
+			} else {
+				res << w.bytes()
+			}
+			continue
+		}
+		if is_string_token(c, lang) {
+			in_string = true
+			ss = c
+			res << '<u>'.bytes()
+			res << write(c)
+			continue
+		}
+		if mlc != '' && c == mlc[0] && pos + mlc.len <= runes.len
+			&& is_line_comment(runes, pos, mlc) {
+			in_line_comment = true
+			res << '<i>'.bytes()
+			res << write(c)
+			continue
+		}
+		if lc != '' && c == lc[0] && pos + lc.len <= runes.len && is_line_comment(runes, pos, lc) {
+			in_line_comment = true
+			res << '<i>'.bytes()
+			res << write(c)
+			continue
+		}
+		res << write(c)
+	}
+	if in_line_comment {
+		res << '</i>'.bytes()
+	}
+	if in_string {
+		res << '</u>'.bytes()
+	}
+	return res.bytestr()
+}
+
+fn escape_html(s string) string {
+	mut res := []u8{cap: s.len}
+	for i in 0 .. s.len {
+		c := s[i]
+		if c == `<` {
+			res << '&lt;'.bytes()
+		} else if c == `>` {
+			res << '&gt;'.bytes()
+		} else if c == `&` {
+			res << '&amp;'.bytes()
+		} else {
+			res << c
+		}
+	}
+	return res.bytestr()
+}
+
 fn write(c u8) []u8 {
 	mut tmp := []u8{}
 	if c == `<` {

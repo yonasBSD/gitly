@@ -4,6 +4,7 @@ import veb
 import api
 import crypto.sha1
 import os
+import time
 import highlight
 import validation
 import git
@@ -80,6 +81,28 @@ pub fn (mut app App) handle_update_repo_settings(username string, repo_name stri
 	return ctx.redirect_to_repository(username, repo_name)
 }
 
+@['/:username/:repo_name/settings/features'; post]
+pub fn (mut app App) handle_update_repo_features(username string, repo_name string) veb.Result {
+	repo := app.find_repo_by_name_and_username(repo_name, username) or {
+		return ctx.redirect_to_repository(username, repo_name)
+	}
+	is_owner := app.check_repo_owner(ctx.user.username, repo_name)
+
+	if !is_owner {
+		return ctx.redirect_to_repository(username, repo_name)
+	}
+
+	disable_discussions := 'discussions_enabled' !in ctx.form
+	disable_projects := 'projects_enabled' !in ctx.form
+	disable_milestones := 'milestones_enabled' !in ctx.form
+	disable_wiki := 'wiki_enabled' !in ctx.form
+
+	app.update_repo_features(repo.id, disable_discussions, disable_projects, disable_milestones,
+		disable_wiki) or { app.info(err.str()) }
+
+	return ctx.redirect('/${username}/${repo_name}/settings')
+}
+
 @['/:user/:repo_name/delete'; post]
 pub fn (mut app App) handle_repo_delete(username string, repo_name string) veb.Result {
 	repo := app.find_repo_by_name_and_username(repo_name, username) or {
@@ -151,6 +174,9 @@ pub fn (mut app App) handle_tree(mut ctx Context, username string, repo_name str
 		}
 		'issues' {
 			return app.handle_get_user_issues(mut ctx, username)
+		}
+		'pulls' {
+			return app.handle_get_user_pulls(mut ctx, username)
 		}
 		'settings' {
 			return app.user_settings(mut ctx, username)
@@ -241,7 +267,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	}
 	println('OK')
 	repo_path := os.join_path(app.config.repo_storage_path, ctx.user.username, name)
-	id := app.get_count_repo() + 1
+	id := app.get_max_repo_id() + 1
 	mut new_repo := &Repo{
 		name:           name
 		id:             id
@@ -253,22 +279,23 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		clone_url:      valid_clone_url
 		is_public:      is_public
 	}
+	import_issues := ctx.form['import_issues'] == '1'
 	if is_clone_url_empty {
 		os.mkdir(new_repo.git_dir) or { panic(err) }
 		new_repo.git('init --bare')
 	} else {
-		app.debug('cloning')
-		// t := time.now()
-
 		new_repo.status = .cloning
-		clone_job_repo := *new_repo
-		spawn clone_repo(clone_job_repo, app.config)
-		// new_repo.clone()
-		// println(time.since(t))
 	}
+	// Insert the repo row BEFORE spawning the clone thread, so that the
+	// background `set_repo_status(.done)` UPDATE has a row to match.
 	app.add_repo(new_repo) or {
 		ctx.error('There was an error while adding the repo ${err}')
 		return app.new(mut ctx)
+	}
+	if !is_clone_url_empty {
+		app.debug('cloning')
+		clone_job_repo := *new_repo
+		spawn clone_repo(clone_job_repo, app.config, import_issues, ctx.user.id)
 	}
 	new_repo2 := app.find_repo_by_name_and_user_id(new_repo.name, ctx.user.id) or {
 		app.info('Repo was not inserted')
@@ -288,7 +315,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 	// Update only cloned repositories
 	/*
 	if !is_clone_url_empty {
-		app.update_repo_from_fs(mut new_repo) or {
+		app.update_repo_from_fs(mut new_repo, true) or {
 			ctx.error('There was an error while cloning the repo')
 			return app.new(mut ctx)
 		}
@@ -325,7 +352,7 @@ fn bg_fetch_files_info(repo_ Repo, branch string, path string, conf config.Confi
 	app.db.close() or {}
 }
 
-fn clone_repo(new_repo Repo, conf config.Config) {
+fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, owner_user_id int) {
 	mut cloned_repo := new_repo
 	cloned_repo.clone()
 	// Use a dedicated DB connection for the clone thread to avoid
@@ -341,15 +368,103 @@ fn clone_repo(new_repo Repo, conf config.Config) {
 	// The tree page will fetch files from git on demand.
 	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
 	eprintln('clone done, repo available — indexing in background')
+	// For GitHub clones, also pull the repo description and contributors list
+	// (the issue import is gated on a separate user opt-in).
+	if cloned_repo.clone_url.contains('github.com') {
+		spawn bg_import_github_repo_info(cloned_repo.id, cloned_repo.clone_url,
+			cloned_repo.description, conf)
+		if import_issues {
+			spawn bg_import_github_issues(cloned_repo.id, cloned_repo.clone_url, owner_user_id,
+				conf)
+		}
+	}
 	// Index branches, commits, and language stats in the background.
-	app.update_repo_from_fs(mut cloned_repo) or { eprintln('cannot update repo from fs ${err}') }
+	app.update_repo_from_fs(mut cloned_repo, true) or {
+		eprintln('cannot update repo from fs ${err}')
+	}
 	eprintln('background indexing complete')
+	app.db.close() or {}
+}
+
+fn bg_import_github_repo_info(repo_id int, clone_url string, existing_description string, conf config.Config) {
+	eprintln('[github-info] spawned thread for repo_id=${repo_id}')
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('[github-info] cannot open db connection: ${err}')
+			return
+		}
+		config: conf
+	}
+	defer {
+		app.db.close() or {}
+	}
+	if existing_description.trim_space() == '' {
+		description := fetch_github_repo_description(clone_url)
+		if description != '' {
+			app.set_repo_description(repo_id, description) or {
+				eprintln('[github-info] cannot save description: ${err}')
+			}
+		}
+	}
+	app.import_github_contributors(repo_id, clone_url) or {
+		eprintln('[github-contrib] FAILED: ${err}')
+	}
+}
+
+fn bg_import_github_issues(repo_id int, clone_url string, owner_user_id int, conf config.Config) {
+	eprintln('[github-import] spawned thread for repo_id=${repo_id}')
+	mut app := &App{
+		db:     connect_db(conf) or {
+			eprintln('[github-import] cannot open db connection for import thread: ${err}')
+			return
+		}
+		config: conf
+	}
+	app.import_github_issues(repo_id, clone_url, owner_user_id) or {
+		eprintln('[github-import] FAILED: ${err}')
+	}
 	app.db.close() or {}
 }
 
 pub fn (mut app App) kekw(mut ctx Context) veb.Result {
 	clone_url := ''
+	clone_progress := ''
 	return $veb.html('templates/cloning_in_process.html')
+}
+
+// read_clone_progress parses a git `--progress` log file and returns
+// the latest output as a single newline-separated string, ready to be
+// shown inside a <pre> block. Git emits live progress with `\r` and
+// stage transitions with `\n`; we collapse repeated progress lines for
+// the same phase ("Counting objects", "Receiving objects", …) so only
+// the most recent value for each phase remains.
+fn read_clone_progress(progress_path string) string {
+	raw := os.read_file(progress_path) or { return '' }
+	if raw.len == 0 {
+		return ''
+	}
+	lines := raw.replace('\r', '\n').split('\n')
+	mut stages := []string{}
+	mut phase_index := map[string]int{}
+	for raw_line in lines {
+		line := raw_line.trim_space()
+		if line == '' {
+			continue
+		}
+		mut body := line
+		if body.starts_with('remote: ') {
+			body = body[8..]
+		}
+		colon := body.index(':') or { -1 }
+		key := if colon == -1 { body } else { body[..colon].trim_space() }
+		if key in phase_index {
+			stages[phase_index[key]] = line
+		} else {
+			phase_index[key] = stages.len
+			stages << line
+		}
+	}
+	return stages.join('\n')
 }
 
 @['/:username/:repo_name/tree/:branch_name/:path...']
@@ -359,7 +474,10 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 		return ctx.not_found()
 	}
 	mut clone_url := ''
+	mut clone_progress := ''
 	if repo.status == .cloning {
+		clone_url = repo.clone_url
+		clone_progress = read_clone_progress(repo.clone_progress_path())
 		return $veb.html('templates/cloning_in_process.html')
 	}
 
@@ -386,6 +504,7 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 
 	ctx.is_tree = true
+	ctx.branch = branch_name
 
 	app.increment_repo_views(repo.id) or { app.info(err.str()) }
 
@@ -496,6 +615,35 @@ pub fn (mut app App) tree(mut ctx Context, username string, repo_name string, br
 	}
 	has_ci := ci_status.id != 0
 
+	mut sidebar_contributors := []User{}
+	mut sidebar_releases := []Release{}
+	if is_top_directory {
+		all_contributors := app.find_repo_registered_contributor(repo_id)
+		sidebar_contributors = if all_contributors.len > 12 {
+			all_contributors[..12]
+		} else {
+			all_contributors
+		}
+
+		rels := app.find_repo_releases_as_page(repo_id, 0)
+		tags := app.get_all_repo_tags(repo_id)
+		for rel in rels {
+			mut r := rel
+			for tag in tags {
+				if tag.id == rel.tag_id {
+					r.tag_name = tag.name
+					r.tag_hash = tag.hash
+					r.date = time.unix(tag.created_at)
+					break
+				}
+			}
+			sidebar_releases << r
+			if sidebar_releases.len >= 3 {
+				break
+			}
+		}
+	}
+
 	return $veb.html()
 }
 
@@ -556,7 +704,8 @@ pub fn (mut app App) handle_api_repo_watch(mut ctx Context, repo_id_str string) 
 }
 
 // API: get file listing with commit info for a directory (used by JS polling)
-@['/api/v1/repos/:repo_id_str/files']
+// Path uses /tree/files to avoid colliding with /api/v1/repos/:username/:repo_name.
+@['/api/v1/repos/:repo_id_str/tree/files']
 pub fn (mut app App) handle_api_repo_files(mut ctx Context, repo_id_str string) veb.Result {
 	repo_id := repo_id_str.int()
 	repo := app.find_repo_by_id(repo_id) or { return ctx.json_error('Not found') }
@@ -616,7 +765,9 @@ pub fn (mut app App) blob(mut ctx Context, username string, repo_name string, br
 	}
 
 	raw_url := '/${username}/${repo_name}/raw/${branch_name}/${path}'
-	file := app.find_repo_file_by_path(repo.id, branch_name, path) or { return ctx.not_found() }
+	file := app.find_repo_file_by_path(repo.id, branch_name, path) or {
+		repo.lookup_file_via_git(branch_name, path) or { return ctx.not_found() }
+	}
 	is_markdown := file.name.to_lower().ends_with('.md')
 	plain_text := repo.read_file(branch_name, path)
 	highlighted_source, _, _ := highlight.highlight_text(plain_text, file.name, false)
