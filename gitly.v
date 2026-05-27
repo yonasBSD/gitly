@@ -28,24 +28,26 @@ pub struct App {
 pub mut:
 	db GitlyDb
 mut:
-	version  string
-	logger   log.Log
-	config   config.Config
-	settings Settings
-	port     int
+	version    string
+	build_time string
+	logger     log.Log
+	config     config.Config
+	settings   Settings
+	port       int
 }
 
 pub struct Context {
 	veb.Context
 mut:
-	user          User
-	current_path  string
-	page_gen_time string
-	is_tree       bool
-	logged_in     bool
-	path_split    []string
-	branch        string
-	lang          Lang = .en //.ru
+	user           User
+	current_path   string
+	page_gen_time  string
+	page_gen_start i64
+	is_tree        bool
+	logged_in      bool
+	path_split     []string
+	branch         string
+	lang           Lang = .en //.ru
 }
 
 // fn C.sqlite3_config(int)
@@ -88,6 +90,9 @@ fn new_app() !&App {
 	}
 
 	app.version = version
+
+	build_unix := os.file_last_mod_unix(os.executable())
+	app.build_time = time.unix(build_unix).format()
 
 	app.handle_static('static', true)!
 	app.serve_static('/favicon.ico', 'static/assets/favicon.svg')!
@@ -141,6 +146,7 @@ pub fn (mut app App) init_server() {
 }
 
 pub fn (mut app App) before_request(mut ctx Context) bool {
+	ctx.page_gen_start = time.ticks()
 	$if trace_prealloc ? {
 		unsafe { prealloc_scope_checkpoint(c'gitly before_request start') }
 	}
@@ -179,10 +185,9 @@ pub fn (mut app App) open_source() veb.Result {
 }
 
 @['/']
-pub fn (mut app App) index() veb.Result {
-	user_count := app.get_users_count() or { 0 }
-	no_users := user_count == 0
-	if no_users {
+pub fn (mut app App) index(mut ctx Context) veb.Result {
+	user_count := app.get_users_count_with_reconnect() or { return ctx.db_error(err) }
+	if user_count == 0 {
 		return ctx.redirect('/register')
 	}
 
@@ -231,6 +236,9 @@ fn (mut app App) create_tables() ! {
 	//"created_at int default (strftime('%s', 'now'))"
 	sql app.db {
 		create table Commit
+	}!
+	sql app.db {
+		create table BranchCommit
 	}!
 	// author text default '' is to to avoid joins
 	sql app.db {
@@ -323,6 +331,12 @@ fn (mut app App) create_tables() ! {
 	sql app.db {
 		create table ApiToken
 	}!
+	sql app.db {
+		create table Org
+	}!
+	sql app.db {
+		create table OrgMember
+	}!
 }
 
 fn (mut app App) migrate_tables() ! {
@@ -334,10 +348,12 @@ fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('Repo', 'disable_milestones', db_bool_column_type())!
 	app.add_missing_column('Repo', 'disable_wiki', db_bool_column_type())!
 	app.add_missing_column('Repo', 'is_pinned', db_bool_column_type())!
+
+	app.db.exec('create index if not exists idx_commit_repo_created on ${sql_table('Commit')} (repo_id, created_at desc)')!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {
-	if db_column_exists(app.db, table_name, column_name)! {
+	if db_column_exists(mut app.db, table_name, column_name)! {
 		return
 	}
 

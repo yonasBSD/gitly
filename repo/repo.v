@@ -132,9 +132,15 @@ fn (app App) find_repo_by_name_and_user_id(repo_name string, user_id int) ?Repo 
 }
 
 fn (app App) find_repo_by_name_and_username(repo_name string, username string) ?Repo {
-	user := app.get_user_by_username(username) or { return none }
-
-	return app.find_repo_by_name_and_user_id(repo_name, user.id)
+	repos := sql app.db {
+		select from Repo where name == repo_name && user_name == username && is_deleted == false limit 1
+	} or { return none }
+	if repos.len == 0 {
+		return none
+	}
+	mut repo := repos.first()
+	repo.lang_stats = app.find_repo_lang_stats(repo.id)
+	return repo
 }
 
 fn (mut app App) get_count_user_repos(user_id int) int {
@@ -189,8 +195,8 @@ fn (mut app App) find_user_profile_repos(user_id int, include_private bool) []Re
 	return app.find_user_top_repos_by_stars(user_id, include_private, profile_repos_limit)
 }
 
-fn (app &App) search_public_repos(query string) []Repo {
-	repo_rows := db_exec_values(app.db,
+fn (mut app App) search_public_repos(query string) []Repo {
+	repo_rows := db_exec_values(mut app.db,
 		'select id, name, user_id, description, stars_count from ${sql_table('Repo')} where is_public is true and is_deleted is false and name like ${sql_like_pattern(query)}') or {
 		return []
 	}
