@@ -6,6 +6,7 @@ import veb
 import validation
 import git
 import time
+import strings
 
 struct PrWithUser {
 	pr   PullRequest
@@ -36,6 +37,93 @@ mut:
 struct PrReviewCommentWithUser {
 	item PrReviewComment
 	user User
+}
+
+struct PrFileTreeRow {
+	path       string
+	name       string
+	depth      int
+	indent_px  int
+	is_dir     bool
+	is_new     bool
+	is_deleted bool
+	is_renamed bool
+	additions  int
+	deletions  int
+}
+
+fn render_pr_file_tree(file_tree []PrFileTreeRow) veb.RawHtml {
+	mut out := strings.new_builder(file_tree.len * 160)
+	for row in file_tree {
+		path := html_escape_text(row.path)
+		name := html_escape_text(row.name)
+		indent := row.indent_px
+		if row.is_dir {
+			out.write_string('<button type=button class="r d" q="${path}" style="--i:${indent}px" aria-expanded=true><b></b><span>${name}</span></button>')
+		} else {
+			status := row.status()
+			out.write_string('<a class="r f" href="#diff-${path}" p="${path}" style="--i:${indent}px" title="${path}"><b></b><span>${name}</span><em>${status}</em><small><b>+${row.additions}</b><i>-${row.deletions}</i></small></a>')
+		}
+	}
+	return veb.RawHtml(out.str())
+}
+
+fn (row PrFileTreeRow) status() string {
+	if row.is_new {
+		return 'A'
+	}
+	if row.is_deleted {
+		return 'D'
+	}
+	if row.is_renamed {
+		return 'R'
+	}
+	return 'M'
+}
+
+fn build_pr_file_tree_rows(file_diffs []FileDiff) []PrFileTreeRow {
+	mut sorted := file_diffs.clone()
+	sorted.sort(a.path < b.path)
+	mut rows := []PrFileTreeRow{}
+	mut seen_dirs := map[string]bool{}
+	for fd in sorted {
+		parts := fd.path.split('/')
+		if parts.len == 0 {
+			continue
+		}
+		mut current_path := ''
+		if parts.len > 1 {
+			for idx := 0; idx < parts.len - 1; idx++ {
+				part := parts[idx]
+				if part == '' {
+					continue
+				}
+				current_path = if current_path == '' { part } else { '${current_path}/${part}' }
+				if current_path !in seen_dirs {
+					seen_dirs[current_path] = true
+					rows << PrFileTreeRow{
+						path:      current_path
+						name:      part
+						depth:     idx
+						indent_px: 10 + idx * 16
+						is_dir:    true
+					}
+				}
+			}
+		}
+		rows << PrFileTreeRow{
+			path:       fd.path
+			name:       parts[parts.len - 1]
+			depth:      parts.len - 1
+			indent_px:  10 + (parts.len - 1) * 16
+			is_new:     fd.is_new
+			is_deleted: fd.is_deleted
+			is_renamed: fd.is_renamed
+			additions:  fd.additions
+			deletions:  fd.deletions
+		}
+	}
+	return rows
 }
 
 // GET /:username/:repo_name/pulls
@@ -225,6 +313,13 @@ pub fn (mut app App) pull_request_files(mut ctx Context, username string, repo_n
 	author := app.get_user_by_id(pr.author_id) or { return ctx.not_found() }
 	raw_diff := repo.diff_branches(pr.base_branch, pr.head_branch)
 	file_diffs := parse_unified_diff(raw_diff)
+	mut all_adds := 0
+	mut all_dels := 0
+	for fd in file_diffs {
+		all_adds += fd.additions
+		all_dels += fd.deletions
+	}
+	file_tree := build_pr_file_tree_rows(file_diffs)
 	rcomments := app.get_pr_review_comments(pr.id)
 	mut comments_by_key := map[string][]PrReviewCommentWithUser{}
 	for rc in rcomments {
@@ -235,6 +330,7 @@ pub fn (mut app App) pull_request_files(mut ctx Context, username string, repo_n
 			user: u
 		}
 	}
+	can_comment := ctx.logged_in && pr.is_open()
 	return $veb.html('templates/pull_files.html')
 }
 
@@ -538,9 +634,28 @@ fn merge_branches_in_bare(repo Repo, base string, head string, author string, me
 	return commit_sha
 }
 
-// render_inline_comments returns the HTML rows for any line comments
-// attached to a given diff line (matched on file_path, side, line_number).
-fn render_inline_comments(file_path string, dline DiffLine, comments_by_key map[string][]PrReviewCommentWithUser) veb.RawHtml {
+fn render_pr_diff_table(fd FileDiff, comments_by_key map[string][]PrReviewCommentWithUser, can_comment bool) veb.RawHtml {
+	mut out := strings.new_builder(1024)
+	out.write_string('<div class=pr-diff__table>')
+	for hunk in fd.hunks {
+		out.write_string(diff_hunk_header_html(hunk.header))
+		for dline in hunk.lines {
+			attrs := if can_comment && dline.kind != 'context' {
+				' s=${dline.compact_side()} l=${dline.effective_line()}'
+			} else {
+				''
+			}
+			out.write_string(diff_line_row_html_with_attrs(fd.path, dline, attrs))
+			out.write_string(inline_comments_html(fd.path, dline, comments_by_key))
+		}
+	}
+	out.write_string('</div>')
+	return veb.RawHtml(out.str())
+}
+
+// inline_comments_html returns any line comments attached to a given diff line,
+// matched on file_path, side, and line_number.
+fn inline_comments_html(file_path string, dline DiffLine, comments_by_key map[string][]PrReviewCommentWithUser) string {
 	mut side := ''
 	mut line_no := 0
 	if dline.kind == 'add' {
@@ -550,24 +665,21 @@ fn render_inline_comments(file_path string, dline DiffLine, comments_by_key map[
 		side = 'old'
 		line_no = dline.old_line
 	} else {
-		return veb.RawHtml('')
+		return ''
 	}
 	key := '${file_path}|${side}|${line_no}'
-	list := comments_by_key[key] or { return veb.RawHtml('') }
+	list := comments_by_key[key] or { return '' }
 	if list.len == 0 {
-		return veb.RawHtml('')
+		return ''
 	}
 	mut out := ''
 	for c in list {
 		body := html_escape_text(c.item.text)
 		username := html_escape_text(c.user.username)
 		rel := html_escape_text(c.item.relative())
-		out += '<tr class="pr-diff__inline-comment"><td colspan="4">' +
-			'<div class="pr-inline-comment">' +
-			'<strong>${username}</strong> <span class="pr-inline-comment__meta">commented ${rel}</span>' +
-			'<p>${body}</p>' + '</div></td></tr>'
+		out += '<p class=n><b>${username}</b> <i>commented ${rel}</i><br><s>${body}</s></p>'
 	}
-	return veb.RawHtml(out)
+	return out
 }
 
 // is_safe_ref does a strict whitelist check for branch names used in shell.

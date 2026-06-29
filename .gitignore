@@ -2,7 +2,9 @@ gitly
 tests/first_run
 bin/
 *.sqlite
+gitly.sqlite.bkup
 *.css
+*.xml
 *.css.map
 .sass-cache/
 .lite_workspace.lua
@@ -21,3 +23,9 @@ avatars/
 
 *~
 gitly.exe
+.claude
+build
+deploy
+gitly_linux
+gitly_ci
+gitly.sqlite*
