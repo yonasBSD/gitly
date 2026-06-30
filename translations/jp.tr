@@ -335,6 +335,9 @@ pr_comment_button
 pr_merge
 プルリクエストをマージ
 -----
+pr_squash_merge
+スカッシュしてマージ
+-----
 pr_close
 プルリクエストをクローズ
 -----
@@ -854,6 +857,9 @@ clone_size_limit_message
 clone_size_limit_purchase_premium
 PayPalでPremiumを$5で購入
 -----
+clone_size_limit_purchase_usdt
+4.50 USDTで支払う（10%割引）
+-----
 clone_size_limit_pricing_link
 Premiumプランを見る
 -----
@@ -887,6 +893,9 @@ pricing_per_month
 pricing_buy_premium
 PayPalでPremiumを購入
 -----
+pricing_buy_premium_usdt
+4.50 USDTで支払う（10%割引）
+-----
 pricing_premium_feature_one
 最大1 GBのリポジトリをクローンしてホスト
 -----
@@ -914,6 +923,9 @@ $19
 pricing_buy_ultimate
 PayPalでUltimateを購入
 -----
+pricing_buy_ultimate_usdt
+17.10 USDTで支払う（10%割引）
+-----
 pricing_ultimate_feature_one
 Premiumのすべて
 -----
@@ -934,4 +946,40 @@ pricing_payment_title
 -----
 pricing_payment_note
 支払いはPayPalで次の宛先に送信されます:
+-----
+pricing_usdt_title
+USDT支払い
+-----
+pricing_usdt_note
+USDT支払いには10%割引が適用されます。割引後の金額をこのウォレットに送信してください。
+-----
+pricing_usdt_wallet_label
+USDTウォレット:
+-----
+user_repos_col_name
+名前
+-----
+user_repos_col_issues
+# Issue
+-----
+user_repos_col_prs
+# PR
+-----
+user_repos_col_stars
+# スター
+-----
+user_repos_col_created
+作成日
+-----
+user_repos_col_activity
+最終アクティビティ日
+-----
+user_repos_unknown
+不明
+-----
+user_repo_public
+公開
+-----
+user_repo_private
+非公開
 -----

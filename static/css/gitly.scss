@@ -147,6 +147,16 @@ pre > code {
 	}
 }
 
+.clone-status-button--usdt {
+	background: #26a17b;
+	border: 1px solid #26a17b;
+
+	&:hover {
+		background: #1d7f61;
+		border-color: #1d7f61;
+	}
+}
+
 .clone-status-url {
 	color: $gray-dark;
 	margin: 10px auto 0;
@@ -611,6 +621,12 @@ form {
 	}
 }
 
+.pricing-plan__actions {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 10px;
+}
+
 .pricing-plan__button--secondary {
 	background: #0969da;
 	border-color: #0969da;
@@ -618,6 +634,16 @@ form {
 	&:hover {
 		background: #0550ae;
 		border-color: #0550ae;
+	}
+}
+
+.pricing-plan__button--usdt {
+	background: #26a17b;
+	border-color: #26a17b;
+
+	&:hover {
+		background: #1d7f61;
+		border-color: #1d7f61;
 	}
 }
 
@@ -643,6 +669,17 @@ form {
 
 	p {
 		color: $gray-dark;
+	}
+}
+
+.pricing-note--usdt {
+	code {
+		display: inline-block;
+		max-width: 100%;
+		padding: 3px 6px;
+		border-radius: $small-radius;
+		background: #f6f8fa;
+		overflow-wrap: anywhere;
 	}
 }
 
@@ -690,35 +727,81 @@ form {
 	}
 }
 
-.repo-list {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-
-.repo-card {
+.repo-table-wrap {
 	border: 1px solid $gray;
 	border-radius: $medium-radius;
-	padding: 14px 18px;
 	background-color: $white;
+	overflow-x: auto;
+}
+
+.repo-table {
+	width: 100%;
+	min-width: 900px;
+	border-collapse: collapse;
 	color: $black;
-	transition: border-color 0.1s, box-shadow 0.1s;
+}
+
+.repo-table th {
+	padding: 10px 16px;
+	border-bottom: 1px solid $gray;
+	background-color: #f6f8fa;
+	color: $gray-dark;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.repo-table th a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: $gray-dark;
 
 	&:hover {
-		border-color: #b8c7d8;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+		color: $link-color;
+		text-decoration: none;
 	}
 }
 
-.repo-card__header {
+.repo-table td {
+	padding: 12px 16px;
+	border-top: 1px solid #eef1f4;
+	font-size: 13px;
+	vertical-align: top;
+}
+
+.repo-table tbody tr:first-child td {
+	border-top: 0;
+}
+
+.repo-table tbody tr:hover {
+	background-color: #f6f8fa;
+}
+
+.repo-table__col-name {
+	width: 50%;
+}
+
+.repo-table__col-number {
+	width: 7%;
+	text-align: right !important;
+}
+
+.repo-table__col-date {
+	width: 14%;
+}
+
+.repo-table__repo-heading {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	margin-bottom: 4px;
+	flex-wrap: wrap;
+	min-width: 0;
 }
 
-.repo-card__title {
-	font-size: 17px;
+.repo-table__repo-name {
+	font-size: 15px;
 	font-weight: 600;
 	color: $link-color;
 
@@ -727,50 +810,7 @@ form {
 	}
 }
 
-.repo-card__footer {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-top: 8px;
-}
-
-.repo-card__footer-left {
-	display: flex;
-	align-items: center;
-	gap: 14px;
-	flex-wrap: wrap;
-	font-size: 12px;
-	color: $gray-dark;
-	flex: 1;
-	min-width: 0;
-}
-
-.repo-card__lang {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-}
-
-.repo-card__lang-dot {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.repo-card__updated {
-	color: $gray-dark;
-}
-
-.repo-card__activity {
-	flex-shrink: 0;
-	width: 120px;
-	height: 28px;
-	overflow: visible;
-}
-
-.repo-card__badge {
+.repo-table__badge {
 	font-size: 11px;
 	font-weight: 500;
 	padding: 1px 8px;
@@ -781,25 +821,38 @@ form {
 	line-height: 1.6;
 }
 
-.repo-card__badge--private {
+.repo-table__badge--private {
 	color: #9a6700;
 	border-color: #d4a72c;
 	background-color: #fff8c5;
 }
 
-.repo-card__desc {
-	margin: 4px 0 10px;
+.repo-table__desc {
+	margin: 4px 0 0;
 	color: $gray-dark;
-	font-size: 14px;
+	font-size: 13px;
 	line-height: 1.4;
 }
 
-.repo-card__meta {
-	display: flex;
-	gap: 18px;
-	flex-wrap: wrap;
-	font-size: 12px;
+.repo-table__number {
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
+.repo-table__date {
 	color: $gray-dark;
+	white-space: nowrap;
+}
+
+.repo-table__muted {
+	color: #8c959f;
+}
+
+.repo-table__sort {
+	min-width: 12px;
+	color: #8c959f;
+	font-size: 12px;
+	line-height: 1;
 }
 
 .repos-empty {

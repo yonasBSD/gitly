@@ -377,6 +377,9 @@ pr_comment_button
 pr_merge
 Слить пулреквест
 -----
+pr_squash_merge
+Сквошить и слить
+-----
 pr_close
 Закрыть пулреквест
 -----
@@ -1004,6 +1007,27 @@ user_view_all_repos
 user_no_repos
 Репозиториев пока нет.
 -----
+user_repos_col_name
+Название
+-----
+user_repos_col_issues
+# задач
+-----
+user_repos_col_prs
+# PR
+-----
+user_repos_col_stars
+# звёзд
+-----
+user_repos_col_created
+Дата создания
+-----
+user_repos_col_activity
+Дата последней активности
+-----
+user_repos_unknown
+Неизвестно
+-----
 user_repo_public
 Публичный
 -----
@@ -1052,6 +1076,9 @@ clone_size_limit_message
 clone_size_limit_purchase_premium
 Купить Premium за $5 через PayPal
 -----
+clone_size_limit_purchase_usdt
+Оплатить 4.50 USDT (-10%)
+-----
 clone_size_limit_pricing_link
 Посмотреть тарифы Premium
 -----
@@ -1085,6 +1112,9 @@ pricing_per_month
 pricing_buy_premium
 Купить Premium через PayPal
 -----
+pricing_buy_premium_usdt
+Оплатить 4.50 USDT (-10%)
+-----
 pricing_premium_feature_one
 Клонирование и хостинг репозиториев до 1 ГБ
 -----
@@ -1112,6 +1142,9 @@ $19
 pricing_buy_ultimate
 Купить Ultimate через PayPal
 -----
+pricing_buy_ultimate_usdt
+Оплатить 17.10 USDT (-10%)
+-----
 pricing_ultimate_feature_one
 Всё из Premium
 -----
@@ -1132,4 +1165,13 @@ pricing_payment_title
 -----
 pricing_payment_note
 Платежи принимаются через PayPal на
+-----
+pricing_usdt_title
+Оплата USDT
+-----
+pricing_usdt_note
+При оплате USDT действует скидка 10%. Отправьте сумму со скидкой на этот кошелёк.
+-----
+pricing_usdt_wallet_label
+USDT-кошелёк:
 -----

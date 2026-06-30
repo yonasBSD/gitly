@@ -335,6 +335,9 @@ Comentar
 pr_merge
 Fusionar pull request
 -----
+pr_squash_merge
+Squash y fusionar
+-----
 pr_close
 Cerrar pull request
 -----
@@ -854,6 +857,9 @@ Este repositorio supera los 100 MB. Compra una suscripción Premium por solo $5/
 clone_size_limit_purchase_premium
 Comprar Premium por $5 con PayPal
 -----
+clone_size_limit_purchase_usdt
+Pagar 4.50 USDT (-10%)
+-----
 clone_size_limit_pricing_link
 Ver planes Premium
 -----
@@ -887,6 +893,9 @@ al mes
 pricing_buy_premium
 Comprar Premium con PayPal
 -----
+pricing_buy_premium_usdt
+Pagar 4.50 USDT (-10%)
+-----
 pricing_premium_feature_one
 Clona y aloja repositorios de hasta 1 GB
 -----
@@ -914,6 +923,9 @@ $19
 pricing_buy_ultimate
 Comprar Ultimate con PayPal
 -----
+pricing_buy_ultimate_usdt
+Pagar 17.10 USDT (-10%)
+-----
 pricing_ultimate_feature_one
 Todo lo incluido en Premium
 -----
@@ -934,4 +946,40 @@ Pago
 -----
 pricing_payment_note
 Los pagos se gestionan con PayPal a
+-----
+pricing_usdt_title
+Pago con USDT
+-----
+pricing_usdt_note
+Los pagos con USDT incluyen un 10% de descuento. Envía el importe con descuento a esta billetera.
+-----
+pricing_usdt_wallet_label
+Billetera USDT:
+-----
+user_repos_col_name
+Nombre
+-----
+user_repos_col_issues
+# incidencias
+-----
+user_repos_col_prs
+# PRs
+-----
+user_repos_col_stars
+# estrellas
+-----
+user_repos_col_created
+Fecha de creación
+-----
+user_repos_col_activity
+Fecha de última actividad
+-----
+user_repos_unknown
+Desconocido
+-----
+user_repo_public
+Público
+-----
+user_repo_private
+Privado
 -----

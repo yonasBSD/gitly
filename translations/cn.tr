@@ -335,6 +335,9 @@ pr_comment_button
 pr_merge
 合并拉取请求
 -----
+pr_squash_merge
+压缩并合并
+-----
 pr_close
 关闭拉取请求
 -----
@@ -854,6 +857,9 @@ clone_size_limit_message
 clone_size_limit_purchase_premium
 用 PayPal 以 $5 购买 Premium
 -----
+clone_size_limit_purchase_usdt
+支付 4.50 USDT（九折）
+-----
 clone_size_limit_pricing_link
 查看 Premium 方案
 -----
@@ -887,6 +893,9 @@ pricing_per_month
 pricing_buy_premium
 用 PayPal 购买 Premium
 -----
+pricing_buy_premium_usdt
+支付 4.50 USDT（九折）
+-----
 pricing_premium_feature_one
 克隆并托管最大 1 GB 的仓库
 -----
@@ -914,6 +923,9 @@ $19
 pricing_buy_ultimate
 用 PayPal 购买 Ultimate
 -----
+pricing_buy_ultimate_usdt
+支付 17.10 USDT（九折）
+-----
 pricing_ultimate_feature_one
 包含 Premium 的全部功能
 -----
@@ -934,4 +946,40 @@ pricing_payment_title
 -----
 pricing_payment_note
 付款通过 PayPal 发送至
+-----
+pricing_usdt_title
+USDT 付款
+-----
+pricing_usdt_note
+USDT 付款享受 10% 折扣。请将折后金额发送到此钱包。
+-----
+pricing_usdt_wallet_label
+USDT 钱包：
+-----
+user_repos_col_name
+名称
+-----
+user_repos_col_issues
+# 问题
+-----
+user_repos_col_prs
+# PR
+-----
+user_repos_col_stars
+# 星标
+-----
+user_repos_col_created
+创建日期
+-----
+user_repos_col_activity
+最近活动日期
+-----
+user_repos_unknown
+未知
+-----
+user_repo_public
+公开
+-----
+user_repo_private
+私有
 -----

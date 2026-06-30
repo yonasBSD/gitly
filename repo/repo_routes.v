@@ -12,6 +12,92 @@ import config
 
 const top_files_limit = 50
 
+fn normalize_repo_sort_key(value string) string {
+	if value in ['name', 'issues', 'prs', 'stars', 'created', 'activity'] {
+		return value
+	}
+	return 'name'
+}
+
+fn repo_default_sort_dir(sort_by string) string {
+	if sort_by == 'name' {
+		return 'asc'
+	}
+	return 'desc'
+}
+
+fn normalize_repo_sort_dir(sort_by string, value string) string {
+	if value == 'asc' || value == 'desc' {
+		return value
+	}
+	return repo_default_sort_dir(sort_by)
+}
+
+fn compare_int(a int, b int) int {
+	if a < b {
+		return -1
+	}
+	if a > b {
+		return 1
+	}
+	return 0
+}
+
+fn compare_string(a string, b string) int {
+	if a < b {
+		return -1
+	}
+	if a > b {
+		return 1
+	}
+	return 0
+}
+
+fn compare_repo_names(a &Repo, b &Repo) int {
+	a_name := a.name.to_lower()
+	b_name := b.name.to_lower()
+	name_result := compare_string(a_name, b_name)
+	if name_result != 0 {
+		return name_result
+	}
+	return compare_int(a.id, b.id)
+}
+
+fn sort_user_repos(mut repos []Repo, sort_by string, sort_dir string) {
+	desc := sort_dir == 'desc'
+	repos.sort_with_compare(fn [sort_by, desc] (a &Repo, b &Repo) int {
+		primary := match sort_by {
+			'issues' { compare_int(a.nr_open_issues, b.nr_open_issues) }
+			'prs' { compare_int(a.nr_open_prs, b.nr_open_prs) }
+			'stars' { compare_int(a.nr_stars, b.nr_stars) }
+			'created' { compare_int(a.created_at, b.created_at) }
+			'activity' { compare_int(a.last_activity_at(), b.last_activity_at()) }
+			else { compare_repo_names(a, b) }
+		}
+
+		if primary != 0 {
+			return if desc { -primary } else { primary }
+		}
+		return compare_repo_names(a, b)
+	})
+}
+
+fn repo_sort_href(username string, current_sort string, current_dir string, target_sort string) string {
+	next_dir := if current_sort == target_sort {
+		if current_dir == 'asc' { 'desc' } else { 'asc' }
+	} else {
+		repo_default_sort_dir(target_sort)
+	}
+	return '/${username}/repos?sort=${target_sort}&dir=${next_dir}'
+}
+
+fn repo_sort_indicator(current_sort string, current_dir string, target_sort string) string {
+	if current_sort != target_sort {
+		return ''
+	}
+	return if current_dir == 'asc' { '↑' } else { '↓' }
+}
+
 @['/:username/repos']
 pub fn (mut app App) user_repos(username string) veb.Result {
 	exists, user := app.check_username(username)
@@ -27,10 +113,17 @@ pub fn (mut app App) user_repos(username string) veb.Result {
 	}
 
 	for mut repo in repos {
-		repo.lang_stats = app.find_repo_lang_stats(repo.id)
 		repo.latest_commit_at = app.find_repo_last_commit_time(repo.id)
-		repo.activity_buckets = app.get_repo_activity_buckets(repo.id)
+		issue_count := app.get_repo_issue_count(repo.id)
+		if repo.nr_open_issues != issue_count {
+			repo.nr_open_issues = issue_count
+			app.sync_repo_open_issue_count(repo.id) or { app.info(err.str()) }
+		}
 	}
+
+	sort_by := normalize_repo_sort_key(ctx.query['sort'] or { 'name' })
+	sort_dir := normalize_repo_sort_dir(sort_by, ctx.query['dir'] or { '' })
+	sort_user_repos(mut repos, sort_by, sort_dir)
 
 	return $veb.html('templates/user/repos.html')
 }
@@ -300,6 +393,7 @@ pub fn (mut app App) handle_new_repo(mut ctx Context, name string, clone_url str
 		user_name:      owner_name
 		clone_url:      valid_clone_url
 		is_public:      is_public
+		created_at:     int(time.now().unix())
 	}
 	import_issues := ctx.form['import_issues'] == '1'
 	import_prs := ctx.form['import_prs'] == '1'
@@ -389,7 +483,6 @@ fn should_enforce_clone_size_limit(is_admin bool, not_self_hosted bool) bool {
 
 fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, import_prs bool, owner_user_id int, enforce_clone_size_limit bool) {
 	mut cloned_repo := new_repo
-	cloned_repo.clone(enforce_clone_size_limit)
 	// Use a dedicated DB connection for the clone thread to avoid
 	// sharing a connection across threads.
 	mut app := &App{
@@ -399,6 +492,15 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, import_prs 
 		}
 		config: conf
 	}
+	if source_repo := app.find_reusable_clone_source(cloned_repo.clone_url, cloned_repo.id) {
+		eprintln('[clone] reusing local clone source repo_id=${source_repo.id} path=${source_repo.git_dir}')
+		reuse_result := cloned_repo.clone_from_existing(source_repo, enforce_clone_size_limit)
+		if reuse_result == .unavailable {
+			cloned_repo.clone(enforce_clone_size_limit)
+		}
+	} else {
+		cloned_repo.clone(enforce_clone_size_limit)
+	}
 	if cloned_repo.status == .clone_failed {
 		app.set_repo_status(cloned_repo.id, .clone_failed) or {
 			eprintln('cannot set repo status ${err}')
@@ -406,14 +508,13 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, import_prs 
 		app.db.close() or {}
 		return
 	}
-	// Mark repo as done immediately so the user can browse it.
-	// The tree page will fetch files from git on demand.
-	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
-	eprintln('clone done, repo available — indexing in background')
+	app.update_repo_primary_branch(cloned_repo.id, cloned_repo.primary_branch) or {
+		eprintln('cannot update repo primary branch ${err}')
+	}
 	// For GitHub clones, also pull the repo description and contributors list.
 	// Issue and PR imports are gated on separate user opt-ins. Open PR refs are
 	// fetched before indexing so the branch scanner sees pr/<number> branches.
-	if cloned_repo.clone_url.contains('github.com') {
+	if is_github_clone_url(cloned_repo.clone_url) {
 		eprintln('[clone] github imports repo_id=${cloned_repo.id} import_issues=${import_issues} import_prs=${import_prs}')
 		if import_prs {
 			app.import_github_pull_requests(cloned_repo, owner_user_id) or {
@@ -427,6 +528,10 @@ fn clone_repo(new_repo Repo, conf config.Config, import_issues bool, import_prs 
 				conf)
 		}
 	}
+	// Mark repo as done after clone-time imports that affect first page views.
+	// The tree page will fetch files from git on demand while indexing continues.
+	app.set_repo_status(cloned_repo.id, .done) or { eprintln('cannot set repo status ${err}') }
+	eprintln('clone done, repo available — indexing in background')
 	// Index branches, commits, and language stats in the background.
 	app.update_repo_from_fs(mut cloned_repo, true) or {
 		eprintln('cannot update repo from fs ${err}')

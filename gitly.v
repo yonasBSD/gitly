@@ -41,6 +41,7 @@ pub struct Context {
 mut:
 	user           User
 	current_path   string
+	page_title     string
 	page_gen_time  string
 	page_gen_start i64
 	is_tree        bool
@@ -74,22 +75,12 @@ fn new_app() !&App {
 
 	app.setup_logger()
 
-	version_path := os.join_path('static', 'assets', 'version')
-	create_directory_if_not_exists(os.dir(version_path))
-
-	stored_version := os.read_file(version_path) or { 'unknown' }
-	mut version := stored_version
 	git_result := git.Git.exec(['rev-parse', '--short', 'HEAD'])
-
 	if git_result.exit_code == 0 && !git_result.output.contains('fatal') {
-		version = git_result.output.trim_space()
+		app.version = git_result.output.trim_space()
+	} else {
+		app.version = 'unknown'
 	}
-
-	if version != stored_version {
-		os.write_file(version_path, version) or { panic(err) }
-	}
-
-	app.version = version
 
 	build_unix := os.file_last_mod_unix(os.executable())
 	app.build_time = time.unix(build_unix).format()
@@ -147,6 +138,7 @@ pub fn (mut app App) init_server() {
 
 pub fn (mut app App) before_request(mut ctx Context) bool {
 	ctx.page_gen_start = time.ticks()
+	ctx.set_page_title_from_path(ctx.req.url)
 	$if trace_prealloc ? {
 		unsafe { prealloc_scope_checkpoint(c'gitly before_request start') }
 	}
@@ -223,6 +215,93 @@ pub fn (mut ctx Context) redirect_to_login() veb.Result {
 
 pub fn (mut ctx Context) redirect_to_repository(username string, repo_name string) veb.Result {
 	return ctx.redirect('/${username}/${repo_name}')
+}
+
+fn (mut ctx Context) set_page_title(parts []string) {
+	mut clean_parts := []string{}
+	for part in parts {
+		clean := part.replace('\r', ' ').replace('\n', ' ').trim_space()
+		if clean != '' {
+			clean_parts << clean
+		}
+	}
+	clean_parts << 'Gitly'
+	ctx.page_title = clean_parts.join(' - ')
+}
+
+fn (mut ctx Context) set_page_title_from_path(raw_url string) {
+	path := raw_url.all_before('?').trim('/')
+	if path == '' {
+		ctx.set_page_title([]string{})
+		return
+	}
+
+	segments := path.split('/')
+	if segments.len >= 2 && segments[0] == 'api' {
+		ctx.set_page_title([]string{})
+		return
+	}
+	if segments.len >= 4 && segments[2] in ['issue', 'pull'] {
+		ctx.set_page_title(['${page_title_label(segments[2])} #${segments[3]}',
+			'${segments[0]}/${segments[1]}'])
+		return
+	}
+	if segments.len >= 3 {
+		ctx.set_page_title([page_title_label(segments[2]), '${segments[0]}/${segments[1]}'])
+		return
+	}
+	if segments.len == 2 {
+		if is_user_page_segment(segments[1]) {
+			ctx.set_page_title([page_title_label(segments[1]), segments[0]])
+		} else {
+			ctx.set_page_title(['${segments[0]}/${segments[1]}'])
+		}
+		return
+	}
+	ctx.set_page_title([page_title_label(segments[0])])
+}
+
+fn is_user_page_segment(slug string) bool {
+	return slug in ['feed', 'issues', 'pulls', 'repos', 'settings', 'stars']
+}
+
+fn page_title_label(slug string) string {
+	return match slug {
+		'2fa' { 'Two-factor authentication' }
+		'api-tokens' { 'API tokens' }
+		'blob' { 'File' }
+		'branches' { 'Branches' }
+		'ci' { 'CI' }
+		'commit' { 'Commit' }
+		'compare' { 'New pull request' }
+		'contributors' { 'Contributors' }
+		'discussions' { 'Discussions' }
+		'edit' { 'Edit file' }
+		'feed' { 'Feed' }
+		'issue' { 'Issue' }
+		'issues' { 'Issues' }
+		'login' { 'Login' }
+		'milestones' { 'Milestones' }
+		'new' { 'New repository' }
+		'open-source' { 'Open source' }
+		'organizations' { 'Organizations' }
+		'pricing' { 'Pricing' }
+		'projects' { 'Projects' }
+		'pull' { 'Pull request' }
+		'pulls' { 'Pull requests' }
+		'register' { 'Register' }
+		'releases' { 'Releases' }
+		'repos' { 'Repositories' }
+		'search' { 'Search' }
+		'security' { 'Security' }
+		'settings' { 'Settings' }
+		'ssh-keys' { 'SSH keys' }
+		'stars' { 'Stars' }
+		'tag' { 'Tag' }
+		'tree' { 'Code' }
+		'webhooks' { 'Webhooks' }
+		else { slug.replace('-', ' ').replace('_', ' ') }
+	}
 }
 
 fn (mut app App) create_tables() ! {
@@ -358,8 +437,15 @@ fn (mut app App) migrate_tables() ! {
 	app.add_missing_column('Repo', 'disable_milestones', db_bool_column_type())!
 	app.add_missing_column('Repo', 'disable_wiki', db_bool_column_type())!
 	app.add_missing_column('Repo', 'is_pinned', db_bool_column_type())!
+	app.add_missing_column('Repo', 'created_at', 'INTEGER NOT NULL DEFAULT 0')!
+	app.backfill_repo_created_at()!
 
 	app.db.exec('create index if not exists idx_commit_repo_created on ${sql_table('Commit')} (repo_id, created_at desc)')!
+}
+
+fn (mut app App) backfill_repo_created_at() ! {
+	created_at := int(time.now().unix())
+	app.db.exec('update ${sql_table('Repo')} set ${sql_table('created_at')} = ${created_at} where ${sql_table('created_at')} is null or ${sql_table('created_at')} <= 0')!
 }
 
 fn (mut app App) add_missing_column(table_name string, column_name string, column_type string) ! {
